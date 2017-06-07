@@ -17,7 +17,9 @@ public class Wall : MonoBehaviour
         MapUtil.m_MapGirdUnitySize = m_MapGirdUnitySize;
         MapUtil.Init();
 
+#if UNITY_EDITOR
         DrawMap();
+#endif
     }
 
     void OnGUI()
@@ -25,7 +27,7 @@ public class Wall : MonoBehaviour
         GUILayout.BeginVertical();
         if (GUILayout.Button("Set", GUILayout.MinHeight(40), GUILayout.MinWidth(80)))
         {
-            if (MapUtil.m_SelectId == 0 
+            if (MapUtil.m_SelectId == 0
                 || MapUtil.m_SelectOK)
             {
                 Debug.LogWarning("空");
@@ -44,6 +46,7 @@ public class Wall : MonoBehaviour
         GUILayout.EndVertical();
     }
 
+#if UNITY_EDITOR
     private void DrawMap()
     {
         for (int i = 0; i <= m_MapSize.x; i++)//竖线
@@ -60,4 +63,5 @@ public class Wall : MonoBehaviour
                 .SetColor(Color.black);
         }
     }
+#endif
 }
