@@ -22,15 +22,26 @@ public class Wall : MonoBehaviour
 
     void OnGUI()
     {
-        if (GUILayout.Button("Set"))
+        GUILayout.BeginVertical();
+        if (GUILayout.Button("Set", GUILayout.MinHeight(40), GUILayout.MinWidth(80)))
         {
             if (MapUtil.m_SelectId == 0 
                 || MapUtil.m_SelectOK)
             {
+                Debug.LogWarning("空");
                 return;
             }
             JerryEventMgr.DispatchEvent(Enum_Event.SetOne.ToString(), new object[] { MapUtil.m_SelectId });
         }
+        if (GUILayout.Button("Init", GUILayout.MinHeight(40), GUILayout.MinWidth(80)))
+        {
+            Drag[] drags = this.transform.parent.GetComponentsInChildren<Drag>();
+            foreach (Drag d in drags)
+            {
+                d.Init();
+            }
+        }
+        GUILayout.EndVertical();
     }
 
     private void DrawMap()

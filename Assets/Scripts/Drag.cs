@@ -34,19 +34,19 @@ public class Drag : MonoBehaviour
     private Vector3 m_AdjustPar;
 
     [ContextMenu("DoInit")]
-    private void Init()
+    public void Init()
     {
-        m_MinPos = MapUtil.Grid2Pos(new Vector3(0, 0, 0)) 
-            + new Vector3((int)(m_GridSize.x / 2 / MapUtil.m_MapGirdUnitySize.x), (int)(m_GridSize.y / 2 / MapUtil.m_MapGirdUnitySize.y), 0);
+        m_MinPos = MapUtil.m_MapStartPos + new Vector3(m_GridSize.x * MapUtil.m_MapGirdUnitySize.x / 2, m_GridSize.y * MapUtil.m_MapGirdUnitySize.y / 2, 0);
+        m_MaxPos = MapUtil.m_MapStartPos
+                + new Vector3(MapUtil.m_MapSize.x * MapUtil.m_MapGirdUnitySize.x, MapUtil.m_MapSize.y * MapUtil.m_MapGirdUnitySize.y, 0)
+                - new Vector3(m_GridSize.x * MapUtil.m_MapGirdUnitySize.x / 2, m_GridSize.y * MapUtil.m_MapGirdUnitySize.y / 2, 0);
 
         if (m_OnFloor)
         {
-            m_MaxPos = MapUtil.Grid2Pos(new Vector3(0, MapUtil.m_MapSize.y - 1, 0));
+            m_MaxPos.y = m_MinPos.y;
         }
-        else
-        {
-            m_MaxPos = MapUtil.Grid2Pos(new Vector3(MapUtil.m_MapSize.x - 1, MapUtil.m_MapSize.y - 1, 0));
-        }
+
+        Debug.LogWarning(m_MinPos + " " + m_MaxPos);
 
         m_AdjustPar = Vector2.zero;
         if (((int)m_GridSize.x) % 2 == 0)
@@ -82,7 +82,7 @@ public class Drag : MonoBehaviour
                     yield break;
                 }
 
-                JerryEventMgr.DispatchEvent(Enum_Event.SelectOne.ToString(), new object[] { m_Id });
+                MapUtil.m_SelectId = m_Id;
 
                 m_Pos = this.transform.position;
                 m_Pos.z = -m_GridSize.z / 2.0f - 0.5f;
