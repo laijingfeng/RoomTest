@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>JerryEvent</name>
+    </assembly>
+    <members>
+        <member name="F:Jerry.UGUIEventListener.onClick">
+            <summary>
+            点击1
+            </summary>
+        </member>
+        <member name="F:Jerry.UGUIEventListener.onClick2">
+            <summary>
+            点击2，和点击1相比，回调参数不一样
+            </summary>
+        </member>
+        <member name="M:Jerry.UGUIEventListener.Get(UnityEngine.GameObject,System.Object[],System.Boolean)">
+            <summary>
+            获得监听
+            </summary>
+            <param name="go"></param>
+            <param name="userData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Jerry.UGUIEventListener.GetData(UnityEngine.GameObject)">
+            <summary>
+            获得用户数据
+            </summary>
+            <param name="go"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Jerry.UGUIEventListener.SetData(System.Object[])">
+            <summary>
+            设置用户数据
+            </summary>
+            <param name="userData"></param>
+        </member>
+        <member name="M:Jerry.UGUIEventListener.SetCanSelected(System.Boolean)">
+            <summary>
+            设置能被选中
+            </summary>
+            <param name="canSelected"></param>
+        </member>
+    </members>
+</doc>

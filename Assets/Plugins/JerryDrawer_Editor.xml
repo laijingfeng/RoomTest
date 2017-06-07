@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>JerryDrawer_Editor</name>
+    </assembly>
+    <members>
+        <member name="F:Jerry.DrawerElementBase._id">
+            <summary>
+            id
+            </summary>
+        </member>
+        <member name="F:Jerry.DrawerElementBase._createTime">
+            <summary>
+            创建时间
+            </summary>
+        </member>
+        <member name="F:Jerry.DrawerElementBase._life">
+            <summary>
+            生命周期，小于等于0表示无穷，单位秒
+            </summary>
+        </member>
+        <member name="F:Jerry.DrawerElementBase._color">
+            <summary>
+            颜色
+            </summary>
+        </member>
+        <member name="F:Jerry.DrawerElementBase._executeInEditMode">
+            <summary>
+            是否支持编辑模式运行
+            </summary>
+        </member>
+        <member name="F:Jerry.DrawerElementBase._onlyDrawSelected">
+            <summary>
+            选中才绘制
+            </summary>
+        </member>
+        <member name="M:Jerry.DrawerElementBase.Start">
+            <summary>
+            为了脚本可以在Inspector开关
+            </summary>
+        </member>
+        <member name="M:Jerry.DrawerElementBase.SetExecuteInEditMode(System.Boolean)">
+            <summary>
+            编辑器模式可用
+            </summary>
+            <param name="executeInEditMode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Jerry.DrawerElementBase.Live">
+            <summary>
+            是否存活
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Jerry.DrawerElementBase.Draw">
+            <summary>
+            绘制
+            </summary>
+            <returns>是否继续往子类传递</returns>
+        </member>
+        <member name="F:Jerry.DrawerElementCube._useVectorPoint">
+            <summary>
+            点使用Vector而不是Transform
+            </summary>
+        </member>
+        <member name="F:Jerry.DrawerElementLabel._useVectorPoint">
+            <summary>
+            点使用Vector而不是Transform
+            </summary>
+        </member>
+        <member name="F:Jerry.DrawerElementPath._useVectorPoint">
+            <summary>
+            点使用Vector而不是Transform
+            </summary>
+        </member>
+    </members>
+</doc>
