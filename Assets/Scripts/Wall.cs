@@ -10,6 +10,9 @@ public class Wall : MonoBehaviour
     public Vector2 m_MapSize;
     public Vector2 m_MapGirdUnitySize;
 
+    private Ray m_Ray;
+    private RaycastHit m_HitInfo;
+
     void Awake()
     {
         MapUtil.m_MapStartPos = m_MapStartPos;
@@ -20,6 +23,27 @@ public class Wall : MonoBehaviour
 #if UNITY_EDITOR
         DrawMap();
 #endif
+    }
+
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            m_Ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(m_Ray, out m_HitInfo, 100))
+            {
+                if (m_HitInfo.collider == null 
+                    || m_HitInfo.collider.gameObject == null)
+                {
+                    return;
+                }
+                if (m_HitInfo.collider.tag == "Wall")
+                {
+
+                }
+            }
+        }
     }
 
     void OnGUI()
