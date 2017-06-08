@@ -60,7 +60,7 @@ public class Drag : MonoBehaviour
                 }
                 break;
         }
-        Place2Pos(pos, true);
+        Place2Pos(pos, first);
     }
 
     IEnumerator OnMouseDown()
@@ -113,7 +113,6 @@ public class Drag : MonoBehaviour
     {
         MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, true, ref pos);
         m_Pos = AdjustPos(pos);
-
         Enum_Wall changeType = Enum_Wall.None;
 
         if (m_InitData.m_CurWall == Enum_Wall.Wall)

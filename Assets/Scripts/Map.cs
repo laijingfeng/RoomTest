@@ -126,7 +126,7 @@ public class Map
         }
         else
         {
-            if (((int)size.z) % 2 == 0)
+            if (((int)size.x) % 2 == 0)
             {
                 ret.z = MapUtil.m_MapGridUnityLen;
             }
