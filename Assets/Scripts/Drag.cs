@@ -12,62 +12,35 @@ public class Drag : MonoBehaviour
     /// 贴地
     /// </summary>
     public bool m_OnFloor = false;
+
     /// <summary>
     /// id
     /// </summary>
-    public int m_Id;
+    private int m_Id;
 
     /// <summary>
     /// 选中
     /// </summary>
     private bool m_Selected = false;
 
-    /// <summary>
-    /// 曾经放过
-    /// </summary>
-    private bool m_HadSet = false;
-
     private Vector3 m_Pos;
 
-    private Vector2 m_MinPos;
-    private Vector2 m_MaxPos;
-    private Vector3 m_AdjustPar;
+    private DragInitData m_InitData = null;
 
-    [ContextMenu("DoInit")]
-    public void Init()
+    void Awake()
     {
-        m_MinPos = MapUtil.m_MapStartPos + new Vector3(m_GridSize.x * MapUtil.m_MapGridUnityLen / 2, m_GridSize.y * MapUtil.m_MapGridUnityLen / 2, 0);
-        m_MaxPos = MapUtil.m_MapStartPos
-                + new Vector3(MapUtil.m_MapSize.x * MapUtil.m_MapGridUnityLen, MapUtil.m_MapSize.y * MapUtil.m_MapGridUnityLen, 0)
-                - new Vector3(m_GridSize.x * MapUtil.m_MapGridUnityLen / 2, m_GridSize.y * MapUtil.m_MapGridUnityLen / 2, 0);
-
-        if (m_OnFloor)
-        {
-            m_MaxPos.y = m_MinPos.y;
-        }
-
-        Debug.LogWarning(m_MinPos + " " + m_MaxPos);
-
-        m_AdjustPar = Vector2.zero;
-        if (((int)m_GridSize.x) % 2 == 0)
-        {
-            m_AdjustPar.x = MapUtil.m_MapGridUnityLen;
-        }
-        else
-        {
-            m_AdjustPar.x = MapUtil.m_MapGridUnityLen / 2;
-        }
-        if (((int)m_GridSize.y) % 2 == 0)
-        {
-            m_AdjustPar.y = MapUtil.m_MapGridUnityLen;
-        }
-        else
-        {
-            m_AdjustPar.y = MapUtil.m_MapGridUnityLen / 2;
-        }
+        m_Id = Util.IDGenerator(m_Id);
+        m_InitData = new DragInitData();
+        m_InitData.isNew = true;
 
         JerryEventMgr.AddEvent(Enum_Event.SetOne.ToString(), EventSetOne);
         JerryEventMgr.AddEvent(Enum_Event.Place2Pos.ToString(), EventPlace2Pos);
+    }
+
+    public void Init()
+    {
+        m_InitData.m_CurPos = this.transform.position;
+        m_InitData = MapUtil.InitDrag(m_GridSize, m_OnFloor, m_InitData);
     }
 
     IEnumerator OnMouseDown()
@@ -83,19 +56,20 @@ public class Drag : MonoBehaviour
                     yield break;
                 }
 
+                if (m_InitData.isNew)
+                {
+                    Init();
+                    Place2Pos(this.transform.position);
+                }
+                else if (m_InitData.m_CurWall != Enum_Wall.None)
+                {
+                    MapUtil.GetMap(m_InitData.m_CurWall).CleanOne(this.transform.position, m_GridSize);
+                }
+
+                m_InitData.isNew = false;
                 MapUtil.m_SelectId = m_Id;
-
-                m_Pos = this.transform.position;
-                m_Pos = AdjustZ(m_Pos, true);
-                this.transform.position = m_Pos;
-
                 m_Selected = true;
                 MapUtil.m_SelectOK = false;
-
-                if (m_HadSet)
-                {
-                    MapUtil.CleanOne(this.transform.position, m_GridSize);
-                }
             }
 
             Vector3 screenPosition = camera.WorldToScreenPoint(transform.position);
@@ -117,35 +91,38 @@ public class Drag : MonoBehaviour
 
     private void Place2Pos(Vector3 pos)
     {
-        pos = AdjustZ(pos, true);
+        MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, true, ref pos);
         m_Pos = AdjustPos(pos);
-        m_Pos.x = Mathf.Clamp(m_Pos.x, m_MinPos.x, m_MaxPos.x);
-        m_Pos.y = Mathf.Clamp(m_Pos.y, m_MinPos.y, m_MaxPos.y);
+        if (m_InitData.m_CurWall == Enum_Wall.Wall)
+        {
+            m_Pos.x = Mathf.Clamp(m_Pos.x, m_InitData.m_MinPos.x, m_InitData.m_MaxPos.x);
+        }
+        else
+        {
+            m_Pos.z = Mathf.Clamp(m_Pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z);
+        }
+        m_Pos.y = Mathf.Clamp(m_Pos.y, m_InitData.m_MinPos.y, m_InitData.m_MaxPos.y);
         transform.position = m_Pos;
     }
 
     private Vector3 AdjustPos(Vector3 pos)
     {
-        Vector3 v = new Vector3((int)(pos.x / m_AdjustPar.x), (int)(pos.y / m_AdjustPar.y));
-        pos.x = MyClamp(pos.x, m_AdjustPar.x * v.x, m_AdjustPar.x * (v.x + 1 * Mathf.Sign(v.x)));
-        pos.y = MyClamp(pos.y, m_AdjustPar.y * v.y, m_AdjustPar.y * (v.y + 1 * Mathf.Sign(v.y)));
+        Vector3 v = new Vector3((int)(pos.x / m_InitData.m_AdjustPar.x), (int)(pos.y / m_InitData.m_AdjustPar.y), (int)(pos.z / m_InitData.m_AdjustPar.z));
+        if (m_InitData.m_CurWall == Enum_Wall.Wall)
+        {
+            pos.x = MyClamp(pos.x, m_InitData.m_AdjustPar.x * v.x, m_InitData.m_AdjustPar.x * (v.x + 1 * Mathf.Sign(v.x)));
+        }
+        else
+        {
+            pos.z = MyClamp(pos.z, m_InitData.m_AdjustPar.z * v.z, m_InitData.m_AdjustPar.z * (v.z + 1 * Mathf.Sign(v.z)));
+        }
+        pos.y = MyClamp(pos.y, m_InitData.m_AdjustPar.y * v.y, m_InitData.m_AdjustPar.y * (v.y + 1 * Mathf.Sign(v.y)));
         return pos;
     }
-
 
     private float MyClamp(float x, float v1, float v2)
     {
         return Mathf.Abs(v1 - x) > Mathf.Abs(v2 - x) ? v2 : v1;
-    }
-
-    private Vector3 AdjustZ(Vector3 pos, bool floating)
-    {
-        pos.z = MapUtil.m_MapStartPos.z - m_GridSize.z * MapUtil.m_MapGridUnityLen / 2.0f;
-        if (floating)
-        {
-            pos.z -= 0.3f;
-        }
-        return pos;
     }
 
     #region 事件
@@ -168,16 +145,15 @@ public class Drag : MonoBehaviour
             return;
         }
 
-        if (MapUtil.SetOne(this.transform.position, m_GridSize))
+        if (MapUtil.GetMap(m_InitData.m_CurWall).SetOne(this.transform.position, m_GridSize))
         {
             MapUtil.m_SelectOK = true;
             MapUtil.m_SelectId = 0;
 
             m_Selected = false;
-            m_HadSet = true;
 
             m_Pos = this.transform.position;
-            m_Pos = AdjustZ(m_Pos, false);
+            MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
             this.transform.position = m_Pos;
 
             Debug.LogWarning("设置OK");

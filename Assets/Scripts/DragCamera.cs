@@ -77,9 +77,9 @@ public class DragCamera : MonoBehaviour
 
     void OnGUI()
     {
-        GUILayout.BeginHorizontal();
-        GUILayout.Label(m_Info);
-        GUILayout.EndHorizontal();
+        //GUILayout.BeginHorizontal();
+        //GUILayout.Label(m_Info);
+        //GUILayout.EndHorizontal();
     }
 
     private void UpdatePC()

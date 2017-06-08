@@ -1,12 +1,5 @@
 ﻿using UnityEngine;
 
-public enum Enum_Event
-{
-    None = 0,
-    SetOne,
-    Place2Pos,
-}
-
 public class Util
 {
     /// <summary>
@@ -37,4 +30,44 @@ public class Util
         pos.z = 0;
         return pos;
     }
+
+    private static int m_IdFactor = 0;
+    public static int IDGenerator(int id)
+    {
+        if (id == 0)
+        {
+            id = ++m_IdFactor;
+        }
+        return id;
+    }
+}
+
+public enum Enum_Event
+{
+    None = 0,
+    SetOne,
+    Place2Pos,
+}
+
+public enum Enum_Wall
+{
+    None = 0,
+    Left,
+    Wall,
+    Right,
+}
+
+public class DragInitData
+{
+    public Vector3 m_MinPos;
+    public Vector3 m_MaxPos;
+    public Vector3 m_AdjustPar;
+
+    public bool isNew = false;
+
+    public Enum_Wall m_CurWall = Enum_Wall.None;
+    public Vector3 m_CurPos = Vector3.zero;
+
+    public Enum_Wall m_LastWall = Enum_Wall.None;
+    public Vector3 m_LastPos = Vector3.zero;
 }

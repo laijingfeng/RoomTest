@@ -96,7 +96,6 @@ GameObject:
   - 33: {fileID: 817020242}
   - 65: {fileID: 817020241}
   - 23: {fileID: 817020240}
-  - 114: {fileID: 817020239}
   m_Layer: 8
   m_Name: LeftSideWall
   m_TagString: Untagged
@@ -110,27 +109,12 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 817020237}
-  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071067}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -7.1, y: 2.5, z: -3.5}
-  m_LocalScale: {x: 7, y: 5, z: 0.2}
+  m_LocalScale: {x: 0.2, y: 5, z: 7}
   m_Children: []
   m_Father: {fileID: 1537739283}
   m_RootOrder: 4
---- !u!114 &817020239
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 817020237}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a6a8bac1f8175d46b34c6b757276117, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_WallStartPos: {x: 0, y: 0, z: 0}
-  m_WallSize: {x: 0, y: 0}
-  m_MapGridUnityLen: 0
-  m_CanClickPlaceObj: 0
 --- !u!23 &817020240
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -520,6 +504,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_WallStartPos: {x: -7, y: 0, z: 0}
   m_WallSize: {x: 28, y: 10}
+  m_LeftSideWallStartPos: {x: -7, y: 0, z: -7}
+  m_LeftSideWallSize: {x: 0, y: 10, z: 14}
   m_MapGridUnityLen: 0.5
   m_CanClickPlaceObj: 0
 --- !u!1 &1537739282
