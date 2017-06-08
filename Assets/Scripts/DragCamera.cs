@@ -1,11 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 using Jerry;
 
 public class DragCamera : MonoBehaviour
 {
-    private string m_Info = "touch to start";
-
     public float m_MinSwipeDistance = 0.1f;
 
     /// <summary>
@@ -73,13 +70,6 @@ public class DragCamera : MonoBehaviour
         {
             UpdatePC();
         }
-    }
-
-    void OnGUI()
-    {
-        //GUILayout.BeginHorizontal();
-        //GUILayout.Label(m_Info);
-        //GUILayout.EndHorizontal();
     }
 
     private void UpdatePC()
@@ -182,14 +172,23 @@ public class DragCamera : MonoBehaviour
         {
             GestureEvent(GestureDir.Up);
         }
-        else
-        {
-            m_Info = "touch false";
-        }
     }
 
     private void GestureEvent(GestureDir dir)
     {
-        m_Info = "touch ok:" + dir.ToString();
+        Debug.LogWarning("dir:" + dir);
+        switch (dir)
+        {
+            case GestureDir.Left:
+                {
+                    Camera.main.transform.eulerAngles += new Vector3(0, -5, 0);
+                }
+                break;
+            case GestureDir.Right:
+                {
+                    Camera.main.transform.eulerAngles += new Vector3(0, 5, 0);
+                }
+                break;
+        }
     }
 }
