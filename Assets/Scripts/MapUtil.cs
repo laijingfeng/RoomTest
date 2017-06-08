@@ -57,7 +57,7 @@ public class MapUtil
         }
 
         oldData.m_CurWall = wall;
-        
+
         GetMap(oldData.m_CurWall).GetMinMaxPos(size, onFloor, ref oldData);
         oldData.m_AdjustPar = GetMap(oldData.m_CurWall).GetAdjustPar(size);
 
@@ -70,7 +70,7 @@ public class MapUtil
         ret.pos = Vector3.zero;
         ret.wallType = Enum_Wall.Wall;
 
-        Ray ray = Camera.main.ScreenPointToRay(new Vector3(269.0f, 514f, 0f));
+        Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
         RaycastHit hitInfo;
         if (Physics.Raycast(ray, out hitInfo, 100,
             JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
@@ -86,7 +86,7 @@ public class MapUtil
             {
                 ret.pos = hitInfo.point;
                 string layerName = LayerMask.LayerToName(hitInfo.collider.gameObject.layer);
-                switch(layerName)
+                switch (layerName)
                 {
                     case "Wall":
                         {
@@ -103,7 +103,7 @@ public class MapUtil
                             ret.wallType = Enum_Wall.RightWall;
                         }
                         break;
-                } 
+                }
             }
         }
         return ret;

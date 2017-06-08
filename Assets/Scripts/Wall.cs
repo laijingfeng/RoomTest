@@ -67,8 +67,8 @@ public class Wall : MonoBehaviour
 
     void OnGUI()
     {
-        GUILayout.BeginVertical();
-        if (GUILayout.Button("Set", GUILayout.MinHeight(40), GUILayout.MinWidth(80)))
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("Set", GUILayout.MinHeight(60), GUILayout.MinWidth(100)))
         {
             if (MapUtil.m_SelectId == 0
                 || MapUtil.m_SelectOK)
@@ -79,12 +79,12 @@ public class Wall : MonoBehaviour
             JerryEventMgr.DispatchEvent(Enum_Event.SetOne.ToString(), new object[] { MapUtil.m_SelectId });
         }
 
-        if (GUILayout.Button("+", GUILayout.MinHeight(40), GUILayout.MinWidth(80)))
+        if (GUILayout.Button("+", GUILayout.MinHeight(60), GUILayout.MinWidth(100)))
         {
             Camera.main.transform.eulerAngles += new Vector3(0, 5, 0);
         }
-        
-        if (GUILayout.Button("-", GUILayout.MinHeight(40), GUILayout.MinWidth(80)))
+
+        if (GUILayout.Button("-", GUILayout.MinHeight(60), GUILayout.MinWidth(100)))
         {
             Camera.main.transform.eulerAngles += new Vector3(0, -5, 0);
         }
@@ -96,7 +96,7 @@ public class Wall : MonoBehaviour
         //        d.Init();
         //    }
         //}
-        GUILayout.EndVertical();
+        GUILayout.EndHorizontal();
     }
 
     #region 点击放置
