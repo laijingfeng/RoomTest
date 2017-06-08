@@ -16,8 +16,8 @@ TagManager:
   - Wall
   - LeftWall
   - RightWall
-  - 
-  - 
+  - Cube
+  - ActiveCube
   - 
   - 
   - 

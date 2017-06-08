@@ -101,6 +101,9 @@ public class Wall : MonoBehaviour
 
     #region 点击放置
 
+    private Vector3 m_ClickDownPos = Vector3.zero;
+    private Vector3 m_ClickUpPos = Vector3.zero;
+
     private void ClickPlaceObj()
     {
         if (!m_CanClickPlaceObj)
@@ -116,6 +119,19 @@ public class Wall : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
+            m_ClickDownPos = JerryUtil.GetClickPos();
+        }
+        
+        if (Input.GetMouseButtonUp(0))
+        {
+            m_ClickUpPos = JerryUtil.GetClickPos();
+            if (Mathf.Abs(m_ClickUpPos.x - m_ClickDownPos.x) > 0.1f
+                || Mathf.Abs(m_ClickUpPos.y - m_ClickDownPos.y) > 0.1f
+                || Mathf.Abs(m_ClickUpPos.z - m_ClickDownPos.z) > 0.1f)
+            {
+                return;
+            }
+
             m_Ray = Camera.main.ScreenPointToRay(Util.GetClickPos());
 
             if (Physics.Raycast(m_Ray, out m_HitInfo, 100))

@@ -1,194 +1,84 @@
 ﻿using UnityEngine;
 using Jerry;
+using UnityEngine.EventSystems;
 
-public class DragCamera : MonoBehaviour
+public class DragCamera : MonoBehaviour, IDragHandler, IBeginDragHandler
 {
-    public float m_MinSwipeDistance = 0.1f;
+    public float m_DragFactor = 0.5f;
+    public float m_RotateFactor = 0.5f;
 
-    /// <summary>
-    /// 正方向可以偏差的判断角度
-    /// </summary>
-    [Range(5, 45)]
-    public float m_Angle = 45;
+    private bool m_DragUsefull = false;
+    private Ray m_Ray;
+    private RaycastHit m_HitInfo;
 
-    public enum GestureDir
+    public void OnBeginDrag(PointerEventData eventData)
     {
-        Right = 0,
-        Down,
-        Left,
-        Up,
-    }
-
-    /// <summary>
-    /// 已经开始滑动
-    /// </summary>
-    private bool m_TouchStarted;
-
-    /// <summary>
-    /// 开始点击的位置
-    /// </summary>
-    private Vector2 m_TouchStartPos;
-
-    /// <summary>
-    /// 开始的时间
-    /// </summary>
-    //private float touchStartTime;
-
-    /// <summary>
-    /// 最小像素距离
-    /// </summary>
-    private float m_MinSwipeDistancePixels;
-
-    /// <summary>
-    /// 是否移动设备
-    /// </summary>
-    private bool m_IsPhone;
-
-    void Start()
-    {
-        float screenDiagonalSize = Mathf.Sqrt(Screen.width * Screen.width + Screen.height * Screen.height);
-        m_MinSwipeDistancePixels = m_MinSwipeDistance * screenDiagonalSize;
-
-#if UNITY_EDITOR
-        m_IsPhone = false;
-#else
-#if UNITY_ANDROID || UNITY_IPHONE
-        m_IsPhone = true;
-#else
-        m_IsPhone = false;
-#endif
-#endif
-    }
-
-    void Update()
-    {
-        if (m_IsPhone)
+        m_Ray = Camera.main.ScreenPointToRay(Util.GetClickPos());
+        if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
+            JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
+                new string[]
+                {
+                    "ActiveCube"
+                })))
         {
-            UpdatePhone();
-        }
-        else
-        {
-            UpdatePC();
-        }
-    }
-
-    private void UpdatePC()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            m_TouchStarted = true;
-            m_TouchStartPos = JerryUtil.GetClickPos();
-        }
-        else if (Input.GetMouseButtonUp(0))
-        {
-            if (m_TouchStarted)
+            if (m_HitInfo.collider != null
+                && m_HitInfo.collider.gameObject != null)
             {
-                Judge();
-                m_TouchStarted = false;
+                m_DragUsefull = false;
+                return;
             }
         }
+        m_DragUsefull = true;
     }
 
-    private void UpdatePhone()
+    public void OnDrag(PointerEventData eventData)
     {
-        if (Input.touchCount > 0)
-        {
-            var touch = Input.touches[0];
-
-            switch (touch.phase)
-            {
-                case TouchPhase.Began:
-                    {
-                        m_TouchStarted = true;
-                        m_TouchStartPos = touch.position;
-                        //m_TouchStartTime = Time.realtimeSinceStartup;
-                    }
-                    break;
-                case TouchPhase.Ended:
-                    {
-                        if (m_TouchStarted)
-                        {
-                            Judge();
-                            m_TouchStarted = false;
-                        }
-                    }
-                    break;
-                case TouchPhase.Canceled:
-                    {
-                        m_TouchStarted = false;
-                    }
-                    break;
-                case TouchPhase.Stationary:
-                    {
-                        //if (m_TouchStarted)
-                        //{
-                        //    m_TouchStartPos = touch.position;
-                        //    m_TouchStartTime = Time.realtimeSinceStartup;
-                        //}
-                    }
-                    break;
-                case TouchPhase.Moved:
-                    {
-
-                    }
-                    break;
-            }
-        }
-    }
-
-    private void Judge()
-    {
-        Vector3 start = m_TouchStartPos;
-        Vector3 end = JerryUtil.GetClickPos();
-
-        float dis = Vector2.Distance(start, end);
-
-        if (dis < m_MinSwipeDistancePixels)
+        if (!m_DragUsefull)
         {
             return;
         }
 
-        float dy = end.y - start.y;
-        float dx = end.x - start.x;
-
-        //结果是：上0，右90，左-90
-        float angle = Mathf.Rad2Deg * Mathf.Atan2(dx, dy);
-
-        angle = (360 + angle - 45) % 360;//正右是45度
-
-        if (angle >= 45 - m_Angle && angle <= 45 + m_Angle)
+        if (Mathf.Abs(eventData.delta.x) < 3f
+            || Mathf.Abs(eventData.delta.x) < Mathf.Abs(eventData.delta.y))
         {
-            GestureEvent(GestureDir.Right);
+            return;
         }
-        else if (angle >= 135 - m_Angle && angle <= 135 + m_Angle)
-        {
-            GestureEvent(GestureDir.Down);
-        }
-        else if (angle >= 225 - m_Angle && angle <= 225 + m_Angle)
-        {
-            GestureEvent(GestureDir.Left);
-        }
-        else if (angle >= 315 - m_Angle && angle <= 315 + m_Angle)
-        {
-            GestureEvent(GestureDir.Up);
-        }
+        DoDrag(eventData.delta.x);
     }
 
-    private void GestureEvent(GestureDir dir)
+    private Vector3 tmp1;
+    private Vector3 tmp2;
+
+    private void DoDrag(float val)
     {
-        Debug.LogWarning("dir:" + dir);
-        switch (dir)
+        //Debug.LogWarning("val=" + val);
+        tmp1 = Camera.main.transform.position;
+        tmp2 = Camera.main.transform.eulerAngles;
+
+        if (tmp1.x >= 3.78f && (tmp2.y > 0 || val > 0))
         {
-            case GestureDir.Left:
-                {
-                    Camera.main.transform.eulerAngles += new Vector3(0, -5, 0);
-                }
-                break;
-            case GestureDir.Right:
-                {
-                    Camera.main.transform.eulerAngles += new Vector3(0, 5, 0);
-                }
-                break;
+            tmp1.x = 3.78f;
+            tmp2.y += val * m_RotateFactor;
+            tmp2.y = Mathf.Clamp(tmp2.y, 0, 30);
         }
+        else if (tmp1.x <= -3.78f && (tmp2.y > 330 || val < 0))
+        {
+            tmp1.x = -3.78f;
+            if (tmp2.y > 0)
+            {
+                tmp2.y -= 360;
+            }
+            tmp2.y += val * m_RotateFactor;
+            tmp2.y = Mathf.Clamp(tmp2.y, -30, 0);
+        }
+        else
+        {
+            tmp1.x += val * m_DragFactor;
+            tmp1.x = Mathf.Clamp(tmp1.x, -3.78f, 3.78f);
+            tmp2.y = 0f;
+        }
+
+        Camera.main.transform.position = tmp1;
+        Camera.main.transform.eulerAngles = tmp2;
     }
 }

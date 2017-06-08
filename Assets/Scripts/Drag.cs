@@ -70,51 +70,77 @@ public class Drag : MonoBehaviour
         Place2Pos(pos, first);
     }
 
+    private Vector3 m_ClickDownPos = Vector3.zero;
+    private Vector3 m_ClickUpPos = Vector3.zero;
+
+    void OnMouseUp()
+    {
+        if (m_Selected)
+        {
+            return;
+        }
+
+        m_ClickUpPos = JerryUtil.GetClickPos();
+        if (Mathf.Abs(m_ClickUpPos.x - m_ClickDownPos.x) > 0.1f
+            || Mathf.Abs(m_ClickUpPos.y - m_ClickDownPos.y) > 0.1f
+            || Mathf.Abs(m_ClickUpPos.z - m_ClickDownPos.z) > 0.1f)
+        {
+            return;
+        }
+
+        if (MapUtil.m_SelectId != 0
+            && !MapUtil.m_SelectOK)
+        {
+            if (MapUtil.m_SelectNew)
+            {
+                Debug.LogWarning("当前选中的还没放好");
+                return;
+            }
+            JerryEventMgr.DispatchEvent(Enum_Event.BackOne.ToString(), new object[] { MapUtil.m_SelectId });
+        }
+
+        if (m_InitData.isNew)
+        {
+            FirstPos fp = MapUtil.GetFirstPos();
+            Init(fp.wallType, fp.pos, true);
+        }
+        else if (m_InitData.m_CurWall != Enum_Wall.None)
+        {
+            //先浮起来，再记录，保持回退时一致性
+            m_Pos = this.transform.position;
+            MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, true, ref m_Pos);
+            this.transform.position = m_Pos;
+
+            m_InitData.m_LastPos = m_Pos;
+            m_InitData.m_LastWall = m_InitData.m_CurWall;
+
+            MapUtil.GetMap(m_InitData.m_CurWall).CleanOne(this.transform.position, m_GridSize);
+        }
+
+        MapUtil.m_SelectId = m_Id;
+        MapUtil.m_SelectOK = false;
+        MapUtil.m_SelectNew = m_InitData.isNew;
+
+        m_InitData.isNew = false;
+        this.gameObject.layer = LayerMask.NameToLayer("ActiveCube");
+        m_Selected = true;
+    }
+
     IEnumerator OnMouseDown()
     {
+        if (m_Selected == false)
+        {
+            m_ClickDownPos = JerryUtil.GetClickPos();
+        }
+
+        if (m_Selected == false)
+        {
+            yield break;
+        }
+
         var camera = Camera.main;
         if (camera)
         {
-            if (m_Selected == false)
-            {
-                if (MapUtil.m_SelectId != 0
-                    && !MapUtil.m_SelectOK)
-                {
-                    if (m_InitData.isNew)
-                    {
-                        Debug.LogWarning("当前选中的还没放好");
-                        yield break;
-                    }
-                    else
-                    {
-                        JerryEventMgr.DispatchEvent(Enum_Event.BackOne.ToString(), new object[] { MapUtil.m_SelectId });
-                    }
-                }
-
-                if (m_InitData.isNew)
-                {
-                    FirstPos fp = MapUtil.GetFirstPos();
-                    Init(fp.wallType, fp.pos, true);
-                }
-                else if (m_InitData.m_CurWall != Enum_Wall.None)
-                {
-                    //先浮起来，再记录，保持回退时一致性
-                    m_Pos = this.transform.position;
-                    MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, true, ref m_Pos);
-                    this.transform.position = m_Pos;
-
-                    m_InitData.m_LastPos = m_Pos;
-                    m_InitData.m_LastWall = m_InitData.m_CurWall;
-
-                    MapUtil.GetMap(m_InitData.m_CurWall).CleanOne(this.transform.position, m_GridSize);
-                }
-
-                m_InitData.isNew = false;
-                MapUtil.m_SelectId = m_Id;
-                m_Selected = true;
-                MapUtil.m_SelectOK = false;
-            }
-
             Vector3 screenPosition = camera.WorldToScreenPoint(transform.position);
             Vector3 mScreenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z);
 
@@ -264,6 +290,7 @@ public class Drag : MonoBehaviour
                 m_InitData.m_CurWall = m_InitData.m_LastWall;
 
                 m_Selected = false;
+                this.gameObject.layer = LayerMask.NameToLayer("Cube");
                 m_Pos = m_InitData.m_LastPos;
                 MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
                 this.transform.position = m_Pos;
@@ -285,6 +312,7 @@ public class Drag : MonoBehaviour
             MapUtil.m_SelectId = 0;
 
             m_Selected = false;
+            this.gameObject.layer = LayerMask.NameToLayer("Cube");
             m_Pos = this.transform.position;
             MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
             this.transform.position = m_Pos;
