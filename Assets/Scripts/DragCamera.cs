@@ -7,6 +7,9 @@ public class DragCamera : MonoBehaviour, IDragHandler, IBeginDragHandler
     public float m_DragFactor = 0.5f;
     public float m_RotateFactor = 0.5f;
 
+    public float m_DragBound = 4.4f;
+    public float m_RotateBound = 25;
+
     private bool m_DragUsefull = false;
     private Ray m_Ray;
     private RaycastHit m_HitInfo;
@@ -60,26 +63,26 @@ public class DragCamera : MonoBehaviour, IDragHandler, IBeginDragHandler
         tmp1 = Camera.main.transform.position;
         tmp2 = Camera.main.transform.eulerAngles;
 
-        if (tmp1.x >= 3.78f && (tmp2.y > 0 || val > 0))
+        if (tmp1.x >= m_DragBound && (tmp2.y > 0 || val > 0))
         {
-            tmp1.x = 3.78f;
+            tmp1.x = m_DragBound;
             tmp2.y += val * m_RotateFactor;
-            tmp2.y = Mathf.Clamp(tmp2.y, 0, 30);
+            tmp2.y = Mathf.Clamp(tmp2.y, 0, m_RotateBound);
         }
-        else if (tmp1.x <= -3.78f && (tmp2.y > 330 || val < 0))
+        else if (tmp1.x <= -m_DragBound && (tmp2.y > 360 - m_RotateBound || val < 0))
         {
-            tmp1.x = -3.78f;
+            tmp1.x = -m_DragBound;
             if (tmp2.y > 0)
             {
                 tmp2.y -= 360;
             }
             tmp2.y += val * m_RotateFactor;
-            tmp2.y = Mathf.Clamp(tmp2.y, -30, 0);
+            tmp2.y = Mathf.Clamp(tmp2.y, -m_RotateBound, 0);
         }
         else
         {
             tmp1.x += val * m_DragFactor;
-            tmp1.x = Mathf.Clamp(tmp1.x, -3.78f, 3.78f);
+            tmp1.x = Mathf.Clamp(tmp1.x, -m_DragBound, m_DragBound);
             tmp2.y = 0f;
         }
 

@@ -126,6 +126,9 @@ public class Drag : MonoBehaviour
         m_Selected = true;
     }
 
+    private Ray m_Ray;
+    private RaycastHit m_HitInfo;
+
     IEnumerator OnMouseDown()
     {
         if (m_Selected == false)
@@ -141,22 +144,80 @@ public class Drag : MonoBehaviour
         var camera = Camera.main;
         if (camera)
         {
-            Vector3 screenPosition = camera.WorldToScreenPoint(transform.position);
-            Vector3 mScreenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z);
+            //Vector3 screenPosition = camera.WorldToScreenPoint(transform.position);
+            //Vector3 mScreenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z);
 
-            Vector3 offset = transform.position - camera.ScreenToWorldPoint(mScreenPosition);
-            
+            //Vector3 offset = transform.position - camera.ScreenToWorldPoint(mScreenPosition);
+
+            //while (Input.GetMouseButton(0))
+            //{
+            //    mScreenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z);
+            //    m_Pos = offset + camera.ScreenToWorldPoint(mScreenPosition);
+
+            //    if (Mathf.Abs(m_Pos.x - m_LastPos.x) > 0.1f
+            //        || Mathf.Abs(m_Pos.y - m_LastPos.y) > 0.1f
+            //        || Mathf.Abs(m_Pos.z - m_LastPos.z) > 0.1f)
+            //    {
+            //        m_LastPos = m_Pos;
+            //        Place2Pos(m_Pos);
+            //    }
+            //    yield return new WaitForFixedUpdate();
+            //}
+
             while (Input.GetMouseButton(0))
             {
-                mScreenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z);
-                m_Pos = offset + camera.ScreenToWorldPoint(mScreenPosition);
+                m_Ray = Camera.main.ScreenPointToRay(Util.GetClickPos());
 
-                if (Mathf.Abs(m_Pos.x - m_LastPos.x) > 0.1f
-                    || Mathf.Abs(m_Pos.y - m_LastPos.y) > 0.1f
-                    || Mathf.Abs(m_Pos.z - m_LastPos.z) > 0.1f)
+                if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
+                    JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
+                    new string[]
+                    {
+                        Enum_Wall.Wall.ToString(),
+                        Enum_Wall.LeftWall.ToString(),
+                        Enum_Wall.RightWall.ToString(),
+                    })))
                 {
-                    m_LastPos = m_Pos;
-                    Place2Pos(m_Pos);
+                    if (m_HitInfo.collider != null
+                        && m_HitInfo.collider.gameObject != null)
+                    {
+                        FirstPos fp = new FirstPos();
+                        fp.pos = m_HitInfo.point;
+                        string layerName = LayerMask.LayerToName(m_HitInfo.collider.gameObject.layer);
+                        switch (layerName)
+                        {
+                            case "Wall":
+                                {
+                                    fp.wallType = Enum_Wall.Wall;
+                                }
+                                break;
+                            case "LeftWall":
+                                {
+                                    fp.wallType = Enum_Wall.LeftWall;
+                                }
+                                break;
+                            case "RightWall":
+                                {
+                                    fp.wallType = Enum_Wall.RightWall;
+                                }
+                                break;
+                        }
+
+                        if (Mathf.Abs(fp.pos.x - m_LastPos.x) > 0.1f
+                            || Mathf.Abs(fp.pos.y - m_LastPos.y) > 0.1f
+                            || Mathf.Abs(fp.pos.z - m_LastPos.z) > 0.1f)
+                        {
+                            m_LastPos = fp.pos;
+
+                            if (fp.wallType == m_InitData.m_CurWall)
+                            {
+                                Place2Pos(fp.pos);
+                            }
+                            else
+                            {
+                                Init(fp.wallType, fp.pos, false);
+                            }
+                        }
+                    }
                 }
                 yield return new WaitForFixedUpdate();
             }
@@ -167,24 +228,24 @@ public class Drag : MonoBehaviour
     {
         Vector3 p = transform.position;
         Vector3 p1 = Vector3.zero, p2 = Vector3.zero;
-        switch(m_InitData.m_CurWall)
+        switch (m_InitData.m_CurWall)
         {
             case Enum_Wall.Wall:
                 {
-                    p1 = p - new Vector3(m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen, 0, 0);
-                    p2 = p + new Vector3(m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen, 0, 0);
+                    p1 = p - new Vector3(m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen + MapUtil.m_MapGridUnityLen, 0, 0);
+                    p2 = p + new Vector3(m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen + MapUtil.m_MapGridUnityLen, 0, 0);
                 }
                 break;
             case Enum_Wall.LeftWall:
                 {
-                    p1 = p - new Vector3(0, 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
-                    p2 = p + new Vector3(0, 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
+                    p1 = p - new Vector3(m_GridSize.z / 2 * MapUtil.m_MapGridUnityLen + MapUtil.m_MapGridUnityLen, 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
+                    p2 = p + new Vector3(m_GridSize.z / 2 * MapUtil.m_MapGridUnityLen, 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
                 }
                 break;
             case Enum_Wall.RightWall:
                 {
-                    p1 = p + new Vector3(0, 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
-                    p2 = p - new Vector3(0, 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
+                    p1 = p + new Vector3(-(m_GridSize.z / 2 * MapUtil.m_MapGridUnityLen), 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
+                    p2 = p - new Vector3(-(m_GridSize.z / 2 * MapUtil.m_MapGridUnityLen + MapUtil.m_MapGridUnityLen), 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
                 }
                 break;
         }
