@@ -24,6 +24,7 @@ public class Drag : MonoBehaviour
     private bool m_Selected = false;
 
     private Vector3 m_Pos;
+    private Vector3 m_LastPos;
 
     private DragInitData m_InitData = null;
 
@@ -34,10 +35,16 @@ public class Drag : MonoBehaviour
         m_InitData.isNew = true;
 
         JerryEventMgr.AddEvent(Enum_Event.SetOne.ToString(), EventSetOne);
-        JerryEventMgr.AddEvent(Enum_Event.Place2Pos.ToString(), EventPlace2Pos); 
+        JerryEventMgr.AddEvent(Enum_Event.Place2Pos.ToString(), EventPlace2Pos);
         JerryEventMgr.AddEvent(Enum_Event.BackOne.ToString(), EventBackOne);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="wallType"></param>
+    /// <param name="pos"></param>
+    /// <param name="first">刚进入到这个面</param>
     public void Init(Enum_Wall wallType, Vector3 pos, bool first)
     {
         m_InitData = MapUtil.InitDrag(m_GridSize, m_OnFloor, m_InitData, wallType);
@@ -118,38 +125,52 @@ public class Drag : MonoBehaviour
                 mScreenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z);
                 m_Pos = offset + camera.ScreenToWorldPoint(mScreenPosition);
 
-                Place2Pos(m_Pos);
-
+                if (Mathf.Abs(m_Pos.x - m_LastPos.x) > 0.1f
+                    || Mathf.Abs(m_Pos.y - m_LastPos.y) > 0.1f
+                    || Mathf.Abs(m_Pos.z - m_LastPos.z) > 0.1f)
+                {
+                    m_LastPos = m_Pos;
+                    Place2Pos(m_Pos);
+                }
                 yield return new WaitForFixedUpdate();
             }
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <param name="first">当前面第一次设置位置</param>
     private void Place2Pos(Vector3 pos, bool first = false)
     {
+        //Debug.LogWarning("one " + pos + " " + pos.z);
         MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, true, ref pos);
+        //Debug.LogWarning("one11111 " + pos + "  " + pos.z);
         m_Pos = AdjustPos(pos);
         Enum_Wall changeType = Enum_Wall.None;
+
+        //Debug.LogWarning(m_Pos.x + "  " + m_Pos.z + " sss " + m_InitData.m_MaxPos.x + " " + m_InitData.m_MaxPos.y + " " + m_InitData.m_MaxPos.z);
 
         if (m_InitData.m_CurWall == Enum_Wall.Wall)
         {
             m_Pos.x = Mathf.Clamp(m_Pos.x, m_InitData.m_MinPos.x, m_InitData.m_MaxPos.x);
-            if (m_Pos.x == m_InitData.m_MinPos.x)
+            if (m_Pos.x <= m_InitData.m_MinPos.x)
             {
                 if (first)
                 {
-                    m_Pos.x += MapUtil.m_MapGridUnityLen;
+                    m_Pos.x = m_InitData.m_MinPos.x + MapUtil.m_MapGridUnityLen;
                 }
                 else
                 {
                     changeType = Enum_Wall.LeftWall;
                 }
             }
-            else if (m_Pos.x == m_InitData.m_MaxPos.x)
+            else if (m_Pos.x >= m_InitData.m_MaxPos.x)
             {
                 if (first)
                 {
-                    m_Pos.x -= MapUtil.m_MapGridUnityLen;
+                    m_Pos.x = m_InitData.m_MaxPos.x - MapUtil.m_MapGridUnityLen;
                 }
                 else
                 {
@@ -160,11 +181,11 @@ public class Drag : MonoBehaviour
         else
         {
             m_Pos.z = Mathf.Clamp(m_Pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z);
-            if (m_Pos.z == m_InitData.m_MaxPos.z)
+            if (m_Pos.z >= m_InitData.m_MaxPos.z)
             {
                 if (first)
                 {
-                    m_Pos.z -= MapUtil.m_MapGridUnityLen;
+                    m_Pos.z = m_InitData.m_MaxPos.z - MapUtil.m_MapGridUnityLen;
                 }
                 else
                 {
@@ -173,11 +194,19 @@ public class Drag : MonoBehaviour
             }
         }
         m_Pos.y = Mathf.Clamp(m_Pos.y, m_InitData.m_MinPos.y, m_InitData.m_MaxPos.y);
-        transform.position = m_Pos;
 
         if (changeType != Enum_Wall.None)
         {
-            Init(changeType, m_Pos, false);
+            MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
+            transform.position = m_Pos;
+            //Debug.LogWarning("ddd " + changeType + " " + m_Pos.x + " " + m_Pos.y + " " + m_Pos.z);
+
+            Init(changeType, m_Pos, true);
+        }
+        else
+        {
+            //Debug.LogWarning("xxxxxxxxxxxxxx " + m_Pos.z);
+            transform.position = m_Pos;
         }
     }
 
@@ -233,7 +262,7 @@ public class Drag : MonoBehaviour
             if (MapUtil.GetMap(m_InitData.m_LastWall).SetOne(m_InitData.m_LastPos, m_GridSize))
             {
                 m_InitData.m_CurWall = m_InitData.m_LastWall;
-                
+
                 m_Selected = false;
                 m_Pos = m_InitData.m_LastPos;
                 MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
