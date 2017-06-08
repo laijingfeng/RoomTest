@@ -15,10 +15,14 @@ public class Wall : MonoBehaviour
     /// </summary>
     public Vector3 m_LeftSideWallSize;
 
+    public Vector3 m_RightSideWallStartPos;
+    /// <summary>
+    /// 宽*高=x*y
+    /// </summary>
+    public Vector3 m_RightSideWallSize;
+
     public float m_MapGridUnityLen;
     public bool m_CanClickPlaceObj = false;
-
-    public Enum_Wall m_DefaulfWall = Enum_Wall.Wall;
 
     private Ray m_Ray;
     private RaycastHit m_HitInfo;
@@ -36,13 +40,22 @@ public class Wall : MonoBehaviour
     {
         m_Inst = this;
 
+        MapUtil.m_MapGridUnityLen = m_MapGridUnityLen;
+
         MapUtil.m_Wall.m_StartPos = m_WallStartPos;
         MapUtil.m_Wall.m_Size = m_WallSize;
-        MapUtil.m_MapGridUnityLen = m_MapGridUnityLen;
+
+        MapUtil.m_LeftSideWall.m_StartPos = m_LeftSideWallStartPos;
+        MapUtil.m_LeftSideWall.m_Size = m_LeftSideWallSize;
+
+        MapUtil.m_RightSideWall.m_StartPos = m_RightSideWallStartPos;
+        MapUtil.m_RightSideWall.m_Size = m_RightSideWallSize;
+
         MapUtil.Init();
 
 #if UNITY_EDITOR
         DrawWall(m_LeftSideWallStartPos, m_LeftSideWallSize, Color.red);
+        DrawWall(m_RightSideWallStartPos, m_RightSideWallSize, Color.red);
         DrawWall(m_WallStartPos, m_WallSize, Color.black);
 #endif
     }
@@ -50,6 +63,12 @@ public class Wall : MonoBehaviour
     void Update()
     {
         ClickPlaceObj();
+
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            MapUtil.GetFirstPos();
+            Debug.LogWarning("pos=" + JerryUtil.GetClickPos());
+        }
     }
 
     void OnGUI()

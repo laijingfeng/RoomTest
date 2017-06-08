@@ -37,10 +37,30 @@ public class Drag : MonoBehaviour
         JerryEventMgr.AddEvent(Enum_Event.Place2Pos.ToString(), EventPlace2Pos);
     }
 
-    public void Init()
+    public void Init(Enum_Wall wallType, Vector3 pos, bool first = false)
     {
-        m_InitData.m_CurPos = this.transform.position;
-        m_InitData = MapUtil.InitDrag(m_GridSize, m_OnFloor, m_InitData);
+        m_InitData.m_LastPos = this.transform.position;
+        m_InitData = MapUtil.InitDrag(m_GridSize, m_OnFloor, m_InitData, wallType);
+
+        switch (m_InitData.m_CurWall)
+        {
+            case Enum_Wall.LeftWall:
+                {
+                    this.transform.eulerAngles = new Vector3(0, -90, 0);
+                }
+                break;
+            case Enum_Wall.RightWall:
+                {
+                    this.transform.eulerAngles = new Vector3(0, 90, 0);
+                }
+                break;
+            case Enum_Wall.Wall:
+                {
+                    this.transform.eulerAngles = Vector3.zero;
+                }
+                break;
+        }
+        Place2Pos(pos, true);
     }
 
     IEnumerator OnMouseDown()
@@ -58,8 +78,8 @@ public class Drag : MonoBehaviour
 
                 if (m_InitData.isNew)
                 {
-                    Init();
-                    Place2Pos(this.transform.position);
+                    FirstPos fp = MapUtil.GetFirstPos();
+                    Init(fp.wallType, fp.pos, true);
                 }
                 else if (m_InitData.m_CurWall != Enum_Wall.None)
                 {
@@ -89,20 +109,61 @@ public class Drag : MonoBehaviour
         }
     }
 
-    private void Place2Pos(Vector3 pos)
+    private void Place2Pos(Vector3 pos, bool first = false)
     {
         MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, true, ref pos);
         m_Pos = AdjustPos(pos);
+
+        Enum_Wall changeType = Enum_Wall.None;
+
         if (m_InitData.m_CurWall == Enum_Wall.Wall)
         {
             m_Pos.x = Mathf.Clamp(m_Pos.x, m_InitData.m_MinPos.x, m_InitData.m_MaxPos.x);
+            if (m_Pos.x == m_InitData.m_MinPos.x)
+            {
+                if (first)
+                {
+                    m_Pos.x += MapUtil.m_MapGridUnityLen;
+                }
+                else
+                {
+                    changeType = Enum_Wall.LeftWall;
+                }
+            }
+            else if (m_Pos.x == m_InitData.m_MaxPos.x)
+            {
+                if (first)
+                {
+                    m_Pos.x -= MapUtil.m_MapGridUnityLen;
+                }
+                else
+                {
+                    changeType = Enum_Wall.RightWall;
+                }
+            }
         }
         else
         {
             m_Pos.z = Mathf.Clamp(m_Pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z);
+            if (m_Pos.z == m_InitData.m_MaxPos.z)
+            {
+                if (first)
+                {
+                    m_Pos.z -= MapUtil.m_MapGridUnityLen;
+                }
+                else
+                {
+                    changeType = Enum_Wall.Wall;
+                }
+            }
         }
         m_Pos.y = Mathf.Clamp(m_Pos.y, m_InitData.m_MinPos.y, m_InitData.m_MaxPos.y);
         transform.position = m_Pos;
+
+        if (changeType != Enum_Wall.None)
+        {
+            Init(changeType, m_Pos, false);
+        }
     }
 
     private Vector3 AdjustPos(Vector3 pos)

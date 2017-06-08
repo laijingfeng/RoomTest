@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Jerry;
 
 public class MapUtil
 {
@@ -22,16 +23,16 @@ public class MapUtil
         m_SelectId = 0;
         m_SelectOK = true;
 
-        m_LeftSideWall.Init(Enum_Wall.Left);
+        m_LeftSideWall.Init(Enum_Wall.LeftWall);
         m_Wall.Init(Enum_Wall.Wall);
-        m_RightSideWall.Init(Enum_Wall.Right);
+        m_RightSideWall.Init(Enum_Wall.RightWall);
     }
 
     public static Map GetMap(Enum_Wall type)
     {
         switch (type)
         {
-            case Enum_Wall.Left:
+            case Enum_Wall.LeftWall:
                 {
                     return m_LeftSideWall;
                 }
@@ -39,7 +40,7 @@ public class MapUtil
                 {
                     return m_Wall;
                 }
-            case Enum_Wall.Right:
+            case Enum_Wall.RightWall:
                 {
                     return m_RightSideWall;
                 }
@@ -47,21 +48,64 @@ public class MapUtil
         return null;
     }
 
-    public static DragInitData InitDrag(Vector3 size, bool onFloor, DragInitData oldData)
+    public static DragInitData InitDrag(Vector3 size, bool onFloor, DragInitData oldData, Enum_Wall wall)
     {
         if (oldData == null)
         {
             oldData = new DragInitData();
         }
+        
         oldData.m_LastWall = oldData.m_CurWall;
-        oldData.m_LastPos = oldData.m_CurPos;
-
-        oldData.m_CurWall = Wall.Inst.m_DefaulfWall;
-        oldData.m_CurPos = Vector3.zero;//TODO
-
+        oldData.m_CurWall = wall;
+        
         GetMap(oldData.m_CurWall).GetMinMaxPos(size, onFloor, ref oldData);
         oldData.m_AdjustPar = GetMap(oldData.m_CurWall).GetAdjustPar(size);
 
         return oldData;
+    }
+
+    public static FirstPos GetFirstPos()
+    {
+        FirstPos ret = new FirstPos();
+        ret.pos = Vector3.zero;
+        ret.wallType = Enum_Wall.Wall;
+
+        Ray ray = Camera.main.ScreenPointToRay(new Vector3(269.0f, 514f, 0f));
+        RaycastHit hitInfo;
+        if (Physics.Raycast(ray, out hitInfo, 100,
+            JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
+                new string[]
+                {
+                    Enum_Wall.Wall.ToString(),
+                    Enum_Wall.LeftWall.ToString(),
+                    Enum_Wall.RightWall.ToString(),
+                })))
+        {
+            if (hitInfo.collider != null
+                && hitInfo.collider.gameObject != null)
+            {
+                ret.pos = hitInfo.point;
+                string layerName = LayerMask.LayerToName(hitInfo.collider.gameObject.layer);
+                switch(layerName)
+                {
+                    case "Wall":
+                        {
+                            ret.wallType = Enum_Wall.Wall;
+                        }
+                        break;
+                    case "LeftWall":
+                        {
+                            ret.wallType = Enum_Wall.LeftWall;
+                        }
+                        break;
+                    case "RightWall":
+                        {
+                            ret.wallType = Enum_Wall.RightWall;
+                        }
+                        break;
+                } 
+            }
+        }
+        return ret;
     }
 }

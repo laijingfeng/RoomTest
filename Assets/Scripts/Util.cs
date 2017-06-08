@@ -52,9 +52,9 @@ public enum Enum_Event
 public enum Enum_Wall
 {
     None = 0,
-    Left,
+    LeftWall,
     Wall,
-    Right,
+    RightWall,
 }
 
 public class DragInitData
@@ -70,4 +70,10 @@ public class DragInitData
 
     public Enum_Wall m_LastWall = Enum_Wall.None;
     public Vector3 m_LastPos = Vector3.zero;
+}
+
+public class FirstPos
+{
+    public Vector3 pos;
+    public Enum_Wall wallType;
 }
