@@ -47,6 +47,7 @@ public enum Enum_Event
     None = 0,
     SetOne,
     Place2Pos,
+    BackOne,
 }
 
 public enum Enum_Wall

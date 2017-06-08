@@ -55,8 +55,7 @@ public class MapUtil
         {
             oldData = new DragInitData();
         }
-        
-        oldData.m_LastWall = oldData.m_CurWall;
+
         oldData.m_CurWall = wall;
         
         GetMap(oldData.m_CurWall).GetMinMaxPos(size, onFloor, ref oldData);

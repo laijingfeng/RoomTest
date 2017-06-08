@@ -269,7 +269,7 @@ public class Map
             }
         }
 
-        //Debug.LogWarning("main=" + mainJudge + " min=" + min + " max=" + max + " size=" + size + " pos=" + pos + " " + pos.x);
+        Debug.LogWarning("main=" + mainJudge + " min=" + min + " max=" + max + " size=" + size + " pos=" + pos);
 
         if (mainJudge && size.z != 0)
         {
