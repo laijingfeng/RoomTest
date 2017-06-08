@@ -3,47 +3,33 @@ using Jerry;
 
 public class Wall : MonoBehaviour
 {
-    public Vector3 m_MapStartPos;
+    public Vector3 m_WallStartPos;
     /// <summary>
     /// 宽*高=x*y
     /// </summary>
-    public Vector2 m_MapSize;
-    public Vector2 m_MapGirdUnitySize;
+    public Vector2 m_WallSize;
+    public float m_MapGridUnityLen;
+    public bool m_CanClickPlaceObj = false;
 
     private Ray m_Ray;
     private RaycastHit m_HitInfo;
 
     void Awake()
     {
-        MapUtil.m_MapStartPos = m_MapStartPos;
-        MapUtil.m_MapSize = m_MapSize;
-        MapUtil.m_MapGirdUnitySize = m_MapGirdUnitySize;
+        MapUtil.m_MapStartPos = m_WallStartPos;
+        MapUtil.m_MapSize = m_WallSize;
+        MapUtil.m_MapGridUnityLen = m_MapGridUnityLen;
         MapUtil.Init();
 
 #if UNITY_EDITOR
-        DrawMap();
+        DrawLeftSideWall();
+        DrawWall();
 #endif
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            m_Ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(m_Ray, out m_HitInfo, 100))
-            {
-                if (m_HitInfo.collider == null 
-                    || m_HitInfo.collider.gameObject == null)
-                {
-                    return;
-                }
-                if (m_HitInfo.collider.tag == "Wall")
-                {
-
-                }
-            }
-        }
+        ClickPlaceObj();
     }
 
     void OnGUI()
@@ -70,21 +56,76 @@ public class Wall : MonoBehaviour
         GUILayout.EndVertical();
     }
 
-#if UNITY_EDITOR
-    private void DrawMap()
+    #region 点击放置
+
+    private void ClickPlaceObj()
     {
-        for (int i = 0; i <= m_MapSize.x; i++)//竖线
+        if (!m_CanClickPlaceObj)
+        {
+            return;
+        }
+
+        if (MapUtil.m_SelectId == 0
+            || MapUtil.m_SelectOK)
+        {
+            return;
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            m_Ray = Camera.main.ScreenPointToRay(Util.GetClickPos());
+
+            if (Physics.Raycast(m_Ray, out m_HitInfo, 100))
+            {
+                if (m_HitInfo.collider == null
+                    || m_HitInfo.collider.gameObject == null)
+                {
+                    return;
+                }
+                string layerName = LayerMask.LayerToName(m_HitInfo.collider.gameObject.layer);
+                Debug.LogWarning(layerName + " " + m_HitInfo.point);
+                if (layerName == "Wall")
+                {
+                    JerryEventMgr.DispatchEvent(Enum_Event.Place2Pos.ToString(), new object[] { m_HitInfo.point });
+                }
+            }
+        }
+    }
+
+    #endregion 点击放置
+
+#if UNITY_EDITOR
+    private void DrawWall()
+    {
+        for (int i = 0; i <= m_WallSize.x; i++)//竖线
         {
             JerryDrawer.Draw<DrawerElementPath>()
-                .SetPoints(m_MapStartPos + new Vector3(i * m_MapGirdUnitySize.x, 0, 0), m_MapStartPos + new Vector3(i * m_MapGirdUnitySize.x, m_MapSize.y * m_MapGirdUnitySize.y, 0))
+                .SetPoints(m_WallStartPos + new Vector3(i * MapUtil.m_MapGridUnityLen, 0, 0), m_WallStartPos + new Vector3(i * MapUtil.m_MapGridUnityLen, m_WallSize.y * MapUtil.m_MapGridUnityLen, 0))
                 .SetColor(Color.black);
         }
 
-        for (int j = 0; j <= m_MapSize.y; j++)//横线
+        for (int j = 0; j <= m_WallSize.y; j++)//横线
         {
             JerryDrawer.Draw<DrawerElementPath>()
-                .SetPoints(m_MapStartPos + new Vector3(0, j * m_MapGirdUnitySize.y, 0), m_MapStartPos + new Vector3(m_MapSize.x * m_MapGirdUnitySize.x, j * m_MapGirdUnitySize.y, 0))
+                .SetPoints(m_WallStartPos + new Vector3(0, j * MapUtil.m_MapGridUnityLen, 0), m_WallStartPos + new Vector3(m_WallSize.x * MapUtil.m_MapGridUnityLen, j * MapUtil.m_MapGridUnityLen, 0))
                 .SetColor(Color.black);
+        }
+    }
+
+    private void DrawLeftSideWall()
+    {
+        for (int i = 0; i <= m_WallSize.x; i++)//竖线
+        {
+            JerryDrawer.Draw<DrawerElementPath>()
+                .SetPoints(m_WallStartPos + new Vector3(i * MapUtil.m_MapGridUnityLen, 0, 0), m_WallStartPos + new Vector3(i * MapUtil.m_MapGridUnityLen, m_WallSize.y * MapUtil.m_MapGridUnityLen, 0))
+                .SetColor(Color.red);
+        }
+
+        for (int j = 0; j <= m_WallSize.y; j++)//横线
+        {
+            JerryDrawer.Draw<DrawerElementPath>()
+                .SetPoints(m_WallStartPos + new Vector3(0, j * MapUtil.m_MapGridUnityLen, 0), m_WallStartPos + new Vector3(m_WallSize.x * MapUtil.m_MapGridUnityLen, j * MapUtil.m_MapGridUnityLen, 0))
+                .SetColor(Color.red);
         }
     }
 #endif

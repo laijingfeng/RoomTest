@@ -16,7 +16,7 @@ public class MapUtil
     /// 宽*高=x*y
     /// </summary>
     public static Vector2 m_MapSize;
-    public static Vector2 m_MapGirdUnitySize;
+    public static float m_MapGridUnityLen;
 
     public static bool[,] m_MapFlag;
 
@@ -80,40 +80,40 @@ public class MapUtil
         {
             if (((int)size.x) % 2 == 0)
             {
-                ret.x = pos.x - ((int)((size.x - 1) / 2) + 0.5f) * m_MapGirdUnitySize.x;
+                ret.x = pos.x - ((int)((size.x - 1) / 2) + 0.5f) * m_MapGridUnityLen;
             }
             else
             {
-                ret.x = pos.x - ((int)(size.x / 2)) * m_MapGirdUnitySize.x * 0.5f;
+                ret.x = pos.x - ((int)(size.x / 2)) * m_MapGridUnityLen * 0.5f;
             }
 
             if (((int)size.y) % 2 == 0)
             {
-                ret.y = pos.y - ((int)((size.y - 1) / 2) + 0.5f) * m_MapGirdUnitySize.y;
+                ret.y = pos.y - ((int)((size.y - 1) / 2) + 0.5f) * m_MapGridUnityLen;
             }
             else
             {
-                ret.y = pos.y - ((int)(size.y / 2)) * m_MapGirdUnitySize.y * 0.5f;
+                ret.y = pos.y - ((int)(size.y / 2)) * m_MapGridUnityLen * 0.5f;
             }
         }
         else
         {
             if (((int)size.x) % 2 == 0)
             {
-                ret.x = pos.x + ((int)((size.x - 1) / 2) + 0.5f) * m_MapGirdUnitySize.x;
+                ret.x = pos.x + ((int)((size.x - 1) / 2) + 0.5f) * m_MapGridUnityLen;
             }
             else
             {
-                ret.x = pos.x + ((int)(size.x / 2)) * m_MapGirdUnitySize.x * 0.5f;
+                ret.x = pos.x + ((int)(size.x / 2)) * m_MapGridUnityLen * 0.5f;
             }
 
             if (((int)size.y) % 2 == 0)
             {
-                ret.y = pos.y + ((int)((size.y - 1) / 2) + 0.5f) * m_MapGirdUnitySize.y;
+                ret.y = pos.y + ((int)((size.y - 1) / 2) + 0.5f) * m_MapGridUnityLen;
             }
             else
             {
-                ret.y = pos.y + ((int)(size.y / 2)) * m_MapGirdUnitySize.y * 0.5f;
+                ret.y = pos.y + ((int)(size.y / 2)) * m_MapGridUnityLen * 0.5f;
             }
         }
 
@@ -123,16 +123,16 @@ public class MapUtil
     public static Vector3 Grid2Pos(Vector3 grid)
     {
         Vector3 ret = Vector3.zero;
-        ret.x = m_MapStartPos.x + m_MapGirdUnitySize.x / 2 + grid.x * m_MapGirdUnitySize.x;
-        ret.y = m_MapStartPos.y + m_MapGirdUnitySize.y / 2 + grid.x * m_MapGirdUnitySize.y;
+        ret.x = m_MapStartPos.x + m_MapGridUnityLen / 2 + grid.x * m_MapGridUnityLen;
+        ret.y = m_MapStartPos.y + m_MapGridUnityLen / 2 + grid.x * m_MapGridUnityLen;
         return ret;
     }
 
     public static Vector3 Pos2Grid(Vector3 pos)
     {
         Vector3 ret = Vector3.zero;
-        ret.x = (int)((pos.x - (m_MapStartPos.x + m_MapGirdUnitySize.x / 2)) / m_MapGirdUnitySize.x);
-        ret.y = (int)((pos.y - (m_MapStartPos.y + m_MapGirdUnitySize.y / 2)) / m_MapGirdUnitySize.y);
+        ret.x = (int)((pos.x - (m_MapStartPos.x + m_MapGridUnityLen / 2)) / m_MapGridUnityLen);
+        ret.y = (int)((pos.y - (m_MapStartPos.y + m_MapGridUnityLen / 2)) / m_MapGridUnityLen);
         return ret;
     }
 }
