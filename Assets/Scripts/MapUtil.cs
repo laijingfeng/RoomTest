@@ -13,6 +13,7 @@ public class MapUtil
     public static bool m_SelectOK = true;
 
     public static float m_MapGridUnityLen;
+    public static float m_AdjustZVal = 0.3f;
 
     public static Map m_LeftSideWall = new Map();
     public static Map m_Wall = new Map();

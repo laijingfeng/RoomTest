@@ -22,7 +22,7 @@ public class Wall : MonoBehaviour
     public Vector3 m_RightSideWallSize;
 
     public float m_MapGridUnityLen;
-    public bool m_CanClickPlaceObj = false;
+    public bool m_CanClickPlaceObj = true;
 
     private Ray m_Ray;
     private RaycastHit m_HitInfo;
@@ -63,12 +63,6 @@ public class Wall : MonoBehaviour
     void Update()
     {
         ClickPlaceObj();
-
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            MapUtil.GetFirstPos();
-            Debug.LogWarning("pos=" + JerryUtil.GetClickPos());
-        }
     }
 
     void OnGUI()
@@ -122,7 +116,7 @@ public class Wall : MonoBehaviour
                     return;
                 }
                 string layerName = LayerMask.LayerToName(m_HitInfo.collider.gameObject.layer);
-                Debug.LogWarning(layerName + " " + m_HitInfo.point);
+                //Debug.LogWarning(layerName + " " + m_HitInfo.point);
                 if (layerName == "Wall")
                 {
                     JerryEventMgr.DispatchEvent(Enum_Event.Place2Pos.ToString(), new object[] { m_HitInfo.point });
