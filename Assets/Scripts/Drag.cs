@@ -145,7 +145,7 @@ public class Drag : MonoBehaviour
             Vector3 mScreenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z);
 
             Vector3 offset = transform.position - camera.ScreenToWorldPoint(mScreenPosition);
-
+            
             while (Input.GetMouseButton(0))
             {
                 mScreenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z);
@@ -160,6 +160,45 @@ public class Drag : MonoBehaviour
                 }
                 yield return new WaitForFixedUpdate();
             }
+        }
+    }
+
+    private void JudgePosOutScreen()
+    {
+        Vector3 p = transform.position;
+        Vector3 p1 = Vector3.zero, p2 = Vector3.zero;
+        switch(m_InitData.m_CurWall)
+        {
+            case Enum_Wall.Wall:
+                {
+                    p1 = p - new Vector3(m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen, 0, 0);
+                    p2 = p + new Vector3(m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen, 0, 0);
+                }
+                break;
+            case Enum_Wall.LeftWall:
+                {
+                    p1 = p - new Vector3(0, 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
+                    p2 = p + new Vector3(0, 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
+                }
+                break;
+            case Enum_Wall.RightWall:
+                {
+                    p1 = p + new Vector3(0, 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
+                    p2 = p - new Vector3(0, 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
+                }
+                break;
+        }
+        Vector3 sp = Camera.main.WorldToScreenPoint(p1);
+        if (sp.x <= 0)
+        {
+            DragCamera.Inst.DoDrag(-10);
+            return;
+        }
+        sp = Camera.main.WorldToScreenPoint(p2);
+        if (sp.x >= Screen.width)
+        {
+            DragCamera.Inst.DoDrag(10);
+            return;
         }
     }
 
@@ -234,6 +273,8 @@ public class Drag : MonoBehaviour
             //Debug.LogWarning("xxxxxxxxxxxxxx " + m_Pos.z);
             transform.position = m_Pos;
         }
+
+        JudgePosOutScreen();
     }
 
     private Vector3 AdjustPos(Vector3 pos)

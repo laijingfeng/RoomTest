@@ -11,6 +11,11 @@ public class DragCamera : MonoBehaviour, IDragHandler, IBeginDragHandler
     private Ray m_Ray;
     private RaycastHit m_HitInfo;
 
+    void Awake()
+    {
+        _inst = this;
+    }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         m_Ray = Camera.main.ScreenPointToRay(Util.GetClickPos());
@@ -49,7 +54,7 @@ public class DragCamera : MonoBehaviour, IDragHandler, IBeginDragHandler
     private Vector3 tmp1;
     private Vector3 tmp2;
 
-    private void DoDrag(float val)
+    public void DoDrag(float val)
     {
         //Debug.LogWarning("val=" + val);
         tmp1 = Camera.main.transform.position;
@@ -80,5 +85,14 @@ public class DragCamera : MonoBehaviour, IDragHandler, IBeginDragHandler
 
         Camera.main.transform.position = tmp1;
         Camera.main.transform.eulerAngles = tmp2;
+    }
+
+    private static DragCamera _inst;
+    public static DragCamera Inst
+    {
+        get
+        {
+            return _inst;
+        }
     }
 }
