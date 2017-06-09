@@ -299,7 +299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_GridSize: {x: 2, y: 2, z: 0}
-  m_OnFloor: 1
+  m_OnFloor: 0
 --- !u!23 &567862672
 MeshRenderer:
   m_ObjectHideFlags: 0
