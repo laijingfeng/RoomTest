@@ -59,6 +59,10 @@ public enum Enum_Event
     SetOne,
     Place2Pos,
     BackOne,
+    /// <summary>
+    /// 放回背包
+    /// </summary>
+    Back2Package,
 }
 
 public enum Enum_Layer

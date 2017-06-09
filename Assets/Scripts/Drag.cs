@@ -42,6 +42,7 @@ public class Drag : MonoBehaviour
         JerryEventMgr.AddEvent(Enum_Event.SetOne.ToString(), EventSetOne);
         JerryEventMgr.AddEvent(Enum_Event.Place2Pos.ToString(), EventPlace2Pos);
         JerryEventMgr.AddEvent(Enum_Event.BackOne.ToString(), EventBackOne);
+        JerryEventMgr.AddEvent(Enum_Event.Back2Package.ToString(), EventBack2Package);
     }
 
     /// <summary>
@@ -91,6 +92,11 @@ public class Drag : MonoBehaviour
             return;
         }
 
+        SelectSelf();
+    }
+
+    private void SelectSelf()
+    {
         if (MapUtil.m_SelectId != 0
             && !MapUtil.m_SelectOK)
         {
@@ -395,6 +401,28 @@ public class Drag : MonoBehaviour
         }
     }
 
+    private void EventBack2Package(object[] args)
+    {
+        int id = (int)args[0];
+        if (id != m_Id)
+        {
+            return;
+        }
+
+        m_InitData.isNew = true;
+
+        MapUtil.m_SelectOK = true;
+        MapUtil.m_SelectId = 0;
+
+        m_Selected = false;
+        this.gameObject.layer = LayerMask.NameToLayer("Cube");
+
+        MyShadow.Inst.SetVisible(false);
+        SetOutLineVisible(false);
+
+        this.transform.position = new Vector3(0, 7, 0);
+    }
+
     private void EventBackOne(object[] args)
     {
         int id = (int)args[0];
@@ -452,4 +480,10 @@ public class Drag : MonoBehaviour
     }
 
     #endregion 事件
+
+    [ContextMenu("放到屏幕中")]
+    private void ToScreen()
+    {
+        SelectSelf();
+    }
 }

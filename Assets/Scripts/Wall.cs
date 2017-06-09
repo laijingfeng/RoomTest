@@ -82,7 +82,7 @@ public class Wall : MonoBehaviour
     void OnGUI()
     {
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Set", GUILayout.MinHeight(60), GUILayout.MinWidth(100)))
+        if (GUILayout.Button("放置选中", GUILayout.MinHeight(60), GUILayout.MinWidth(100)))
         {
             if (MapUtil.m_SelectId == 0
                 || MapUtil.m_SelectOK)
@@ -91,6 +91,16 @@ public class Wall : MonoBehaviour
                 return;
             }
             JerryEventMgr.DispatchEvent(Enum_Event.SetOne.ToString(), new object[] { MapUtil.m_SelectId });
+        }
+        if (GUILayout.Button("回收选中", GUILayout.MinHeight(60), GUILayout.MinWidth(100)))
+        {
+            if (MapUtil.m_SelectId == 0
+                || MapUtil.m_SelectOK)
+            {
+                Debug.LogWarning("没有选中家具");
+                return;
+            }
+            JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
         }
         GUILayout.EndHorizontal();
     }
