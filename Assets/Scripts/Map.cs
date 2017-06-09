@@ -383,7 +383,7 @@ public class Map
             }
             else
             {
-                ret.y = pos.y - ((int)(size.y / 2)) * MapUtil.m_MapGridUnityLen * 0.5f;
+                ret.y = pos.y - ((int)(size.y / 2)) * MapUtil.m_MapGridUnityLen;
             }
 
             if (m_Type == Enum_Layer.Wall)
@@ -394,7 +394,7 @@ public class Map
                 }
                 else
                 {
-                    ret.x = pos.x - ((int)(size.x / 2)) * MapUtil.m_MapGridUnityLen * 0.5f;
+                    ret.x = pos.x - ((int)(size.x / 2)) * MapUtil.m_MapGridUnityLen;
                 }
             }
             else
@@ -405,7 +405,7 @@ public class Map
                 }
                 else
                 {
-                    ret.z = pos.z - ((int)(size.x / 2)) * MapUtil.m_MapGridUnityLen * 0.5f;
+                    ret.z = pos.z - ((int)(size.x / 2)) * MapUtil.m_MapGridUnityLen;
                 }
             }
         }
@@ -417,7 +417,7 @@ public class Map
             }
             else
             {
-                ret.y = pos.y + ((int)(size.y / 2)) * MapUtil.m_MapGridUnityLen * 0.5f;
+                ret.y = pos.y + ((int)(size.y / 2)) * MapUtil.m_MapGridUnityLen;
             }
 
             if (m_Type == Enum_Layer.Wall)
@@ -428,7 +428,7 @@ public class Map
                 }
                 else
                 {
-                    ret.x = pos.x + ((int)(size.x / 2)) * MapUtil.m_MapGridUnityLen * 0.5f;
+                    ret.x = pos.x + ((int)(size.x / 2)) * MapUtil.m_MapGridUnityLen;
                 }
             }
             else
@@ -439,7 +439,7 @@ public class Map
                 }
                 else
                 {
-                    ret.z = pos.z + ((int)(size.x / 2)) * MapUtil.m_MapGridUnityLen * 0.5f;
+                    ret.z = pos.z + ((int)(size.x / 2)) * MapUtil.m_MapGridUnityLen;
                 }
             }
         }
