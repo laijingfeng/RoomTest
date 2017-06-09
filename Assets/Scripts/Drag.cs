@@ -382,7 +382,7 @@ public class Drag : MonoBehaviour
 
     private void SetOutLineVisible(bool show)
     {
-        m_Render.material.SetFloat("_Scale", show ? 1.05f : 1f);
+        m_Render.material.SetFloat("_Scale", show ? 1.02f : 1f);
     }
 
     private void SetOutLineColor(Color col)
