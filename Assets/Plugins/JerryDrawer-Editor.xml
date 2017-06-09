@@ -1,9 +1,14 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>JerryDrawer_Editor</name>
+        <name>JerryDrawer-Editor</name>
     </assembly>
     <members>
+        <member name="T:Jerry.DrawerElementGrid">
+            <summary>
+            平面网格
+            </summary>
+        </member>
         <member name="F:Jerry.DrawerElementBase._id">
             <summary>
             id
@@ -57,6 +62,21 @@
             绘制
             </summary>
             <returns>是否继续往子类传递</returns>
+        </member>
+        <member name="F:Jerry.DrawerElementGrid._minPos">
+            <summary>
+            左下角位置
+            </summary>
+        </member>
+        <member name="F:Jerry.DrawerElementGrid._size">
+            <summary>
+            大小
+            </summary>
+        </member>
+        <member name="F:Jerry.DrawerElementGrid._gridSize">
+            <summary>
+            格子大小
+            </summary>
         </member>
         <member name="F:Jerry.DrawerElementCube._useVectorPoint">
             <summary>

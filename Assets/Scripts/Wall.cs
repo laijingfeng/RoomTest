@@ -54,9 +54,23 @@ public class Wall : MonoBehaviour
         MapUtil.Init();
 
 #if UNITY_EDITOR
-        DrawWall(m_LeftSideWallStartPos, m_LeftSideWallSize, Color.red);
-        DrawWall(m_RightSideWallStartPos, m_RightSideWallSize, Color.red);
-        DrawWall(m_WallStartPos, m_WallSize, Color.black);
+        JerryDrawer.Draw<DrawerElementGrid>()
+                    .SetMinPos(m_LeftSideWallStartPos)
+                    .SetGridSize(new Vector3(0, 0.5f, 0.5f))
+                    .SetSize(m_LeftSideWallSize)
+                    .SetColor(Color.red);
+
+        JerryDrawer.Draw<DrawerElementGrid>()
+                    .SetMinPos(m_RightSideWallStartPos)
+                    .SetGridSize(new Vector3(0, 0.5f, 0.5f))
+                    .SetSize(m_RightSideWallSize)
+                    .SetColor(Color.red);
+
+        JerryDrawer.Draw<DrawerElementGrid>()
+                    .SetMinPos(m_WallStartPos)
+                    .SetGridSize(new Vector3(0.5f, 0.5f, 0))
+                    .SetSize(m_WallSize)
+                    .SetColor(Color.black);
 #endif
     }
 
@@ -106,7 +120,7 @@ public class Wall : MonoBehaviour
         {
             m_ClickDownPos = JerryUtil.GetClickPos();
         }
-        
+
         if (Input.GetMouseButtonUp(0))
         {
             m_ClickUpPos = JerryUtil.GetClickPos();
@@ -129,7 +143,7 @@ public class Wall : MonoBehaviour
                     FirstPos fp = new FirstPos();
                     fp.pos = m_HitInfo.point;
                     fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
-                    
+
                     JerryEventMgr.DispatchEvent(Enum_Event.Place2Pos.ToString(), new object[] { fp });
                 }
             }
@@ -137,51 +151,4 @@ public class Wall : MonoBehaviour
     }
 
     #endregion 点击放置
-
-#if UNITY_EDITOR
-
-    private void DrawWall(Vector3 startPos, Vector3 size, Color color)
-    {
-        if (size.z == 0)
-        {
-            for (int i = 0; i <= size.x; i++)//竖线
-            {
-                DrawLine(startPos + new Vector3(i * MapUtil.m_MapGridUnityLen, 0, 0)
-                    , startPos + new Vector3(i * MapUtil.m_MapGridUnityLen, size.y * MapUtil.m_MapGridUnityLen, 0)
-                    , color);
-            }
-
-            for (int i = 0; i <= size.y; i++)//横线
-            {
-                DrawLine(startPos + new Vector3(0, i * MapUtil.m_MapGridUnityLen, 0)
-                    , startPos + new Vector3(size.x * MapUtil.m_MapGridUnityLen, i * MapUtil.m_MapGridUnityLen, 0)
-                    , color);
-            }
-        }
-        else if (size.x == 0)
-        {
-            for (int i = 0; i <= size.z; i++)//竖线
-            {
-                DrawLine(startPos + new Vector3(0, 0, i * MapUtil.m_MapGridUnityLen)
-                    , startPos + new Vector3(0, size.y * MapUtil.m_MapGridUnityLen, i * MapUtil.m_MapGridUnityLen)
-                    , color);
-            }
-
-            for (int i = 0; i <= size.y; i++)//横线
-            {
-                DrawLine(startPos + new Vector3(0, i * MapUtil.m_MapGridUnityLen, 0)
-                    , startPos + new Vector3(0, i * MapUtil.m_MapGridUnityLen, size.z * MapUtil.m_MapGridUnityLen)
-                    , color);
-            }
-        }
-    }
-
-    private void DrawLine(Vector3 from, Vector3 to, Color color)
-    {
-        JerryDrawer.Draw<DrawerElementPath>()
-                    .SetPoints(from, to)
-                    .SetColor(color);
-    }
-
-#endif
 }
