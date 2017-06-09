@@ -33,6 +33,7 @@ public class Drag : MonoBehaviour
     void Awake()
     {
         m_Render = this.GetComponent<Renderer>();
+        this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.Cube.ToString());
 
         m_Id = Util.IDGenerator(m_Id);
         m_InitData = new DragInitData();
@@ -49,23 +50,23 @@ public class Drag : MonoBehaviour
     /// <param name="wallType"></param>
     /// <param name="pos"></param>
     /// <param name="first">刚进入到这个面</param>
-    public void Init(Enum_Wall wallType, Vector3 pos, bool first)
+    public void Init(Enum_Layer wallType, Vector3 pos, bool first)
     {
         m_InitData = MapUtil.InitDrag(m_GridSize, m_OnFloor, m_InitData, wallType);
 
         switch (m_InitData.m_CurWall)
         {
-            case Enum_Wall.LeftWall:
+            case Enum_Layer.LeftWall:
                 {
                     this.transform.eulerAngles = new Vector3(0, -90, 0);
                 }
                 break;
-            case Enum_Wall.RightWall:
+            case Enum_Layer.RightWall:
                 {
                     this.transform.eulerAngles = new Vector3(0, 90, 0);
                 }
                 break;
-            case Enum_Wall.Wall:
+            case Enum_Layer.Wall:
                 {
                     this.transform.eulerAngles = Vector3.zero;
                 }
@@ -85,9 +86,7 @@ public class Drag : MonoBehaviour
         }
 
         m_ClickUpPos = JerryUtil.GetClickPos();
-        if (Mathf.Abs(m_ClickUpPos.x - m_ClickDownPos.x) > 0.1f
-            || Mathf.Abs(m_ClickUpPos.y - m_ClickDownPos.y) > 0.1f
-            || Mathf.Abs(m_ClickUpPos.z - m_ClickDownPos.z) > 0.1f)
+        if (!Util.Vector3Equal(m_ClickUpPos, m_ClickDownPos))
         {
             return;
         }
@@ -108,7 +107,7 @@ public class Drag : MonoBehaviour
             FirstPos fp = MapUtil.GetFirstPos();
             Init(fp.wallType, fp.pos, true);
         }
-        else if (m_InitData.m_CurWall != Enum_Wall.None)
+        else if (m_InitData.m_CurWall != Enum_Layer.None)
         {
             //先浮起来，再记录，保持回退时一致性
             m_Pos = this.transform.position;
@@ -126,7 +125,7 @@ public class Drag : MonoBehaviour
         MapUtil.m_SelectNew = m_InitData.isNew;
 
         m_InitData.isNew = false;
-        this.gameObject.layer = LayerMask.NameToLayer("ActiveCube");
+        this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.ActiveCube.ToString());
         m_Selected = true;
 
         bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_GridSize);
@@ -167,14 +166,12 @@ public class Drag : MonoBehaviour
             //    mScreenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z);
             //    m_Pos = offset + camera.ScreenToWorldPoint(mScreenPosition);
 
-            //    if (Mathf.Abs(m_Pos.x - m_LastPos.x) > 0.1f
-            //        || Mathf.Abs(m_Pos.y - m_LastPos.y) > 0.1f
-            //        || Mathf.Abs(m_Pos.z - m_LastPos.z) > 0.1f)
+            //    if (!Util.Vector3Equal(m_Pos, m_LastPos))
             //    {
             //        m_LastPos = m_Pos;
             //        Place2Pos(m_Pos);
             //    }
-            //    yield return new WaitForFixedUpdate();
+            //    yield return new WaitForEndOfFrame();
             //}
 
             while (Input.GetMouseButton(0))
@@ -185,9 +182,9 @@ public class Drag : MonoBehaviour
                     JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
                     new string[]
                     {
-                        Enum_Wall.Wall.ToString(),
-                        Enum_Wall.LeftWall.ToString(),
-                        Enum_Wall.RightWall.ToString(),
+                        Enum_Layer.Wall.ToString(),
+                        Enum_Layer.LeftWall.ToString(),
+                        Enum_Layer.RightWall.ToString(),
                     })))
                 {
                     if (m_HitInfo.collider != null
@@ -195,29 +192,9 @@ public class Drag : MonoBehaviour
                     {
                         FirstPos fp = new FirstPos();
                         fp.pos = m_HitInfo.point;
-                        string layerName = LayerMask.LayerToName(m_HitInfo.collider.gameObject.layer);
-                        switch (layerName)
-                        {
-                            case "Wall":
-                                {
-                                    fp.wallType = Enum_Wall.Wall;
-                                }
-                                break;
-                            case "LeftWall":
-                                {
-                                    fp.wallType = Enum_Wall.LeftWall;
-                                }
-                                break;
-                            case "RightWall":
-                                {
-                                    fp.wallType = Enum_Wall.RightWall;
-                                }
-                                break;
-                        }
+                        fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
 
-                        if (Mathf.Abs(fp.pos.x - m_LastPos.x) > 0.1f
-                            || Mathf.Abs(fp.pos.y - m_LastPos.y) > 0.1f
-                            || Mathf.Abs(fp.pos.z - m_LastPos.z) > 0.1f)
+                        if (!Util.Vector3Equal(fp.pos, m_LastPos))
                         {
                             m_LastPos = fp.pos;
 
@@ -232,7 +209,7 @@ public class Drag : MonoBehaviour
                         }
                     }
                 }
-                yield return new WaitForFixedUpdate();
+                yield return new WaitForEndOfFrame();
             }
         }
     }
@@ -243,19 +220,19 @@ public class Drag : MonoBehaviour
         Vector3 p1 = Vector3.zero, p2 = Vector3.zero;
         switch (m_InitData.m_CurWall)
         {
-            case Enum_Wall.Wall:
+            case Enum_Layer.Wall:
                 {
                     p1 = p - new Vector3(m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen + MapUtil.m_MapGridUnityLen, 0, 0);
                     p2 = p + new Vector3(m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen + MapUtil.m_MapGridUnityLen, 0, 0);
                 }
                 break;
-            case Enum_Wall.LeftWall:
+            case Enum_Layer.LeftWall:
                 {
                     p1 = p - new Vector3(m_GridSize.z / 2 * MapUtil.m_MapGridUnityLen + MapUtil.m_MapGridUnityLen, 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
                     p2 = p + new Vector3(m_GridSize.z / 2 * MapUtil.m_MapGridUnityLen, 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
                 }
                 break;
-            case Enum_Wall.RightWall:
+            case Enum_Layer.RightWall:
                 {
                     p1 = p + new Vector3(-(m_GridSize.z / 2 * MapUtil.m_MapGridUnityLen), 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
                     p2 = p - new Vector3(-(m_GridSize.z / 2 * MapUtil.m_MapGridUnityLen + MapUtil.m_MapGridUnityLen), 0, m_GridSize.x / 2 * MapUtil.m_MapGridUnityLen);
@@ -287,11 +264,11 @@ public class Drag : MonoBehaviour
         MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, true, ref pos);
         //Debug.LogWarning("one11111 " + pos + "  " + pos.z);
         m_Pos = AdjustPos(pos);
-        Enum_Wall changeType = Enum_Wall.None;
+        Enum_Layer changeType = Enum_Layer.None;
 
         //Debug.LogWarning(m_Pos.x + "  " + m_Pos.z + " sss " + m_InitData.m_MaxPos.x + " " + m_InitData.m_MaxPos.y + " " + m_InitData.m_MaxPos.z);
 
-        if (m_InitData.m_CurWall == Enum_Wall.Wall)
+        if (m_InitData.m_CurWall == Enum_Layer.Wall)
         {
             m_Pos.x = Mathf.Clamp(m_Pos.x, m_InitData.m_MinPos.x, m_InitData.m_MaxPos.x);
             if (m_Pos.x <= m_InitData.m_MinPos.x)
@@ -302,7 +279,7 @@ public class Drag : MonoBehaviour
                 }
                 else
                 {
-                    changeType = Enum_Wall.LeftWall;
+                    changeType = Enum_Layer.LeftWall;
                 }
             }
             else if (m_Pos.x >= m_InitData.m_MaxPos.x)
@@ -313,7 +290,7 @@ public class Drag : MonoBehaviour
                 }
                 else
                 {
-                    changeType = Enum_Wall.RightWall;
+                    changeType = Enum_Layer.RightWall;
                 }
             }
         }
@@ -328,13 +305,13 @@ public class Drag : MonoBehaviour
                 }
                 else
                 {
-                    changeType = Enum_Wall.Wall;
+                    changeType = Enum_Layer.Wall;
                 }
             }
         }
         m_Pos.y = Mathf.Clamp(m_Pos.y, m_InitData.m_MinPos.y, m_InitData.m_MaxPos.y);
 
-        if (changeType != Enum_Wall.None)
+        if (changeType != Enum_Layer.None)
         {
             bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_GridSize);
             MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(this.transform.position), this.transform.eulerAngles);
@@ -363,7 +340,7 @@ public class Drag : MonoBehaviour
     private Vector3 AdjustPos(Vector3 pos)
     {
         Vector3 v = new Vector3((int)(pos.x / m_InitData.m_AdjustPar.x), (int)(pos.y / m_InitData.m_AdjustPar.y), (int)(pos.z / m_InitData.m_AdjustPar.z));
-        if (m_InitData.m_CurWall == Enum_Wall.Wall)
+        if (m_InitData.m_CurWall == Enum_Layer.Wall)
         {
             pos.x = MyClamp(pos.x, m_InitData.m_AdjustPar.x * v.x, m_InitData.m_AdjustPar.x * (v.x + 1 * Mathf.Sign(v.x)));
         }
@@ -417,14 +394,14 @@ public class Drag : MonoBehaviour
             return;
         }
 
-        if (m_InitData.m_LastWall != Enum_Wall.None)
+        if (m_InitData.m_LastWall != Enum_Layer.None)
         {
             if (MapUtil.GetMap(m_InitData.m_LastWall).SetOne(m_InitData.m_LastPos, m_GridSize))
             {
                 m_InitData.m_CurWall = m_InitData.m_LastWall;
 
                 m_Selected = false;
-                this.gameObject.layer = LayerMask.NameToLayer("Cube");
+                this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.Cube.ToString());
                 m_Pos = m_InitData.m_LastPos;
                 MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
                 this.transform.position = m_Pos;

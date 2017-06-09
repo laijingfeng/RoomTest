@@ -40,6 +40,17 @@ public class Util
         }
         return id;
     }
+
+    public static bool Vector3Equal(Vector3 a, Vector3 b)
+    {
+        if (Mathf.Abs(a.x - b.x) > 0.1f
+            || Mathf.Abs(a.y - b.y) > 0.1f
+            || Mathf.Abs(a.z - b.z) > 0.1f)
+        {
+            return false;
+        }
+        return true;
+    }
 }
 
 public enum Enum_Event
@@ -50,12 +61,17 @@ public enum Enum_Event
     BackOne,
 }
 
-public enum Enum_Wall
+public enum Enum_Layer
 {
     None = 0,
-    LeftWall,
-    Wall,
-    RightWall,
+    Wall = 8,
+    LeftWall = 9,
+    RightWall = 10,
+    Cube = 11,
+    /// <summary>
+    /// 选中的Cube
+    /// </summary>
+    ActiveCube = 12,
 }
 
 public class DragInitData
@@ -66,15 +82,18 @@ public class DragInitData
 
     public bool isNew = false;
 
-    public Enum_Wall m_CurWall = Enum_Wall.None;
+    public Enum_Layer m_CurWall = Enum_Layer.None;
     public Vector3 m_CurPos = Vector3.zero;
 
-    public Enum_Wall m_LastWall = Enum_Wall.None;
+    /// <summary>
+    /// 用来回退
+    /// </summary>
+    public Enum_Layer m_LastWall = Enum_Layer.None;
     public Vector3 m_LastPos = Vector3.zero;
 }
 
 public class FirstPos
 {
     public Vector3 pos;
-    public Enum_Wall wallType;
+    public Enum_Layer wallType;
 }

@@ -25,24 +25,24 @@ public class MapUtil
         m_SelectId = 0;
         m_SelectOK = true;
 
-        m_LeftSideWall.Init(Enum_Wall.LeftWall);
-        m_Wall.Init(Enum_Wall.Wall);
-        m_RightSideWall.Init(Enum_Wall.RightWall);
+        m_LeftSideWall.Init(Enum_Layer.LeftWall);
+        m_Wall.Init(Enum_Layer.Wall);
+        m_RightSideWall.Init(Enum_Layer.RightWall);
     }
 
-    public static Map GetMap(Enum_Wall type)
+    public static Map GetMap(Enum_Layer type)
     {
         switch (type)
         {
-            case Enum_Wall.LeftWall:
+            case Enum_Layer.LeftWall:
                 {
                     return m_LeftSideWall;
                 }
-            case Enum_Wall.Wall:
+            case Enum_Layer.Wall:
                 {
                     return m_Wall;
                 }
-            case Enum_Wall.RightWall:
+            case Enum_Layer.RightWall:
                 {
                     return m_RightSideWall;
                 }
@@ -50,7 +50,7 @@ public class MapUtil
         return null;
     }
 
-    public static DragInitData InitDrag(Vector3 size, bool onFloor, DragInitData oldData, Enum_Wall wall)
+    public static DragInitData InitDrag(Vector3 size, bool onFloor, DragInitData oldData, Enum_Layer wall)
     {
         if (oldData == null)
         {
@@ -65,11 +65,15 @@ public class MapUtil
         return oldData;
     }
 
+    /// <summary>
+    /// 默认放一个位置
+    /// </summary>
+    /// <returns></returns>
     public static FirstPos GetFirstPos()
     {
         FirstPos ret = new FirstPos();
         ret.pos = Vector3.zero;
-        ret.wallType = Enum_Wall.Wall;
+        ret.wallType = Enum_Layer.Wall;
 
         Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
         RaycastHit hitInfo;
@@ -77,35 +81,64 @@ public class MapUtil
             JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
                 new string[]
                 {
-                    Enum_Wall.Wall.ToString(),
-                    Enum_Wall.LeftWall.ToString(),
-                    Enum_Wall.RightWall.ToString(),
+                    Enum_Layer.Wall.ToString(),
+                    Enum_Layer.LeftWall.ToString(),
+                    Enum_Layer.RightWall.ToString(),
                 })))
         {
             if (hitInfo.collider != null
                 && hitInfo.collider.gameObject != null)
             {
                 ret.pos = hitInfo.point;
-                string layerName = LayerMask.LayerToName(hitInfo.collider.gameObject.layer);
-                switch (layerName)
-                {
-                    case "Wall":
-                        {
-                            ret.wallType = Enum_Wall.Wall;
-                        }
-                        break;
-                    case "LeftWall":
-                        {
-                            ret.wallType = Enum_Wall.LeftWall;
-                        }
-                        break;
-                    case "RightWall":
-                        {
-                            ret.wallType = Enum_Wall.RightWall;
-                        }
-                        break;
-                }
+                ret.wallType = WallLayer2Enum(hitInfo.collider.gameObject.layer);
             }
+        }
+        return ret;
+    }
+
+    public static bool IsWallLayer(int layer)
+    {
+        if(layer == Enum_Layer.Wall.GetHashCode()
+            || layer == Enum_Layer.LeftWall.GetHashCode()
+            || layer == Enum_Layer.RightWall.GetHashCode())
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public static Enum_Layer WallLayer2Enum(int layer)
+    {
+        Enum_Layer ret = Enum_Layer.None;
+        if (layer == Enum_Layer.Wall.GetHashCode())
+        {
+            ret = Enum_Layer.Wall;
+        }
+        else if (layer == Enum_Layer.LeftWall.GetHashCode())
+        {
+            ret = Enum_Layer.LeftWall;
+        }
+        else if (layer == Enum_Layer.RightWall.GetHashCode())
+        {
+            ret = Enum_Layer.RightWall;
+        }
+        return ret;
+    }
+
+    public static Enum_Layer WallLayerName2Enum(string layerName)
+    {
+        Enum_Layer ret = Enum_Layer.None;
+        if (layerName == Enum_Layer.Wall.ToString())
+        {
+            ret = Enum_Layer.Wall;
+        }
+        else if (layerName == Enum_Layer.LeftWall.ToString())
+        {
+            ret = Enum_Layer.LeftWall;
+        }
+        else if (layerName == Enum_Layer.RightWall.ToString())
+        {
+            ret = Enum_Layer.RightWall;
         }
         return ret;
     }

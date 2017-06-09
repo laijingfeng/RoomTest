@@ -73,19 +73,11 @@ public class Wall : MonoBehaviour
             if (MapUtil.m_SelectId == 0
                 || MapUtil.m_SelectOK)
             {
-                Debug.LogWarning("空");
+                Debug.LogWarning("没有选中家具");
                 return;
             }
             JerryEventMgr.DispatchEvent(Enum_Event.SetOne.ToString(), new object[] { MapUtil.m_SelectId });
         }
-        //if (GUILayout.Button("Init", GUILayout.MinHeight(40), GUILayout.MinWidth(80)))
-        //{
-        //    Drag[] drags = this.transform.parent.GetComponentsInChildren<Drag>();
-        //    foreach (Drag d in drags)
-        //    {
-        //        d.Init();
-        //    }
-        //}
         GUILayout.EndHorizontal();
     }
 
@@ -94,6 +86,9 @@ public class Wall : MonoBehaviour
     private Vector3 m_ClickDownPos = Vector3.zero;
     private Vector3 m_ClickUpPos = Vector3.zero;
 
+    /// <summary>
+    /// 点击放置
+    /// </summary>
     private void ClickPlaceObj()
     {
         if (!m_CanClickPlaceObj)
@@ -115,9 +110,7 @@ public class Wall : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
         {
             m_ClickUpPos = JerryUtil.GetClickPos();
-            if (Mathf.Abs(m_ClickUpPos.x - m_ClickDownPos.x) > 0.1f
-                || Mathf.Abs(m_ClickUpPos.y - m_ClickDownPos.y) > 0.1f
-                || Mathf.Abs(m_ClickUpPos.z - m_ClickDownPos.z) > 0.1f)
+            if (!Util.Vector3Equal(m_ClickUpPos, m_ClickDownPos))
             {
                 return;
             }
@@ -131,34 +124,12 @@ public class Wall : MonoBehaviour
                 {
                     return;
                 }
-                string layerName = LayerMask.LayerToName(m_HitInfo.collider.gameObject.layer);
-                //Debug.LogWarning(layerName + " " + m_HitInfo.point);
-                if (layerName == Enum_Wall.Wall.ToString()
-                    || layerName == Enum_Wall.LeftWall.ToString()
-                    || layerName == Enum_Wall.RightWall.ToString())
+                if (MapUtil.IsWallLayer(m_HitInfo.collider.gameObject.layer))
                 {
                     FirstPos fp = new FirstPos();
                     fp.pos = m_HitInfo.point;
-
-                    switch (layerName)
-                    {
-                        case "Wall":
-                            {
-                                fp.wallType = Enum_Wall.Wall;
-                            }
-                            break;
-                        case "LeftWall":
-                            {
-                                fp.wallType = Enum_Wall.LeftWall;
-                            }
-                            break;
-                        case "RightWall":
-                            {
-                                fp.wallType = Enum_Wall.RightWall;
-                            }
-                            break;
-                    }
-
+                    fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
+                    
                     JerryEventMgr.DispatchEvent(Enum_Event.Place2Pos.ToString(), new object[] { fp });
                 }
             }

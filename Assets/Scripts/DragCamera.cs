@@ -26,12 +26,13 @@ public class DragCamera : MonoBehaviour, IDragHandler, IBeginDragHandler
             JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
                 new string[]
                 {
-                    "ActiveCube"
+                    Enum_Layer.ActiveCube.ToString()
                 })))
         {
             if (m_HitInfo.collider != null
                 && m_HitInfo.collider.gameObject != null)
             {
+                //点到选中的物体，是移动物体，不移动镜头
                 m_DragUsefull = false;
                 return;
             }
