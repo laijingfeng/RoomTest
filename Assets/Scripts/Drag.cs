@@ -26,10 +26,14 @@ public class Drag : MonoBehaviour
     private Vector3 m_Pos;
     private Vector3 m_LastPos;
 
+    private Renderer m_Render;
+
     private DragInitData m_InitData = null;
 
     void Awake()
     {
+        m_Render = this.GetComponent<Renderer>();
+
         m_Id = Util.IDGenerator(m_Id);
         m_InitData = new DragInitData();
         m_InitData.isNew = true;
@@ -125,9 +129,14 @@ public class Drag : MonoBehaviour
         this.gameObject.layer = LayerMask.NameToLayer("ActiveCube");
         m_Selected = true;
 
+        bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_GridSize);
+
+        SetOutLineVisible(true);
+        SetOutLineColor(canSet ? Color.green : Color.red);
         MyShadow.Inst.SetSize(m_GridSize);
         MyShadow.Inst.SetVisible(true);
-        MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(m_GridSize, false, this.transform.position), this.transform.eulerAngles);
+        MyShadow.Inst.SetColor(canSet ? Color.green : Color.red);
+        MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(this.transform.position), this.transform.eulerAngles);
     }
 
     private Ray m_Ray;
@@ -327,11 +336,13 @@ public class Drag : MonoBehaviour
 
         if (changeType != Enum_Wall.None)
         {
+            bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_GridSize);
+            MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(this.transform.position), this.transform.eulerAngles);
+            SetOutLineColor(canSet ? Color.green : Color.red);
+            MyShadow.Inst.SetColor(canSet ? Color.green : Color.red);
+
             MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
             transform.position = m_Pos;
-
-            MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(m_GridSize, false, this.transform.position), this.transform.eulerAngles);
-            //Debug.LogWarning("ddd " + changeType + " " + m_Pos.x + " " + m_Pos.y + " " + m_Pos.z);
 
             Init(changeType, m_Pos, true);
         }
@@ -340,7 +351,10 @@ public class Drag : MonoBehaviour
             //Debug.LogWarning("xxxxxxxxxxxxxx " + m_Pos.z);
             transform.position = m_Pos;
 
-            MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(m_GridSize, false, this.transform.position), this.transform.eulerAngles);
+            bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_GridSize);
+            MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(this.transform.position), this.transform.eulerAngles);
+            SetOutLineColor(canSet ? Color.green : Color.red);
+            MyShadow.Inst.SetColor(canSet ? Color.green : Color.red);
         }
 
         JudgePosOutScreen();
@@ -364,6 +378,16 @@ public class Drag : MonoBehaviour
     private float MyClamp(float x, float v1, float v2)
     {
         return Mathf.Abs(v1 - x) > Mathf.Abs(v2 - x) ? v2 : v1;
+    }
+
+    private void SetOutLineVisible(bool show)
+    {
+        m_Render.material.SetFloat("_Scale", show ? 1.05f : 1f);
+    }
+
+    private void SetOutLineColor(Color col)
+    {
+        m_Render.material.SetColor("_OutlineColor", col);
     }
 
     #region 事件
@@ -406,6 +430,7 @@ public class Drag : MonoBehaviour
                 this.transform.position = m_Pos;
 
                 MyShadow.Inst.SetVisible(false);
+                SetOutLineVisible(false);
             }
         }
     }
@@ -430,6 +455,8 @@ public class Drag : MonoBehaviour
             this.transform.position = m_Pos;
 
             MyShadow.Inst.SetVisible(false);
+            SetOutLineVisible(false);
+
             Debug.LogWarning("设置OK");
         }
         else

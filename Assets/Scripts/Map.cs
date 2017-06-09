@@ -37,7 +37,7 @@ public class Map
         }
     }
 
-    public Vector3 AdjustZ2(Vector3 size, bool floating, Vector3 pos)
+    public Vector3 AdjustZ2(Vector3 pos)
     {
         if (m_Type == Enum_Wall.Wall)
         {
