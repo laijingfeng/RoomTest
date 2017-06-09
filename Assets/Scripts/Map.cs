@@ -24,6 +24,17 @@ public class Map
                 }
             }
         }
+        else if (m_Type == Enum_Layer.FloorWall)
+        {
+            m_Flag = new bool[(int)m_Size.x, (int)m_Size.z];
+            for (int i = 0; i < (int)m_Size.x; i++)
+            {
+                for (int j = 0; j < (int)m_Size.z; j++)
+                {
+                    m_Flag[i, j] = false;
+                }
+            }
+        }
         else
         {
             m_Flag = new bool[(int)m_Size.z, (int)m_Size.y];
@@ -43,7 +54,7 @@ public class Map
         {
             pos.z = m_StartPos.z - 0.01f;
         }
-        else if(m_Type == Enum_Layer.LeftWall)
+        else if (m_Type == Enum_Layer.LeftWall)
         {
             pos.x = m_StartPos.x + 0.01f;
         }

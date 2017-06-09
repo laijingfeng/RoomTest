@@ -76,6 +76,7 @@ public enum Enum_Layer
     /// 选中的Cube
     /// </summary>
     ActiveCube = 12,
+    FloorWall = 13,
 }
 
 public class DragInitData

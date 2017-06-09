@@ -19,6 +19,7 @@ public class MapUtil
     public static Map m_LeftSideWall = new Map();
     public static Map m_Wall = new Map();
     public static Map m_RightSideWall = new Map();
+    public static Map m_FloorWall = new Map();
 
     public static void Init()
     {
@@ -28,6 +29,7 @@ public class MapUtil
         m_LeftSideWall.Init(Enum_Layer.LeftWall);
         m_Wall.Init(Enum_Layer.Wall);
         m_RightSideWall.Init(Enum_Layer.RightWall);
+        m_FloorWall.Init(Enum_Layer.FloorWall);
     }
 
     public static Map GetMap(Enum_Layer type)

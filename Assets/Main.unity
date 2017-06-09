@@ -1257,6 +1257,8 @@ MonoBehaviour:
   m_LeftSideWallSize: {x: 0, y: 6, z: 8}
   m_RightSideWallStartPos: {x: 6, y: 0, z: -4}
   m_RightSideWallSize: {x: 0, y: 6, z: 8}
+  m_FloorWallStartPos: {x: -6, y: 0, z: -4}
+  m_FloorWallSize: {x: 24, y: 0, z: 8}
   m_MapGridUnityLen: 0.5
   m_CanClickPlaceObj: 1
 --- !u!1 &1281540308

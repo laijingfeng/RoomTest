@@ -21,6 +21,12 @@ public class Wall : MonoBehaviour
     /// </summary>
     public Vector3 m_RightSideWallSize;
 
+    public Vector3 m_FloorWallStartPos;
+    /// <summary>
+    /// 宽*高=x*y
+    /// </summary>
+    public Vector3 m_FloorWallSize;
+
     public float m_MapGridUnityLen;
     public bool m_CanClickPlaceObj = true;
 
@@ -51,6 +57,9 @@ public class Wall : MonoBehaviour
         MapUtil.m_RightSideWall.m_StartPos = m_RightSideWallStartPos;
         MapUtil.m_RightSideWall.m_Size = m_RightSideWallSize;
 
+        MapUtil.m_FloorWall.m_StartPos = m_FloorWallStartPos;
+        MapUtil.m_FloorWall.m_Size = m_FloorWallSize;
+
         MapUtil.Init();
 
 #if UNITY_EDITOR
@@ -70,6 +79,12 @@ public class Wall : MonoBehaviour
                     .SetMinPos(m_WallStartPos)
                     .SetGridSize(new Vector3(0.5f, 0.5f, 0))
                     .SetSize(m_WallSize)
+                    .SetColor(Color.black);
+
+        JerryDrawer.Draw<DrawerElementGrid>()
+                    .SetMinPos(m_FloorWallStartPos)
+                    .SetGridSize(new Vector3(0.5f, 0, 0.5f))
+                    .SetSize(m_FloorWallSize)
                     .SetColor(Color.black);
 #endif
     }
