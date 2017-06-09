@@ -144,4 +144,20 @@ public class MapUtil
         }
         return ret;
     }
+
+    public enum SetType
+    {
+        /// <summary>
+        /// 墙
+        /// </summary>
+        Wall = 0,
+        /// <summary>
+        /// 墙角
+        /// </summary>
+        WallFloor,
+        /// <summary>
+        /// 地面
+        /// </summary>
+        Floor,
+    }
 }
