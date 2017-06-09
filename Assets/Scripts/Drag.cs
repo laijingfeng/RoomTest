@@ -194,6 +194,8 @@ public class Drag : MonoBehaviour
                         fp.pos = m_HitInfo.point;
                         fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
 
+                        //Debug.LogWarning(fp.wallType + " xxx " + m_InitData.m_CurWall);
+
                         if (!Util.Vector3Equal(fp.pos, m_LastPos))
                         {
                             m_LastPos = fp.pos;
@@ -204,7 +206,8 @@ public class Drag : MonoBehaviour
                             }
                             else
                             {
-                                Init(fp.wallType, fp.pos, false);
+                                //Debug.LogWarning("1111");
+                                Init(fp.wallType, fp.pos, true);
                             }
                         }
                     }
@@ -313,10 +316,8 @@ public class Drag : MonoBehaviour
 
         if (changeType != Enum_Layer.None)
         {
-            bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_GridSize);
-            MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(this.transform.position), this.transform.eulerAngles);
-            SetOutLineColor(canSet ? Color.green : Color.red);
-            MyShadow.Inst.SetColor(canSet ? Color.green : Color.red);
+            //Debug.LogWarning("yyyyyyyyyyyy " + m_Pos.x);
+            //这一步不标记状态，因为已经越界了
 
             MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
             transform.position = m_Pos;
@@ -325,7 +326,7 @@ public class Drag : MonoBehaviour
         }
         else
         {
-            //Debug.LogWarning("xxxxxxxxxxxxxx " + m_Pos.z);
+            //Debug.LogWarning("xxxxxxxxxxxxxx " + m_Pos.x);
             transform.position = m_Pos;
 
             bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_GridSize);
@@ -339,16 +340,24 @@ public class Drag : MonoBehaviour
 
     private Vector3 AdjustPos(Vector3 pos)
     {
-        Vector3 v = new Vector3((int)(pos.x / m_InitData.m_AdjustPar.x), (int)(pos.y / m_InitData.m_AdjustPar.y), (int)(pos.z / m_InitData.m_AdjustPar.z));
+        Vector3 v = pos / MapUtil.m_MapGridUnityLen;
+        v.x = (int)v.x;
+        v.y = (int)v.y;
+        v.z = (int)v.z;
+
         if (m_InitData.m_CurWall == Enum_Layer.Wall)
         {
-            pos.x = MyClamp(pos.x, m_InitData.m_AdjustPar.x * v.x, m_InitData.m_AdjustPar.x * (v.x + 1 * Mathf.Sign(v.x)));
+            pos.x = MyClamp(pos.x, MapUtil.m_MapGridUnityLen * v.x, MapUtil.m_MapGridUnityLen * (v.x + 1 * Mathf.Sign(v.x)));
+            pos.x -= m_InitData.m_AdjustPar.x * Mathf.Sign(pos.x);
+            //缓解转角，用减
         }
         else
         {
-            pos.z = MyClamp(pos.z, m_InitData.m_AdjustPar.z * v.z, m_InitData.m_AdjustPar.z * (v.z + 1 * Mathf.Sign(v.z)));
+            pos.z = MyClamp(pos.z, MapUtil.m_MapGridUnityLen * v.z, MapUtil.m_MapGridUnityLen * (v.z + 1 * Mathf.Sign(v.z)));
+            pos.z -= m_InitData.m_AdjustPar.z * Mathf.Sign(pos.z);
         }
-        pos.y = MyClamp(pos.y, m_InitData.m_AdjustPar.y * v.y, m_InitData.m_AdjustPar.y * (v.y + 1 * Mathf.Sign(v.y)));
+        pos.y = MyClamp(pos.y, MapUtil.m_MapGridUnityLen * v.y, MapUtil.m_MapGridUnityLen * (v.y + 1 * Mathf.Sign(v.y)));
+        pos.y -= m_InitData.m_AdjustPar.y * Mathf.Sign(pos.y);
         return pos;
     }
 

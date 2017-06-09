@@ -133,7 +133,7 @@ public class Map
         {
             if (((int)size.x) % 2 == 0)
             {
-                ret.x = MapUtil.m_MapGridUnityLen;
+                ret.x = 0;
             }
             else
             {
@@ -144,7 +144,7 @@ public class Map
         {
             if (((int)size.x) % 2 == 0)
             {
-                ret.z = MapUtil.m_MapGridUnityLen;
+                ret.z = 0;
             }
             else
             {
@@ -154,12 +154,14 @@ public class Map
 
         if (((int)size.y) % 2 == 0)
         {
-            ret.y = MapUtil.m_MapGridUnityLen;
+            ret.y = 0;
         }
         else
         {
-            size.y = MapUtil.m_MapGridUnityLen / 2;
+            ret.y = MapUtil.m_MapGridUnityLen / 2;
         }
+
+        //Debug.LogWarning("ret " + ret.x + " " + ret.y + " " + ret.z);
 
         return ret;
     }
@@ -208,6 +210,8 @@ public class Map
     {
         Vector3 min = Pos2Grid(GetCornerPos(pos, size, true));
         Vector3 max = Pos2Grid(GetCornerPos(pos, size, false));
+
+        //Debug.LogWarning(min.x + " " + min.y + " " + max.x + " " + max.y + " " + m_Type);
 
         for (int i = (int)min.x; i <= (int)max.x; i++)
         {

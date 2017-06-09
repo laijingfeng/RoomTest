@@ -57,7 +57,7 @@ Material:
       data:
         first:
           name: _TextureColor
-        second: {r: 0.41534424, g: 0.43382353, b: 0.29984862, a: 1}
+        second: {r: 0.21715786, g: 0.2352941, b: 0.10380622, a: 1}
       data:
         first:
           name: _OutlineColor
