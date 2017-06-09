@@ -58,9 +58,13 @@ public class Map
         {
             pos.x = m_StartPos.x + 0.01f;
         }
-        else
+        else if (m_Type == Enum_Layer.RightWall)
         {
             pos.x = m_StartPos.x - 0.01f;
+        }
+        else if (m_Type == Enum_Layer.FloorWall)
+        {
+            pos.y = m_StartPos.y + 0.01f;
         }
         return pos;
     }
@@ -91,6 +95,14 @@ public class Map
                 pos.x -= MapUtil.m_AdjustZVal;
             }
         }
+        else
+        {
+            pos.y = m_StartPos.y + size.z * MapUtil.m_MapGridUnityLen / 2.0f;
+            if (floating)
+            {
+                pos.y += MapUtil.m_AdjustZVal;
+            }
+        }
     }
 
     public void GetMinMaxPos(Vector3 size, bool onFloor, ref DragInitData data)
@@ -109,7 +121,8 @@ public class Map
                 data.m_MaxPos.y = data.m_MinPos.y;
             }
         }
-        else
+        else if (m_Type == Enum_Layer.LeftWall
+            || m_Type == Enum_Layer.RightWall)
         {
             data.m_MinPos = m_StartPos
                 + new Vector3(0, size.y * MapUtil.m_MapGridUnityLen / 2, size.x * MapUtil.m_MapGridUnityLen / 2);
@@ -129,7 +142,8 @@ public class Map
             data.m_MinPos.x -= MapUtil.m_MapGridUnityLen;
             data.m_MaxPos.x += MapUtil.m_MapGridUnityLen;
         }
-        else
+        else if (m_Type == Enum_Layer.LeftWall
+            || m_Type == Enum_Layer.RightWall)
         {
             data.m_MaxPos.z += MapUtil.m_MapGridUnityLen;
         }
