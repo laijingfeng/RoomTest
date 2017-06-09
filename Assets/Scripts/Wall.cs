@@ -78,16 +78,6 @@ public class Wall : MonoBehaviour
             }
             JerryEventMgr.DispatchEvent(Enum_Event.SetOne.ToString(), new object[] { MapUtil.m_SelectId });
         }
-
-        if (GUILayout.Button("+", GUILayout.MinHeight(60), GUILayout.MinWidth(100)))
-        {
-            Camera.main.transform.eulerAngles += new Vector3(0, 5, 0);
-        }
-
-        if (GUILayout.Button("-", GUILayout.MinHeight(60), GUILayout.MinWidth(100)))
-        {
-            Camera.main.transform.eulerAngles += new Vector3(0, -5, 0);
-        }
         //if (GUILayout.Button("Init", GUILayout.MinHeight(40), GUILayout.MinWidth(80)))
         //{
         //    Drag[] drags = this.transform.parent.GetComponentsInChildren<Drag>();
