@@ -124,6 +124,10 @@ public class Drag : MonoBehaviour
         m_InitData.isNew = false;
         this.gameObject.layer = LayerMask.NameToLayer("ActiveCube");
         m_Selected = true;
+
+        MyShadow.Inst.SetSize(m_GridSize);
+        MyShadow.Inst.SetVisible(true);
+        MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(m_GridSize, false, this.transform.position), this.transform.eulerAngles);
     }
 
     private Ray m_Ray;
@@ -325,6 +329,8 @@ public class Drag : MonoBehaviour
         {
             MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
             transform.position = m_Pos;
+
+            MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(m_GridSize, false, this.transform.position), this.transform.eulerAngles);
             //Debug.LogWarning("ddd " + changeType + " " + m_Pos.x + " " + m_Pos.y + " " + m_Pos.z);
 
             Init(changeType, m_Pos, true);
@@ -333,6 +339,8 @@ public class Drag : MonoBehaviour
         {
             //Debug.LogWarning("xxxxxxxxxxxxxx " + m_Pos.z);
             transform.position = m_Pos;
+
+            MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(m_GridSize, false, this.transform.position), this.transform.eulerAngles);
         }
 
         JudgePosOutScreen();
@@ -396,6 +404,8 @@ public class Drag : MonoBehaviour
                 m_Pos = m_InitData.m_LastPos;
                 MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
                 this.transform.position = m_Pos;
+
+                MyShadow.Inst.SetVisible(false);
             }
         }
     }
@@ -419,6 +429,7 @@ public class Drag : MonoBehaviour
             MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
             this.transform.position = m_Pos;
 
+            MyShadow.Inst.SetVisible(false);
             Debug.LogWarning("设置OK");
         }
         else

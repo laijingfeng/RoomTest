@@ -37,7 +37,20 @@ public class Map
         }
     }
 
-    public Vector3 AdjustZ(Vector3 size, bool floating, ref Vector3 pos)
+    public Vector3 AdjustZ2(Vector3 size, bool floating, Vector3 pos)
+    {
+        if (m_Type == Enum_Wall.Wall)
+        {
+            pos.z = m_StartPos.z;
+        }
+        else
+        {
+            pos.x = m_StartPos.x;
+        }
+        return pos;
+    }
+
+    public void AdjustZ(Vector3 size, bool floating, ref Vector3 pos)
     {
         if (m_Type == Enum_Wall.Wall)
         {
@@ -63,7 +76,6 @@ public class Map
                 pos.x -= MapUtil.m_AdjustZVal;
             }
         }
-        return pos;
     }
 
     public void GetMinMaxPos(Vector3 size, bool onFloor, ref DragInitData data)
