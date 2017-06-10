@@ -240,10 +240,12 @@ public class Drag : MonoBehaviour
     {
         if (JerryUtil.GetClickPos().x < 50)
         {
+            //Debug.LogWarning("----");
             DragCamera.Inst.DoDrag(-10);
         }
         else if(Screen.width - JerryUtil.GetClickPos().x < 50)
         {
+            //Debug.LogWarning("++++");
             DragCamera.Inst.DoDrag(10);
         }
     }

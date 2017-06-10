@@ -64,6 +64,8 @@ public class DragCamera : MonoBehaviour, IDragHandler, IBeginDragHandler
         {
             return;
         }
+
+        //Debug.LogWarning("drag");
         DoDrag(eventData.delta.x);
     }
 
