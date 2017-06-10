@@ -57,6 +57,9 @@ public enum Enum_Event
 {
     None = 0,
     SetOne,
+    /// <summary>
+    /// 点击放到一个位置
+    /// </summary>
     Place2Pos,
     BackOne,
     /// <summary>

@@ -14,7 +14,7 @@ public class MapUtil
     public static bool m_SelectNew = false;
 
     public static float m_MapGridUnityLen;
-    public static float m_AdjustZVal = 0.3f;//不要大于格子单位
+    public static float m_AdjustZVal = 0.1f;//不要大于格子单位
 
     public static Map m_LeftSideWall = new Map();
     public static Map m_Wall = new Map();

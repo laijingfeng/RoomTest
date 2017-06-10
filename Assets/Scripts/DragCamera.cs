@@ -14,6 +14,8 @@ public class DragCamera : MonoBehaviour, IDragHandler, IBeginDragHandler
     private Ray m_Ray;
     private RaycastHit m_HitInfo;
 
+    public bool m_InUse = true;
+
     void Awake()
     {
         _inst = this;
@@ -21,6 +23,11 @@ public class DragCamera : MonoBehaviour, IDragHandler, IBeginDragHandler
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (!m_InUse)
+        {
+            return;
+        }
+
         m_Ray = Camera.main.ScreenPointToRay(Util.GetClickPos());
         if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
             JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
@@ -42,6 +49,11 @@ public class DragCamera : MonoBehaviour, IDragHandler, IBeginDragHandler
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (!m_InUse)
+        {
+            return;
+        }
+
         if (!m_DragUsefull)
         {
             return;
@@ -60,6 +72,11 @@ public class DragCamera : MonoBehaviour, IDragHandler, IBeginDragHandler
 
     public void DoDrag(float val)
     {
+        if (!m_InUse)
+        {
+            return;
+        }
+
         //Debug.LogWarning("val=" + val);
         tmp1 = Camera.main.transform.position;
         tmp2 = Camera.main.transform.eulerAngles;

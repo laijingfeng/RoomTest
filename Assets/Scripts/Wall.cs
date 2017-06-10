@@ -60,25 +60,25 @@ public class Wall : MonoBehaviour
 #if UNITY_EDITOR
         JerryDrawer.Draw<DrawerElementGrid>()
                     .SetMinPos(m_LeftSideWallStartPos)
-                    .SetGridSize(new Vector3(0, 0.5f, 0.5f))
+                    .SetGridSize(new Vector3(0, MapUtil.m_MapGridUnityLen, MapUtil.m_MapGridUnityLen))
                     .SetSize(m_LeftSideWallSize.ToVector3())
                     .SetColor(Color.red);
 
         JerryDrawer.Draw<DrawerElementGrid>()
                     .SetMinPos(m_RightSideWallStartPos)
-                    .SetGridSize(new Vector3(0, 0.5f, 0.5f))
+                    .SetGridSize(new Vector3(0, MapUtil.m_MapGridUnityLen, MapUtil.m_MapGridUnityLen))
                     .SetSize(m_RightSideWallSize.ToVector3())
                     .SetColor(Color.red);
 
         JerryDrawer.Draw<DrawerElementGrid>()
                     .SetMinPos(m_WallStartPos)
-                    .SetGridSize(new Vector3(0.5f, 0.5f, 0))
+                    .SetGridSize(new Vector3(MapUtil.m_MapGridUnityLen, MapUtil.m_MapGridUnityLen, 0))
                     .SetSize(m_WallSize.ToVector3())
                     .SetColor(Color.black);
 
         JerryDrawer.Draw<DrawerElementGrid>()
                     .SetMinPos(m_FloorWallStartPos)
-                    .SetGridSize(new Vector3(0.5f, 0, 0.5f))
+                    .SetGridSize(new Vector3(MapUtil.m_MapGridUnityLen, 0, MapUtil.m_MapGridUnityLen))
                     .SetSize(m_FloorWallSize.ToVector3())
                     .SetColor(Color.black);
 #endif
