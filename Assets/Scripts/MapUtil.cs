@@ -214,6 +214,13 @@ public class MapUtil
             z = _z;
         }
 
+        public IVector3(Vector3 v)
+        {
+            x = (int)v.x;
+            y = (int)v.y;
+            z = (int)v.z;
+        }
+
         public Vector3 ToVector3()
         {
             return new Vector3(x, y, z);

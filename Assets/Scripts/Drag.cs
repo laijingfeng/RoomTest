@@ -347,38 +347,21 @@ public class Drag : MonoBehaviour
 
     private Vector3 AdjustPos(Vector3 pos)
     {
-        Vector3 v = pos / MapUtil.m_MapGridUnityLen;
-        v.x = (int)v.x;
-        v.y = (int)v.y;
-        v.z = (int)v.z;
+        //Debug.LogWarning("pp1=" + MapUtil.Vector3String(pos));
+        pos = pos - m_InitData.m_AdjustPar - MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos;
 
-        if (m_InitData.m_CurWall == Enum_Layer.Wall)
-        {
-            pos.x = MyClamp(pos.x, MapUtil.m_MapGridUnityLen * v.x, MapUtil.m_MapGridUnityLen * (v.x + 1 * Mathf.Sign(v.x)));
-            pos.x -= m_InitData.m_AdjustPar.x * Mathf.Sign(pos.x);
-            //缓解转角，用减
+        Vector3 p1 = pos / MapUtil.m_MapGridUnityLen;
+        p1.x = Mathf.RoundToInt(p1.x);
+        p1.y = Mathf.RoundToInt(p1.y);
+        p1.z = Mathf.RoundToInt(p1.z);
 
-            pos.y = MyClamp(pos.y, MapUtil.m_MapGridUnityLen * v.y, MapUtil.m_MapGridUnityLen * (v.y + 1 * Mathf.Sign(v.y)));
-            pos.y -= m_InitData.m_AdjustPar.y * Mathf.Sign(pos.y);
-        }
-        else if(m_InitData.m_CurWall == Enum_Layer.LeftWall
-            || m_InitData.m_CurWall == Enum_Layer.RightWall)
-        {
-            pos.z = MyClamp(pos.z, MapUtil.m_MapGridUnityLen * v.z, MapUtil.m_MapGridUnityLen * (v.z + 1 * Mathf.Sign(v.z)));
-            pos.z -= m_InitData.m_AdjustPar.z * Mathf.Sign(pos.z);
+        //Debug.LogWarning("pp2=" + MapUtil.Vector3String(pos) + " " + MapUtil.Vector3String(p1));
 
-            pos.y = MyClamp(pos.y, MapUtil.m_MapGridUnityLen * v.y, MapUtil.m_MapGridUnityLen * (v.y + 1 * Mathf.Sign(v.y)));
-            pos.y -= m_InitData.m_AdjustPar.y * Mathf.Sign(pos.y);
-        }
-        else if (m_InitData.m_CurWall == Enum_Layer.FloorWall)
-        {
-            pos.x = MyClamp(pos.x, MapUtil.m_MapGridUnityLen * v.x, MapUtil.m_MapGridUnityLen * (v.x + 1 * Mathf.Sign(v.x)));
-            pos.x -= m_InitData.m_AdjustPar.x * Mathf.Sign(pos.x);
+        pos = MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos + m_InitData.m_AdjustPar;
+        pos += p1 * MapUtil.m_MapGridUnityLen;
 
-            pos.z = MyClamp(pos.z, MapUtil.m_MapGridUnityLen * v.z, MapUtil.m_MapGridUnityLen * (v.z + 1 * Mathf.Sign(v.z)));
-            pos.z -= m_InitData.m_AdjustPar.z * Mathf.Sign(pos.z);
-        }
-        
+        //Debug.LogWarning("pp3=" + MapUtil.Vector3String(pos));
+
         return pos;
     }
 
