@@ -177,6 +177,7 @@ public class Drag : MonoBehaviour
 
     private Ray m_Ray;
     private RaycastHit m_HitInfo;
+    private Vector3 m_LastClickPos;
 
     IEnumerator OnMouseDown()
     {
@@ -197,7 +198,13 @@ public class Drag : MonoBehaviour
         {
             while (Input.GetMouseButton(0))
             {
-                m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos());
+                if (Util.Vector3Equal(JerryUtil.GetClickPos(), m_LastClickPos))
+                {
+                    yield return new WaitForEndOfFrame();
+                    continue;
+                }
+                m_LastClickPos = JerryUtil.GetClickPos();
+                m_Ray = Camera.main.ScreenPointToRay(m_LastClickPos);
 
                 if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
                     JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
@@ -293,6 +300,10 @@ public class Drag : MonoBehaviour
                     changeType = Enum_Layer.RightWall;
                 }
             }
+            else
+            {
+                m_Pos.x = Mathf.Clamp(m_Pos.x, m_InitData.m_MinPos.x + MapUtil.m_MapGridUnityLen, m_InitData.m_MaxPos.x - MapUtil.m_MapGridUnityLen);
+            }
             m_Pos.y = Mathf.Clamp(m_Pos.y, m_InitData.m_MinPos.y, m_InitData.m_MaxPos.y);
         }
         else if(m_InitData.m_CurWall == Enum_Layer.LeftWall
@@ -310,6 +321,10 @@ public class Drag : MonoBehaviour
                 {
                     changeType = Enum_Layer.Wall;
                 }
+            }
+            else
+            {
+                m_Pos.z = Mathf.Clamp(m_Pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z - MapUtil.m_MapGridUnityLen);
             }
 
             m_Pos.y = Mathf.Clamp(m_Pos.y, m_InitData.m_MinPos.y, m_InitData.m_MaxPos.y);
@@ -332,7 +347,9 @@ public class Drag : MonoBehaviour
         }
         else
         {
-            //Debug.LogWarning("xxxxxxxxxxxxxx " + m_Pos.x);
+            //Debug.LogWarning("xxxxxxxxxxxxxx " + MapUtil.Vector3String(m_Pos)
+            //    + " Min:" + MapUtil.Vector3String(m_InitData.m_MinPos) + " Max:" + MapUtil.Vector3String(m_InitData.m_MaxPos)
+            //    + " wall:" + m_InitData.m_CurWall);
             transform.position = m_Pos;
 
             bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_GridSize);
