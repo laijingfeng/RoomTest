@@ -239,7 +239,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 492560, guid: b504ed39cb7ee7144b8ddf841da9b1dd, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 6.47
+      value: 6.43
       objectReference: {fileID: 0}
     - target: {fileID: 492560, guid: b504ed39cb7ee7144b8ddf841da9b1dd, type: 2}
       propertyPath: m_LocalPosition.z
@@ -310,6 +310,14 @@ Prefab:
     - target: {fileID: 11433282, guid: 00c1f9fc5691dc04aaf46b07afac930b, type: 2}
       propertyPath: m_OnFloor
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11433282, guid: 00c1f9fc5691dc04aaf46b07afac930b, type: 2}
+      propertyPath: m_GridSize.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 11433282, guid: 00c1f9fc5691dc04aaf46b07afac930b, type: 2}
+      propertyPath: m_GridSize.y
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 00c1f9fc5691dc04aaf46b07afac930b, type: 2}
@@ -473,7 +481,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51896bef3e37c114d97fd91491ebd271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_GridSize: {x: 2, y: 2, z: 0}
+  m_GridSize:
+    x: 1
+    y: 1
+    z: 1
   m_SetType: 0
 --- !u!23 &567862672
 MeshRenderer:
@@ -1023,7 +1034,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 449588, guid: 3dd704c9254e774488b56000ae01e191, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -2.75
+      value: -8.99
       objectReference: {fileID: 0}
     - target: {fileID: 449588, guid: 3dd704c9254e774488b56000ae01e191, type: 2}
       propertyPath: m_LocalPosition.y
@@ -1031,7 +1042,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 449588, guid: 3dd704c9254e774488b56000ae01e191, type: 2}
       propertyPath: m_LocalPosition.z
-      value: 2.07
+      value: 0.35
       objectReference: {fileID: 0}
     - target: {fileID: 449588, guid: 3dd704c9254e774488b56000ae01e191, type: 2}
       propertyPath: m_LocalRotation.x
@@ -1106,10 +1117,6 @@ Prefab:
     - target: {fileID: 477998, guid: e5f7e1cde6782144fbbd3e29158e2288, type: 2}
       propertyPath: m_RootOrder
       value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 11460660, guid: e5f7e1cde6782144fbbd3e29158e2288, type: 2}
-      propertyPath: m_OnFloor
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 167288, guid: e5f7e1cde6782144fbbd3e29158e2288, type: 2}
       propertyPath: m_Name
@@ -1379,7 +1386,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51896bef3e37c114d97fd91491ebd271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_GridSize: {x: 2, y: 4, z: 1}
+  m_GridSize:
+    x: 1
+    y: 1
+    z: 1
   m_SetType: 0
 --- !u!23 &1281540311
 MeshRenderer:
@@ -1464,10 +1474,6 @@ Prefab:
     - target: {fileID: 485812, guid: 741907ceb9f9a0546a27fe0fcf840217, type: 2}
       propertyPath: m_RootOrder
       value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 11446236, guid: 741907ceb9f9a0546a27fe0fcf840217, type: 2}
-      propertyPath: m_GridSize.y
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 741907ceb9f9a0546a27fe0fcf840217, type: 2}
@@ -1915,8 +1921,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51896bef3e37c114d97fd91491ebd271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_GridSize: {x: 2, y: 1, z: 5}
-  m_SetType: 0
+  m_GridSize:
+    x: 2
+    y: 1
+    z: 3
+  m_SetType: 1
 --- !u!23 &2000709041
 MeshRenderer:
   m_ObjectHideFlags: 0

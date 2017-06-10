@@ -25,6 +25,10 @@ public class MyShadow : MonoBehaviour
         m_Inst = this;
     }
 
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <param name="size"></param>
     public void SetSize(Vector3 size)
     {
         size = size * MapUtil.m_MapGridUnityLen;

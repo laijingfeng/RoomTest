@@ -87,8 +87,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51896bef3e37c114d97fd91491ebd271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_GridSize: {x: 3, y: 4, z: 1}
-  m_OnFloor: 1
+  m_GridSize:
+    x: 3
+    y: 4
+    z: 1
+  m_SetType: 1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

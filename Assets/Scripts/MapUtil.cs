@@ -52,7 +52,7 @@ public class MapUtil
         return null;
     }
 
-    public static DragInitData InitDrag(Vector3 size, MapUtil.SetType setType, DragInitData oldData, Enum_Layer wall)
+    public static DragInitData InitDrag(IVector3 size, MapUtil.SetType setType, DragInitData oldData, Enum_Layer wall)
     {
         if (oldData == null)
         {

@@ -7,7 +7,7 @@ public class Drag : MonoBehaviour
     /// <summary>
     /// 大小
     /// </summary>
-    public Vector3 m_GridSize = new Vector3(2, 2, 2);
+    public MapUtil.IVector3 m_GridSize = new MapUtil.IVector3(1, 1, 1);
     
     public MapUtil.SetType m_SetType = MapUtil.SetType.Wall;
 
@@ -136,7 +136,7 @@ public class Drag : MonoBehaviour
 
         SetOutLineVisible(true);
         SetOutLineColor(canSet ? Color.green : Color.red);
-        MyShadow.Inst.SetSize(m_GridSize);
+        MyShadow.Inst.SetSize(m_GridSize.ToVector3());
         MyShadow.Inst.SetVisible(true);
         MyShadow.Inst.SetColor(canSet ? Color.green : Color.red);
         MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(this.transform.position), this.transform.eulerAngles);
