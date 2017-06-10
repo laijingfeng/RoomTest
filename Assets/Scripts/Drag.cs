@@ -405,7 +405,11 @@ public class Drag : MonoBehaviour
         {
             return;
         }
+
         FirstPos fp = (FirstPos)args[0];
+        
+        Debug.LogWarning(MapUtil.Vector3String(fp.pos) + " grid=" + MapUtil.GetMap(m_InitData.m_CurWall).Pos2Grid(fp.pos));
+
         if (fp.wallType == m_InitData.m_CurWall)
         {
             Place2Pos(fp.pos, false, true);

@@ -260,19 +260,19 @@ public class Map
         MapUtil.IVector3 ret = new MapUtil.IVector3(0, 0, 0);
         if (m_Type == Enum_Layer.Wall)
         {
-            ret.x = (int)((pos.x - (m_StartPos.x + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
-            ret.y = (int)((pos.y - (m_StartPos.y + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
+            ret.x = Mathf.RoundToInt((pos.x - (m_StartPos.x + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
+            ret.y = Mathf.RoundToInt((pos.y - (m_StartPos.y + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
         }
         else if(m_Type == Enum_Layer.LeftWall
             || m_Type == Enum_Layer.RightWall)
         {
-            ret.x = (int)((pos.z - (m_StartPos.z + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
-            ret.y = (int)((pos.y - (m_StartPos.y + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
+            ret.x = Mathf.RoundToInt((pos.z - (m_StartPos.z + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
+            ret.y = Mathf.RoundToInt((pos.y - (m_StartPos.y + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
         }
-        else
+        else if(m_Type == Enum_Layer.FloorWall)
         {
-            ret.x = (int)((pos.x - (m_StartPos.x + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
-            ret.y = (int)((pos.z - (m_StartPos.z + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
+            ret.x = Mathf.RoundToInt((pos.x - (m_StartPos.x + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
+            ret.y = Mathf.RoundToInt((pos.z - (m_StartPos.z + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
         }
         return ret;
     }

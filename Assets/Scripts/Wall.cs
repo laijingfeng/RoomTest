@@ -164,6 +164,14 @@ public class Wall : MonoBehaviour
                     fp.pos = m_HitInfo.point;
                     fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
 
+                    JerryDrawer.Draw<DrawerElementCube>()
+                        .SetColor(Color.black)
+                        .SetLife(3f)
+                        .SetPos(m_HitInfo.point)
+                        .SetSize(Vector3.one)
+                        .SetWire(false)
+                        .SetSizeFactor(0.2f);
+
                     JerryEventMgr.DispatchEvent(Enum_Event.Place2Pos.ToString(), new object[] { fp });
                 }
                 else if(m_CtrType == CtrObjType.OnlyClick
