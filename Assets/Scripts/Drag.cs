@@ -391,7 +391,7 @@ public class Drag : MonoBehaviour
 
         FirstPos fp = (FirstPos)args[0];
         
-        Debug.LogWarning(MapUtil.Vector3String(fp.pos) + " grid=" + MapUtil.GetMap(m_InitData.m_CurWall).Pos2Grid(fp.pos));
+        //Debug.LogWarning(MapUtil.Vector3String(fp.pos) + " grid=" + MapUtil.GetMap(m_InitData.m_CurWall).Pos2Grid(fp.pos));
 
         if (fp.wallType == m_InitData.m_CurWall)
         {
