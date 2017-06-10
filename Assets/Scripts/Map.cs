@@ -5,7 +5,7 @@ public class Map
     /// <summary>
     /// 地图大小
     /// </summary>
-    public Vector3 m_Size;
+    public MapUtil.IVector3 m_Size;
     public Vector3 m_StartPos;
     public bool[,] m_Flag;
     public Enum_Layer m_Type;
@@ -116,7 +116,7 @@ public class Map
             + new Vector3(m_Size.x * MapUtil.m_MapGridUnityLen, m_Size.y * MapUtil.m_MapGridUnityLen, 0)
             - new Vector3(size.x * MapUtil.m_MapGridUnityLen / 2, size.y * MapUtil.m_MapGridUnityLen / 2, 0);
 
-            if (setType == MapUtil.SetType.WallFloor)
+            if (setType == MapUtil.SetType.WallOnFloor)
             {
                 data.m_MaxPos.y = data.m_MinPos.y;
             }
@@ -131,7 +131,7 @@ public class Map
             + new Vector3(0, m_Size.y * MapUtil.m_MapGridUnityLen, m_Size.z * MapUtil.m_MapGridUnityLen)
             - new Vector3(0, size.y * MapUtil.m_MapGridUnityLen / 2, size.x * MapUtil.m_MapGridUnityLen / 2);
 
-            if (setType == MapUtil.SetType.WallFloor)
+            if (setType == MapUtil.SetType.WallOnFloor)
             {
                 data.m_MaxPos.y = data.m_MinPos.y;
             }

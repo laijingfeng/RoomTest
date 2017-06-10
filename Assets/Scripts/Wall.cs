@@ -4,28 +4,16 @@ using Jerry;
 public class Wall : MonoBehaviour
 {
     public Vector3 m_WallStartPos;
-    /// <summary>
-    /// 宽*高=x*y
-    /// </summary>
-    public Vector3 m_WallSize;
+    public MapUtil.IVector3 m_WallSize;
 
     public Vector3 m_LeftSideWallStartPos;
-    /// <summary>
-    /// 宽*高=x*y
-    /// </summary>
-    public Vector3 m_LeftSideWallSize;
+    public MapUtil.IVector3 m_LeftSideWallSize;
 
     public Vector3 m_RightSideWallStartPos;
-    /// <summary>
-    /// 宽*高=x*y
-    /// </summary>
-    public Vector3 m_RightSideWallSize;
+    public MapUtil.IVector3 m_RightSideWallSize;
 
     public Vector3 m_FloorWallStartPos;
-    /// <summary>
-    /// 宽*高=x*y
-    /// </summary>
-    public Vector3 m_FloorWallSize;
+    public MapUtil.IVector3 m_FloorWallSize;
 
     public float m_MapGridUnityLen;
     public bool m_CanClickPlaceObj = true;
@@ -66,25 +54,25 @@ public class Wall : MonoBehaviour
         JerryDrawer.Draw<DrawerElementGrid>()
                     .SetMinPos(m_LeftSideWallStartPos)
                     .SetGridSize(new Vector3(0, 0.5f, 0.5f))
-                    .SetSize(m_LeftSideWallSize)
+                    .SetSize(m_LeftSideWallSize.ToVector3())
                     .SetColor(Color.red);
 
         JerryDrawer.Draw<DrawerElementGrid>()
                     .SetMinPos(m_RightSideWallStartPos)
                     .SetGridSize(new Vector3(0, 0.5f, 0.5f))
-                    .SetSize(m_RightSideWallSize)
+                    .SetSize(m_RightSideWallSize.ToVector3())
                     .SetColor(Color.red);
 
         JerryDrawer.Draw<DrawerElementGrid>()
                     .SetMinPos(m_WallStartPos)
                     .SetGridSize(new Vector3(0.5f, 0.5f, 0))
-                    .SetSize(m_WallSize)
+                    .SetSize(m_WallSize.ToVector3())
                     .SetColor(Color.black);
 
         JerryDrawer.Draw<DrawerElementGrid>()
                     .SetMinPos(m_FloorWallStartPos)
                     .SetGridSize(new Vector3(0.5f, 0, 0.5f))
-                    .SetSize(m_FloorWallSize)
+                    .SetSize(m_FloorWallSize.ToVector3())
                     .SetColor(Color.black);
 #endif
     }

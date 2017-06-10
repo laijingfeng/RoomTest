@@ -154,19 +154,45 @@ public class MapUtil
         return ret;
     }
 
+    /// <summary>
+    /// 放置类型
+    /// </summary>
     public enum SetType
     {
         /// <summary>
-        /// 墙
+        /// 墙面
         /// </summary>
         Wall = 0,
         /// <summary>
-        /// 墙角
+        /// 墙面贴地面
         /// </summary>
-        WallFloor,
+        WallOnFloor,
         /// <summary>
         /// 地面
         /// </summary>
         Floor,
+    }
+
+    /// <summary>
+    /// 整型Vector3
+    /// </summary>
+    [System.Serializable]
+    public class IVector3
+    {
+        public int x;
+        public int y;
+        public int z;
+
+        public IVector3(int _x, int _y, int _z)
+        {
+            x = _x;
+            y = _y;
+            z = _z;
+        }
+
+        public Vector3 ToVector3()
+        {
+            return new Vector3(x, y, z);
+        }
     }
 }
