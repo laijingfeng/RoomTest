@@ -41,11 +41,11 @@ public class Util
         return id;
     }
 
-    public static bool Vector3Equal(Vector3 a, Vector3 b)
+    public static bool Vector3Equal(Vector3 a, Vector3 b, float val = 0.1f)
     {
-        if (Mathf.Abs(a.x - b.x) > 0.1f
-            || Mathf.Abs(a.y - b.y) > 0.1f
-            || Mathf.Abs(a.z - b.z) > 0.1f)
+        if (Mathf.Abs(a.x - b.x) > val
+            || Mathf.Abs(a.y - b.y) > val
+            || Mathf.Abs(a.z - b.z) > val)
         {
             return false;
         }
