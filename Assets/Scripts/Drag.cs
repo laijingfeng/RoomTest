@@ -271,7 +271,7 @@ public class Drag : MonoBehaviour
     /// <param name="first">当前面第一次设置位置</param>
     private void Place2Pos(Vector3 pos, bool first = false)
     {
-        Debug.LogWarning("pos1 " + MapUtil.Vector3String(pos) + " " + m_InitData.m_CurWall + " " + MapUtil.GetMap(m_InitData.m_CurWall).Pos2Grid(pos));
+        //Debug.LogWarning("pos1 " + MapUtil.Vector3String(pos) + " " + m_InitData.m_CurWall + " " + MapUtil.GetMap(m_InitData.m_CurWall).Pos2Grid(pos));
         
         MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, true, ref pos);
         //Debug.LogWarning("pos2 " + MapUtil.Vector3String(pos));
