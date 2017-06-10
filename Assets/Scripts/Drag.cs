@@ -156,7 +156,9 @@ public class Drag : MonoBehaviour
             m_ClickDownPos = JerryUtil.GetClickPos();
         }
 
-        if (m_Selected == false)
+        //下面是拖拽
+        if (m_Selected == false
+            || Wall.Inst.m_CtrType == Wall.CtrObjType.OnlyClick)
         {
             yield break;
         }
@@ -269,7 +271,8 @@ public class Drag : MonoBehaviour
     /// <param name="first">当前面第一次设置位置</param>
     private void Place2Pos(Vector3 pos, bool first = false)
     {
-        //Debug.LogWarning("pos1 " + MapUtil.Vector3String(pos) + m_InitData.m_CurWall);
+        Debug.LogWarning("pos1 " + MapUtil.Vector3String(pos) + " " + m_InitData.m_CurWall + " " + MapUtil.GetMap(m_InitData.m_CurWall).Pos2Grid(pos));
+        
         MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, true, ref pos);
         //Debug.LogWarning("pos2 " + MapUtil.Vector3String(pos));
         m_Pos = AdjustPos(pos);
@@ -282,7 +285,8 @@ public class Drag : MonoBehaviour
             m_Pos.x = Mathf.Clamp(m_Pos.x, m_InitData.m_MinPos.x, m_InitData.m_MaxPos.x);
             if (m_Pos.x <= m_InitData.m_MinPos.x)
             {
-                if (first)
+                //只能点的时候，不能会自动换墙
+                if (first || Wall.Inst.m_CtrType == Wall.CtrObjType.OnlyClick)
                 {
                     m_Pos.x = m_InitData.m_MinPos.x + MapUtil.m_MapGridUnityLen;
                 }
@@ -293,7 +297,8 @@ public class Drag : MonoBehaviour
             }
             else if (m_Pos.x >= m_InitData.m_MaxPos.x)
             {
-                if (first)
+                //只能点的时候，不能会自动换墙
+                if (first || Wall.Inst.m_CtrType == Wall.CtrObjType.OnlyClick)
                 {
                     m_Pos.x = m_InitData.m_MaxPos.x - MapUtil.m_MapGridUnityLen;
                 }
@@ -310,7 +315,8 @@ public class Drag : MonoBehaviour
             m_Pos.z = Mathf.Clamp(m_Pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z);
             if (m_Pos.z >= m_InitData.m_MaxPos.z)
             {
-                if (first)
+                //只能点的时候，不能会自动换墙
+                if (first || Wall.Inst.m_CtrType == Wall.CtrObjType.OnlyClick)
                 {
                     m_Pos.z = m_InitData.m_MaxPos.z - MapUtil.m_MapGridUnityLen;
                 }
@@ -349,7 +355,10 @@ public class Drag : MonoBehaviour
             MyShadow.Inst.SetColor(canSet ? Color.green : Color.red);
         }
 
-        JudgePosOutScreen();
+        if (Wall.Inst.m_CtrType != Wall.CtrObjType.OnlyClick)
+        {
+            JudgePosOutScreen();
+        }
     }
 
     private Vector3 AdjustPos(Vector3 pos)
@@ -422,7 +431,7 @@ public class Drag : MonoBehaviour
             if(m_SetType != MapUtil.SetType.Floor
                 && fp.wallType != Enum_Layer.FloorWall)
             {
-                Init(fp.wallType, fp.pos, false);
+                Init(fp.wallType, fp.pos, true);
             }
         }
     }

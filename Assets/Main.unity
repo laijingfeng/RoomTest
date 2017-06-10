@@ -1256,7 +1256,7 @@ MonoBehaviour:
     y: 0
     z: 8
   m_MapGridUnityLen: 0.5
-  m_CanClickPlaceObj: 1
+  m_CtrType: 0
 --- !u!1 &1263235080
 GameObject:
   m_ObjectHideFlags: 0
@@ -1463,6 +1463,10 @@ Prefab:
       propertyPath: m_RootOrder
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 11446236, guid: 741907ceb9f9a0546a27fe0fcf840217, type: 2}
+      propertyPath: m_SetType
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 741907ceb9f9a0546a27fe0fcf840217, type: 2}
   m_IsPrefabParent: 0
@@ -1546,6 +1550,10 @@ Prefab:
     - target: {fileID: 430664, guid: c67dda4eed1e5434ab81f9b408a8508c, type: 2}
       propertyPath: m_RootOrder
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 11471034, guid: c67dda4eed1e5434ab81f9b408a8508c, type: 2}
+      propertyPath: m_SetType
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c67dda4eed1e5434ab81f9b408a8508c, type: 2}
@@ -1997,6 +2005,10 @@ Prefab:
     - target: {fileID: 464840, guid: 0b50dd258eb6c2747b4556d0a77594d6, type: 2}
       propertyPath: m_RootOrder
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 11497022, guid: 0b50dd258eb6c2747b4556d0a77594d6, type: 2}
+      propertyPath: m_SetType
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 0b50dd258eb6c2747b4556d0a77594d6, type: 2}

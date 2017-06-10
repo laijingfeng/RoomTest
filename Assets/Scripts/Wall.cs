@@ -16,7 +16,14 @@ public class Wall : MonoBehaviour
     public MapUtil.IVector3 m_FloorWallSize;
 
     public float m_MapGridUnityLen;
-    public bool m_CanClickPlaceObj = true;
+    public CtrObjType m_CtrType = CtrObjType.ClickAndDrag;
+
+    public enum CtrObjType
+    {
+        OnlyClick = 0,
+        OnlyDrag,
+        ClickAndDrag,
+    }
 
     private Ray m_Ray;
     private RaycastHit m_HitInfo;
@@ -118,7 +125,7 @@ public class Wall : MonoBehaviour
     /// </summary>
     private void ClickPlaceObj()
     {
-        if (!m_CanClickPlaceObj)
+        if (m_CtrType == CtrObjType.OnlyDrag)
         {
             return;
         }
@@ -158,6 +165,22 @@ public class Wall : MonoBehaviour
                     fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
 
                     JerryEventMgr.DispatchEvent(Enum_Event.Place2Pos.ToString(), new object[] { fp });
+                }
+                else if(m_CtrType == CtrObjType.OnlyClick
+                    && m_HitInfo.collider.gameObject.layer == LayerMask.NameToLayer(Enum_Layer.ActiveCube.ToString()))
+                {
+                    if (Physics.Raycast(m_Ray, out m_HitInfo, 100, JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false), MapUtil.GetWallLayerNames())))
+                    {
+                        if (m_HitInfo.collider != null
+                            && m_HitInfo.collider.gameObject != null)
+                        {
+                            FirstPos fp = new FirstPos();
+                            fp.pos = m_HitInfo.point;
+                            fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
+
+                            JerryEventMgr.DispatchEvent(Enum_Event.Place2Pos.ToString(), new object[] { fp });
+                        }
+                    }
                 }
             }
         }
