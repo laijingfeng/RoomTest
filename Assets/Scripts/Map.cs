@@ -95,7 +95,7 @@ public class Map
                 pos.x -= MapUtil.m_AdjustZVal;
             }
         }
-        else
+        else if (m_Type == Enum_Layer.FloorWall)
         {
             pos.y = m_StartPos.y + size.z * MapUtil.m_MapGridUnityLen / 2.0f;
             if (floating)
@@ -105,7 +105,7 @@ public class Map
         }
     }
 
-    public void GetMinMaxPos(Vector3 size, bool onFloor, ref DragInitData data)
+    public void GetMinMaxPos(Vector3 size, MapUtil.SetType setType, ref DragInitData data)
     {
         if (m_Type == Enum_Layer.Wall)
         {
@@ -116,7 +116,7 @@ public class Map
             + new Vector3(m_Size.x * MapUtil.m_MapGridUnityLen, m_Size.y * MapUtil.m_MapGridUnityLen, 0)
             - new Vector3(size.x * MapUtil.m_MapGridUnityLen / 2, size.y * MapUtil.m_MapGridUnityLen / 2, 0);
 
-            if (onFloor)
+            if (setType == MapUtil.SetType.WallFloor)
             {
                 data.m_MaxPos.y = data.m_MinPos.y;
             }
@@ -131,10 +131,14 @@ public class Map
             + new Vector3(0, m_Size.y * MapUtil.m_MapGridUnityLen, m_Size.z * MapUtil.m_MapGridUnityLen)
             - new Vector3(0, size.y * MapUtil.m_MapGridUnityLen / 2, size.x * MapUtil.m_MapGridUnityLen / 2);
 
-            if (onFloor)
+            if (setType == MapUtil.SetType.WallFloor)
             {
                 data.m_MaxPos.y = data.m_MinPos.y;
             }
+        }
+        else if(m_Type == Enum_Layer.FloorWall)
+        {
+
         }
 
         if (m_Type == Enum_Layer.Wall)
@@ -164,10 +168,28 @@ public class Map
             {
                 ret.x = MapUtil.m_MapGridUnityLen / 2;
             }
+
+            if (((int)size.y) % 2 == 0)
+            {
+                ret.y = 0;
+            }
+            else
+            {
+                ret.y = MapUtil.m_MapGridUnityLen / 2;
+            }
         }
-        else
+        else if (m_Type == Enum_Layer.FloorWall)
         {
             if (((int)size.x) % 2 == 0)
+            {
+                ret.x = 0;
+            }
+            else
+            {
+                ret.x = MapUtil.m_MapGridUnityLen / 2;
+            }
+
+            if (((int)size.z) % 2 == 0)
             {
                 ret.z = 0;
             }
@@ -176,14 +198,25 @@ public class Map
                 ret.z = MapUtil.m_MapGridUnityLen / 2;
             }
         }
-
-        if (((int)size.y) % 2 == 0)
-        {
-            ret.y = 0;
-        }
         else
         {
-            ret.y = MapUtil.m_MapGridUnityLen / 2;
+            if (((int)size.z) % 2 == 0)
+            {
+                ret.z = 0;
+            }
+            else
+            {
+                ret.z = MapUtil.m_MapGridUnityLen / 2;
+            }
+
+            if (((int)size.y) % 2 == 0)
+            {
+                ret.y = 0;
+            }
+            else
+            {
+                ret.y = MapUtil.m_MapGridUnityLen / 2;
+            }
         }
 
         //Debug.LogWarning("ret " + ret.x + " " + ret.y + " " + ret.z);

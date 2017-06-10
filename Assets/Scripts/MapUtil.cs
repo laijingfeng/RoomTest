@@ -52,7 +52,7 @@ public class MapUtil
         return null;
     }
 
-    public static DragInitData InitDrag(Vector3 size, bool onFloor, DragInitData oldData, Enum_Layer wall)
+    public static DragInitData InitDrag(Vector3 size, MapUtil.SetType setType, DragInitData oldData, Enum_Layer wall)
     {
         if (oldData == null)
         {
@@ -61,7 +61,7 @@ public class MapUtil
 
         oldData.m_CurWall = wall;
 
-        GetMap(oldData.m_CurWall).GetMinMaxPos(size, onFloor, ref oldData);
+        GetMap(oldData.m_CurWall).GetMinMaxPos(size, setType, ref oldData);
         oldData.m_AdjustPar = GetMap(oldData.m_CurWall).GetAdjustPar(size);
 
         return oldData;
@@ -102,7 +102,8 @@ public class MapUtil
     {
         if(layer == Enum_Layer.Wall.GetHashCode()
             || layer == Enum_Layer.LeftWall.GetHashCode()
-            || layer == Enum_Layer.RightWall.GetHashCode())
+            || layer == Enum_Layer.RightWall.GetHashCode()
+            || layer == Enum_Layer.FloorWall.GetHashCode())
         {
             return true;
         }
@@ -124,6 +125,10 @@ public class MapUtil
         {
             ret = Enum_Layer.RightWall;
         }
+        else if (layer == Enum_Layer.FloorWall.GetHashCode())
+        {
+            ret = Enum_Layer.FloorWall;
+        }
         return ret;
     }
 
@@ -141,6 +146,10 @@ public class MapUtil
         else if (layerName == Enum_Layer.RightWall.ToString())
         {
             ret = Enum_Layer.RightWall;
+        }
+        else if (layerName == Enum_Layer.FloorWall.ToString())
+        {
+            ret = Enum_Layer.FloorWall;
         }
         return ret;
     }

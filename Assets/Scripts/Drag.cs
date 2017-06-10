@@ -8,10 +8,8 @@ public class Drag : MonoBehaviour
     /// 大小
     /// </summary>
     public Vector3 m_GridSize = new Vector3(2, 2, 2);
-    /// <summary>
-    /// 贴地
-    /// </summary>
-    public bool m_OnFloor = false;
+    
+    public MapUtil.SetType m_SetType = MapUtil.SetType.Wall;
 
     /// <summary>
     /// id
@@ -53,7 +51,7 @@ public class Drag : MonoBehaviour
     /// <param name="first">刚进入到这个面</param>
     public void Init(Enum_Layer wallType, Vector3 pos, bool first)
     {
-        m_InitData = MapUtil.InitDrag(m_GridSize, m_OnFloor, m_InitData, wallType);
+        m_InitData = MapUtil.InitDrag(m_GridSize, m_SetType, m_InitData, wallType);
 
         switch (m_InitData.m_CurWall)
         {
