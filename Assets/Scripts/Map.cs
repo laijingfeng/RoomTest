@@ -97,7 +97,7 @@ public class Map
         }
         else if (m_Type == Enum_Layer.FloorWall)
         {
-            pos.y = m_StartPos.y + size.z * MapUtil.m_MapGridUnityLen / 2.0f;
+            pos.y = m_StartPos.y + size.y * MapUtil.m_MapGridUnityLen / 2.0f;
             if (floating)
             {
                 pos.y += MapUtil.m_AdjustZVal;
@@ -138,7 +138,12 @@ public class Map
         }
         else if (m_Type == Enum_Layer.FloorWall)
         {
+            data.m_MinPos = m_StartPos
+                + new Vector3(size.x * MapUtil.m_MapGridUnityLen / 2, 0, size.z * MapUtil.m_MapGridUnityLen / 2);
 
+            data.m_MaxPos = m_StartPos
+            + new Vector3(m_Size.x * MapUtil.m_MapGridUnityLen, 0, m_Size.z * MapUtil.m_MapGridUnityLen)
+            - new Vector3(size.x * MapUtil.m_MapGridUnityLen / 2, 0, size.z * MapUtil.m_MapGridUnityLen / 2);
         }
 
         if (m_Type == Enum_Layer.Wall)
@@ -152,7 +157,7 @@ public class Map
             data.m_MaxPos.z += MapUtil.m_MapGridUnityLen;
         }
 
-        //Debug.LogWarning("min=" + data.m_MinPos + " max=" + data.m_MaxPos + " size=" + size);
+        Debug.LogWarning("min=" + MapUtil.Vector3String(data.m_MinPos) + " max=" + MapUtil.Vector3String(data.m_MaxPos) + " size=" + size);
     }
 
     public Vector3 GetAdjustPar(MapUtil.IVector3 size)
@@ -198,7 +203,8 @@ public class Map
                 ret.z = MapUtil.m_MapGridUnityLen / 2;
             }
         }
-        else
+        else if(m_Type == Enum_Layer.LeftWall
+            || m_Type == Enum_Layer.RightWall)
         {
             if (size.z % 2 == 0)
             {

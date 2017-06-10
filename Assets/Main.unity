@@ -1913,7 +1913,7 @@ MonoBehaviour:
     x: 2
     y: 1
     z: 3
-  m_SetType: 1
+  m_SetType: 2
 --- !u!23 &2000709041
 MeshRenderer:
   m_ObjectHideFlags: 0

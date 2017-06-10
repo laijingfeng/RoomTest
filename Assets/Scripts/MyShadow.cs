@@ -25,14 +25,18 @@ public class MyShadow : MonoBehaviour
         m_Inst = this;
     }
 
-    /// <summary>
-    /// TODO
-    /// </summary>
     /// <param name="size"></param>
-    public void SetSize(Vector3 size)
+    public void SetSize(Vector3 size, MapUtil.SetType setType)
     {
         size = size * MapUtil.m_MapGridUnityLen;
-        size.z = 0.001f;
+        if (setType == MapUtil.SetType.Floor)
+        {
+            size.y = 0.001f;
+        }
+        else
+        {
+            size.z = 0.001f;
+        }
         this.transform.localScale = size;
     }
 

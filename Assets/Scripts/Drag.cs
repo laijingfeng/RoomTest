@@ -66,6 +66,7 @@ public class Drag : MonoBehaviour
                 }
                 break;
             case Enum_Layer.Wall:
+            case Enum_Layer.FloorWall:
                 {
                     this.transform.eulerAngles = Vector3.zero;
                 }
@@ -93,6 +94,9 @@ public class Drag : MonoBehaviour
         SelectSelf();
     }
 
+    /// <summary>
+    /// 选中
+    /// </summary>
     private void SelectSelf()
     {
         if (MapUtil.m_SelectId != 0
@@ -108,7 +112,7 @@ public class Drag : MonoBehaviour
 
         if (m_InitData.isNew)
         {
-            FirstPos fp = MapUtil.GetFirstPos();
+            FirstPos fp = MapUtil.GetFirstPos(m_SetType);
             Init(fp.wallType, fp.pos, true);
         }
         else if (m_InitData.m_CurWall != Enum_Layer.None)
@@ -136,7 +140,7 @@ public class Drag : MonoBehaviour
 
         SetOutLineVisible(true);
         SetOutLineColor(canSet ? Color.green : Color.red);
-        MyShadow.Inst.SetSize(m_GridSize.ToVector3());
+        MyShadow.Inst.SetSize(m_GridSize.ToVector3(), m_SetType);
         MyShadow.Inst.SetVisible(true);
         MyShadow.Inst.SetColor(canSet ? Color.green : Color.red);
         MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(this.transform.position), this.transform.eulerAngles);
@@ -184,12 +188,7 @@ public class Drag : MonoBehaviour
 
                 if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
                     JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
-                    new string[]
-                    {
-                        Enum_Layer.Wall.ToString(),
-                        Enum_Layer.LeftWall.ToString(),
-                        Enum_Layer.RightWall.ToString(),
-                    })))
+                    MapUtil.GetWallLayerNames())))
                 {
                     if (m_HitInfo.collider != null
                         && m_HitInfo.collider.gameObject != null)
@@ -210,8 +209,11 @@ public class Drag : MonoBehaviour
                             }
                             else
                             {
-                                //Debug.LogWarning("1111");
-                                Init(fp.wallType, fp.pos, true);
+                                if(fp.wallType != Enum_Layer.FloorWall
+                                    && m_SetType != MapUtil.SetType.Floor)
+                                {
+                                    Init(fp.wallType, fp.pos, true);
+                                }
                             }
                         }
                     }
@@ -267,9 +269,9 @@ public class Drag : MonoBehaviour
     /// <param name="first">当前面第一次设置位置</param>
     private void Place2Pos(Vector3 pos, bool first = false)
     {
-        //Debug.LogWarning("one " + pos + " " + pos.z);
+        //Debug.LogWarning("pos1 " + MapUtil.Vector3String(pos) + m_InitData.m_CurWall);
         MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, true, ref pos);
-        //Debug.LogWarning("one11111 " + pos + "  " + pos.z);
+        //Debug.LogWarning("pos2 " + MapUtil.Vector3String(pos));
         m_Pos = AdjustPos(pos);
         Enum_Layer changeType = Enum_Layer.None;
 
@@ -300,8 +302,10 @@ public class Drag : MonoBehaviour
                     changeType = Enum_Layer.RightWall;
                 }
             }
+            m_Pos.y = Mathf.Clamp(m_Pos.y, m_InitData.m_MinPos.y, m_InitData.m_MaxPos.y);
         }
-        else
+        else if(m_InitData.m_CurWall == Enum_Layer.LeftWall
+            || m_InitData.m_CurWall == Enum_Layer.RightWall)
         {
             m_Pos.z = Mathf.Clamp(m_Pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z);
             if (m_Pos.z >= m_InitData.m_MaxPos.z)
@@ -315,9 +319,15 @@ public class Drag : MonoBehaviour
                     changeType = Enum_Layer.Wall;
                 }
             }
-        }
-        m_Pos.y = Mathf.Clamp(m_Pos.y, m_InitData.m_MinPos.y, m_InitData.m_MaxPos.y);
 
+            m_Pos.y = Mathf.Clamp(m_Pos.y, m_InitData.m_MinPos.y, m_InitData.m_MaxPos.y);
+        }
+        else if (m_InitData.m_CurWall == Enum_Layer.FloorWall)
+        {
+            m_Pos.x = Mathf.Clamp(m_Pos.x, m_InitData.m_MinPos.x, m_InitData.m_MaxPos.x);
+            m_Pos.z = Mathf.Clamp(m_Pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z);
+        }
+        
         if (changeType != Enum_Layer.None)
         {
             //Debug.LogWarning("yyyyyyyyyyyy " + m_Pos.x);
@@ -354,14 +364,28 @@ public class Drag : MonoBehaviour
             pos.x = MyClamp(pos.x, MapUtil.m_MapGridUnityLen * v.x, MapUtil.m_MapGridUnityLen * (v.x + 1 * Mathf.Sign(v.x)));
             pos.x -= m_InitData.m_AdjustPar.x * Mathf.Sign(pos.x);
             //缓解转角，用减
+
+            pos.y = MyClamp(pos.y, MapUtil.m_MapGridUnityLen * v.y, MapUtil.m_MapGridUnityLen * (v.y + 1 * Mathf.Sign(v.y)));
+            pos.y -= m_InitData.m_AdjustPar.y * Mathf.Sign(pos.y);
         }
-        else
+        else if(m_InitData.m_CurWall == Enum_Layer.LeftWall
+            || m_InitData.m_CurWall == Enum_Layer.RightWall)
         {
             pos.z = MyClamp(pos.z, MapUtil.m_MapGridUnityLen * v.z, MapUtil.m_MapGridUnityLen * (v.z + 1 * Mathf.Sign(v.z)));
             pos.z -= m_InitData.m_AdjustPar.z * Mathf.Sign(pos.z);
+
+            pos.y = MyClamp(pos.y, MapUtil.m_MapGridUnityLen * v.y, MapUtil.m_MapGridUnityLen * (v.y + 1 * Mathf.Sign(v.y)));
+            pos.y -= m_InitData.m_AdjustPar.y * Mathf.Sign(pos.y);
         }
-        pos.y = MyClamp(pos.y, MapUtil.m_MapGridUnityLen * v.y, MapUtil.m_MapGridUnityLen * (v.y + 1 * Mathf.Sign(v.y)));
-        pos.y -= m_InitData.m_AdjustPar.y * Mathf.Sign(pos.y);
+        else if (m_InitData.m_CurWall == Enum_Layer.FloorWall)
+        {
+            pos.x = MyClamp(pos.x, MapUtil.m_MapGridUnityLen * v.x, MapUtil.m_MapGridUnityLen * (v.x + 1 * Mathf.Sign(v.x)));
+            pos.x -= m_InitData.m_AdjustPar.x * Mathf.Sign(pos.x);
+
+            pos.z = MyClamp(pos.z, MapUtil.m_MapGridUnityLen * v.z, MapUtil.m_MapGridUnityLen * (v.z + 1 * Mathf.Sign(v.z)));
+            pos.z -= m_InitData.m_AdjustPar.z * Mathf.Sign(pos.z);
+        }
+        
         return pos;
     }
 
@@ -395,7 +419,11 @@ public class Drag : MonoBehaviour
         }
         else
         {
-            Init(fp.wallType, fp.pos, false);
+            if(m_SetType != MapUtil.SetType.Floor
+                && fp.wallType != Enum_Layer.FloorWall)
+            {
+                Init(fp.wallType, fp.pos, false);
+            }
         }
     }
 

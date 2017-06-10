@@ -48,6 +48,10 @@ public class MapUtil
                 {
                     return m_RightSideWall;
                 }
+            case Enum_Layer.FloorWall:
+                {
+                    return m_FloorWall;
+                }
         }
         return null;
     }
@@ -71,7 +75,7 @@ public class MapUtil
     /// 默认放一个位置
     /// </summary>
     /// <returns></returns>
-    public static FirstPos GetFirstPos()
+    public static FirstPos GetFirstPos(MapUtil.SetType setType)
     {
         FirstPos ret = new FirstPos();
         ret.pos = Vector3.zero;
@@ -79,14 +83,7 @@ public class MapUtil
 
         Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
         RaycastHit hitInfo;
-        if (Physics.Raycast(ray, out hitInfo, 100,
-            JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
-                new string[]
-                {
-                    Enum_Layer.Wall.ToString(),
-                    Enum_Layer.LeftWall.ToString(),
-                    Enum_Layer.RightWall.ToString(),
-                })))
+        if (Physics.Raycast(ray, out hitInfo, 100, JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false), GetWallLayerNames())))
         {
             if (hitInfo.collider != null
                 && hitInfo.collider.gameObject != null)
@@ -95,12 +92,28 @@ public class MapUtil
                 ret.wallType = WallLayer2Enum(hitInfo.collider.gameObject.layer);
             }
         }
+
+        if (setType == SetType.Floor)
+        {
+            if (ret.wallType != Enum_Layer.FloorWall)
+            {
+                ret.wallType = Enum_Layer.FloorWall;
+            }
+        }
+        else
+        {
+            if (ret.wallType == Enum_Layer.FloorWall)
+            {
+                ret.wallType = Enum_Layer.Wall;
+            }
+        }
+
         return ret;
     }
 
     public static bool IsWallLayer(int layer)
     {
-        if(layer == Enum_Layer.Wall.GetHashCode()
+        if (layer == Enum_Layer.Wall.GetHashCode()
             || layer == Enum_Layer.LeftWall.GetHashCode()
             || layer == Enum_Layer.RightWall.GetHashCode()
             || layer == Enum_Layer.FloorWall.GetHashCode())
@@ -108,6 +121,17 @@ public class MapUtil
             return true;
         }
         return false;
+    }
+
+    public static string[] GetWallLayerNames()
+    {
+        return new string[] 
+        {
+            Enum_Layer.Wall.ToString(),
+            Enum_Layer.FloorWall.ToString(),
+            Enum_Layer.LeftWall.ToString(),
+            Enum_Layer.RightWall.ToString(),
+        };
     }
 
     public static Enum_Layer WallLayer2Enum(int layer)
