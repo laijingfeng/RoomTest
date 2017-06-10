@@ -257,9 +257,9 @@ public class Drag : MonoBehaviour
     {
         //Debug.LogWarning("pos1 " + MapUtil.Vector3String(pos) + " " + m_InitData.m_CurWall + " " + MapUtil.GetMap(m_InitData.m_CurWall).Pos2Grid(pos));
         
-        MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, true, ref pos);
         //Debug.LogWarning("pos2 " + MapUtil.Vector3String(pos));
         m_Pos = AdjustPos(pos);
+        MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, true, ref m_Pos);
         Enum_Layer changeType = Enum_Layer.None;
 
         //Debug.LogWarning(m_Pos.x + "  " + m_Pos.z + " sss " + m_InitData.m_MaxPos.x + " " + m_InitData.m_MaxPos.y + " " + m_InitData.m_MaxPos.z);

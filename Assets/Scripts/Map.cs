@@ -577,7 +577,7 @@ public class Map
                 {
                     if (size.x == 0)
                     {
-                        ret.x = m_StartPos.x + (m_Size.x + 1) * MapUtil.m_MapGridUnityLen;//变成MAX+1
+                        ret.x = m_StartPos.x + (m_Size.x + 2) * MapUtil.m_MapGridUnityLen;//大于MAX
                     }
                     else
                     {
@@ -593,7 +593,7 @@ public class Map
                 {
                     if(size.y == 0)
                     {
-                        ret.y = m_StartPos.y + (m_Size.y + 1) * MapUtil.m_MapGridUnityLen;//变成MAX+1
+                        ret.y = m_StartPos.y + (m_Size.y + 2) * MapUtil.m_MapGridUnityLen;//大于MAX
                     }
                     else
                     {
@@ -612,7 +612,7 @@ public class Map
                 {
                     if (size.x == 0)
                     {
-                        ret.z = m_StartPos.z + (m_Size.z + 1) * MapUtil.m_MapGridUnityLen;//变成MAX+1
+                        ret.z = m_StartPos.z + (m_Size.z + 2) * MapUtil.m_MapGridUnityLen;//大于MAX
                     }
                     else
                     {
@@ -628,7 +628,7 @@ public class Map
                 {
                     if (size.y == 0)
                     {
-                        ret.y = m_StartPos.y + (m_Size.y + 1) * MapUtil.m_MapGridUnityLen;//变成MAX+1
+                        ret.y = m_StartPos.y + (m_Size.y + 2) * MapUtil.m_MapGridUnityLen;//大于MAX
                     }
                     else
                     {
@@ -646,7 +646,7 @@ public class Map
                 {
                     if (size.x == 0)
                     {
-                        ret.x = m_StartPos.x + (m_Size.x + 1) * MapUtil.m_MapGridUnityLen;//变成MAX+1
+                        ret.x = m_StartPos.x + (m_Size.x + 2) * MapUtil.m_MapGridUnityLen;//大于MAX
                     }
                     else
                     {
@@ -662,7 +662,7 @@ public class Map
                 {
                     if (size.z == 0)
                     {
-                        ret.z = m_StartPos.z + (m_Size.z + 1) * MapUtil.m_MapGridUnityLen;//变成MAX+1
+                        ret.z = m_StartPos.z + (m_Size.z + 2) * MapUtil.m_MapGridUnityLen;//大于MAX
                     }
                     else
                     {
@@ -683,7 +683,7 @@ public class Map
                 {
                     if (size.x == 0)
                     {
-                        ret.x = m_StartPos.x + m_Size.x * MapUtil.m_MapGridUnityLen;//变成MAX
+                        ret.x = m_StartPos.x + m_Size.x * MapUtil.m_MapGridUnityLen;
                     }
                     else
                     {
@@ -699,7 +699,7 @@ public class Map
                 {
                     if (size.y == 0)
                     {
-                        ret.y = m_StartPos.y + m_Size.y * MapUtil.m_MapGridUnityLen;//变成MAX
+                        ret.y = m_StartPos.y + m_Size.y * MapUtil.m_MapGridUnityLen;
                     }
                     else
                     {
@@ -718,7 +718,7 @@ public class Map
                 {
                     if (size.x == 0)
                     {
-                        ret.z = m_StartPos.z + m_Size.z * MapUtil.m_MapGridUnityLen;//变成MAX
+                        ret.z = m_StartPos.z + m_Size.z * MapUtil.m_MapGridUnityLen;
                     }
                     else
                     {
@@ -734,7 +734,7 @@ public class Map
                 {
                     if (size.y == 0)
                     {
-                        ret.y = m_StartPos.y + m_Size.y * MapUtil.m_MapGridUnityLen;//变成MAX
+                        ret.y = m_StartPos.y + m_Size.y * MapUtil.m_MapGridUnityLen;
                     }
                     else
                     {
@@ -752,7 +752,7 @@ public class Map
                 {
                     if (size.x == 0)
                     {
-                        ret.x = m_StartPos.x + m_Size.x * MapUtil.m_MapGridUnityLen;//变成MAX
+                        ret.x = m_StartPos.x + m_Size.x * MapUtil.m_MapGridUnityLen;
                     }
                     else
                     {
@@ -768,7 +768,7 @@ public class Map
                 {
                     if (size.z == 0)
                     {
-                        ret.z = m_StartPos.z + m_Size.z * MapUtil.m_MapGridUnityLen;//变成MAX
+                        ret.z = m_StartPos.z + m_Size.z * MapUtil.m_MapGridUnityLen;
                     }
                     else
                     {
