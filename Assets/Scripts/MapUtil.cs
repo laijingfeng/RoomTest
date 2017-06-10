@@ -194,5 +194,15 @@ public class MapUtil
         {
             return new Vector3(x, y, z);
         }
+
+        public override string ToString()
+        {
+            return string.Format("({0},{1},{2})", x, y, z);
+        }
+    }
+
+    public static string Vector3String(Vector3 v)
+    {
+        return string.Format("({0},{1},{2})", v.x, v.y, v.z);
     }
 }

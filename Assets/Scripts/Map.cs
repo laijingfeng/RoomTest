@@ -269,7 +269,7 @@ public class Map
         MapUtil.IVector3 min = Pos2Grid(GetCornerPos(pos, size, true));
         MapUtil.IVector3 max = Pos2Grid(GetCornerPos(pos, size, false));
 
-        //Debug.LogWarning(min.x + " " + min.y + " " + max.x + " " + max.y + " " + m_Type);
+        //Debug.LogWarning("min=" + min.ToString() + " max=" + max.ToString() + " type=" + m_Type + " pos=" + MapUtil.Vector3String(pos) + " main=" + mainJudge);
 
         for (int i = min.x; i <= max.x; i++)
         {
@@ -455,9 +455,10 @@ public class Map
                     ret.x = pos.x - (size.x / 2) * MapUtil.m_MapGridUnityLen;
                 }
             }
-            else
+            else if(m_Type == Enum_Layer.LeftWall
+                || m_Type == Enum_Layer.RightWall)
             {
-                if (size.y % 2 == 0)
+                if (size.x % 2 == 0)
                 {
                     ret.z = pos.z - ((size.x - 1) / 2 + 0.5f) * MapUtil.m_MapGridUnityLen;
                 }
@@ -489,9 +490,10 @@ public class Map
                     ret.x = pos.x + (size.x / 2) * MapUtil.m_MapGridUnityLen;
                 }
             }
-            else
+            else if(m_Type == Enum_Layer.LeftWall
+                || m_Type == Enum_Layer.RightWall)
             {
-                if (size.y % 2 == 0)
+                if (size.x % 2 == 0)
                 {
                     ret.z = pos.z + ((size.x - 1) / 2 + 0.5f) * MapUtil.m_MapGridUnityLen;
                 }
