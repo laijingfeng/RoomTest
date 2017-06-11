@@ -280,7 +280,7 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
         }
 
         //Debug.LogWarning("drag");
-        DoDrag(eventData.delta.x);
+        DoDrag(-eventData.delta.x);
     }
 
     private Vector3 tmp1;

@@ -83,7 +83,13 @@ public class MapUtil
         ret.pos = Vector3.zero;
         ret.wallType = Enum_Layer.Wall;
 
-        Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
+        Vector3 pos = new Vector3(Screen.width / 2, Screen.height / 2, 0f);
+        if (setType == SetType.Floor)
+        {
+            pos.y = Screen.height / 4;
+        }
+
+        Ray ray = Camera.main.ScreenPointToRay(pos);
         RaycastHit hitInfo;
         if (Physics.Raycast(ray, out hitInfo, 100, JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false), GetWallLayerNames(setType))))
         {
@@ -93,6 +99,10 @@ public class MapUtil
                 ret.pos = hitInfo.point;
                 ret.wallType = WallLayer2Enum(hitInfo.collider.gameObject.layer);
             }
+        }
+        else 
+        {
+            Debug.LogError("first error");
         }
 
         return ret;

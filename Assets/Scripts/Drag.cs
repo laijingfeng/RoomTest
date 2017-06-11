@@ -115,6 +115,7 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         if (m_InitData.isNew)
         {
             FirstPos fp = MapUtil.GetFirstPos(m_SetType);
+            //Debug.LogWarning(fp.pos + " x " + fp.wallType + " " + m_SetType);
             Init(fp.wallType, fp.pos);
         }
         else if (m_InitData.m_CurWall != Enum_Layer.None)
