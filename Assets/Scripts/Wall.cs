@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Jerry;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class Wall : MonoBehaviour, IDragHandler, IBeginDragHandler
 {
@@ -106,6 +107,7 @@ public class Wall : MonoBehaviour, IDragHandler, IBeginDragHandler
             }
             JerryEventMgr.DispatchEvent(Enum_Event.SetOne.ToString(), new object[] { MapUtil.m_SelectId });
         }
+        
         if (GUILayout.Button("回收选中", GUILayout.MinHeight(60), GUILayout.MinWidth(100)))
         {
             if (MapUtil.m_SelectId == 0
@@ -115,6 +117,31 @@ public class Wall : MonoBehaviour, IDragHandler, IBeginDragHandler
                 return;
             }
             JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
+        }
+
+        if (GUILayout.Button("随机一个", GUILayout.MinHeight(60), GUILayout.MinWidth(100)))
+        {
+            Drag[] drags = this.transform.parent.GetComponentsInChildren<Drag>();
+            if(drags == null || drags.Length <= 0)
+            {
+                Debug.LogWarning("没有可用家具");
+                return;
+            }
+            List<Drag> usefullDrags = new List<Drag>();
+            for (int i = 0; i < drags.Length; i++)
+            {
+                if (drags[i].m_InitData.isNew)
+                {
+                    usefullDrags.Add(drags[i]);
+                }
+            }
+            if (usefullDrags.Count <= 0)
+            {
+                Debug.LogWarning("没有可用家具");
+                return;
+            }
+            int idx = Random.Range(0, usefullDrags.Count);
+            usefullDrags[idx].ToScreen();
         }
         GUILayout.EndHorizontal();
     }
@@ -178,7 +205,7 @@ public class Wall : MonoBehaviour, IDragHandler, IBeginDragHandler
 
                     JerryEventMgr.DispatchEvent(Enum_Event.Place2Pos.ToString(), new object[] { fp });
                 }
-                else if(m_CtrType == CtrObjType.OnlyClick
+                else if (m_CtrType == CtrObjType.OnlyClick
                     && m_HitInfo.collider.gameObject.layer == LayerMask.NameToLayer(Enum_Layer.ActiveCube.ToString()))
                 {
                     if (Physics.Raycast(m_Ray, out m_HitInfo, 100, JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false), MapUtil.GetWallLayerNames())))

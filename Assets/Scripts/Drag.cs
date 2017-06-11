@@ -27,7 +27,7 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
 
     private Renderer m_Render;
 
-    private DragInitData m_InitData = null;
+    public DragInitData m_InitData = null;
 
     void Awake()
     {
@@ -104,10 +104,13 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         {
             if (MapUtil.m_SelectNew)
             {
-                Debug.LogWarning("当前选中的还没放好");
-                return;
+                JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
             }
-            JerryEventMgr.DispatchEvent(Enum_Event.BackOne.ToString(), new object[] { MapUtil.m_SelectId });
+            else
+            {
+                JerryEventMgr.DispatchEvent(Enum_Event.BackOne.ToString(), new object[] { MapUtil.m_SelectId });
+            }
+            
         }
 
         if (m_InitData.isNew)
@@ -127,6 +130,8 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
 
             MapUtil.GetMap(m_InitData.m_CurWall).CleanOne(this.transform.position, m_GridSize);
         }
+
+        //Debug.LogWarning("xxx");
 
         MapUtil.m_SelectId = m_Id;
         MapUtil.m_SelectOK = false;
@@ -212,8 +217,6 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
 
             while (Input.GetMouseButton(0))
             {
-                //JudgePosOutScreen();
-
                 if (Util.Vector3Equal(JerryUtil.GetClickPos()/* - m_Offset*/, m_LastClickPos, MapUtil.m_MapGridUnityLen / 2))
                 {
                     yield return new WaitForEndOfFrame();
@@ -332,23 +335,36 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
             return;
         }
 
-        if (JerryUtil.GetClickPos().x < 50)
+        this.StopCoroutine("IE_JudgePosOutScreen");
+        this.StartCoroutine("IE_JudgePosOutScreen");
+    }
+
+    private IEnumerator IE_JudgePosOutScreen()
+    {
+        while (true)
         {
-            if (Camera.main.transform.position.x < -4.8f)
+            if (JerryUtil.GetClickPos().x < 50)
             {
-                return;
+                if (Camera.main.transform.position.x < -4.8f)
+                {
+                    yield break;
+                }
+                //Debug.LogWarning("----");
+                Wall.Inst.DoDrag(-10);
             }
-            //Debug.LogWarning("----");
-            Wall.Inst.DoDrag(-10);
-        }
-        else if (Screen.width - JerryUtil.GetClickPos().x < 50)
-        {
-            if (Camera.main.transform.position.x > 4.8f)
+            else if (Screen.width - JerryUtil.GetClickPos().x < 50)
             {
-                return;
+                if (Camera.main.transform.position.x > 4.8f)
+                {
+                    yield break;
+                }
+                //Debug.LogWarning("++++");
+                Wall.Inst.DoDrag(10);
             }
-            //Debug.LogWarning("++++");
-            Wall.Inst.DoDrag(10);
+            else
+            {
+                yield break;
+            }
         }
     }
 
@@ -452,6 +468,8 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
             SetOutLineColor(canSet ? Color.green : Color.red);
             MyShadow.Inst.SetColor(canSet ? Color.green : Color.red);
         }
+
+        JudgePosOutScreen();
     }
 
     private Vector3 AdjustPos(Vector3 pos)
@@ -601,8 +619,10 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     #endregion 事件
 
     [ContextMenu("放到屏幕中")]
-    private void ToScreen()
+    public void ToScreen()
     {
+        Debug.LogWarning(this.name);
+
         SelectSelf();
     }
 }
