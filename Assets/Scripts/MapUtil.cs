@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Jerry;
+using System.Collections.Generic;
 
 public class MapUtil
 {
@@ -83,28 +84,13 @@ public class MapUtil
 
         Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
         RaycastHit hitInfo;
-        if (Physics.Raycast(ray, out hitInfo, 100, JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false), GetWallLayerNames())))
+        if (Physics.Raycast(ray, out hitInfo, 100, JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false), GetWallLayerNames(setType))))
         {
             if (hitInfo.collider != null
                 && hitInfo.collider.gameObject != null)
             {
                 ret.pos = hitInfo.point;
                 ret.wallType = WallLayer2Enum(hitInfo.collider.gameObject.layer);
-            }
-        }
-
-        if (setType == SetType.Floor)
-        {
-            if (ret.wallType != Enum_Layer.FloorWall)
-            {
-                ret.wallType = Enum_Layer.FloorWall;
-            }
-        }
-        else
-        {
-            if (ret.wallType == Enum_Layer.FloorWall)
-            {
-                ret.wallType = Enum_Layer.Wall;
             }
         }
 
@@ -123,15 +109,38 @@ public class MapUtil
         return false;
     }
 
-    public static string[] GetWallLayerNames()
+    public static string[] GetWallLayerNames(SetType setType = SetType.None)
     {
-        return new string[] 
+        switch (setType)
         {
-            Enum_Layer.Wall.ToString(),
-            Enum_Layer.FloorWall.ToString(),
-            Enum_Layer.LeftWall.ToString(),
-            Enum_Layer.RightWall.ToString(),
-        };
+            case SetType.WallOnFloor:
+            case SetType.Wall:
+                {
+                    return new string[] 
+                    {
+                        Enum_Layer.Wall.ToString(),
+                        Enum_Layer.LeftWall.ToString(),
+                        Enum_Layer.RightWall.ToString(),
+                    };
+                }
+            case SetType.Floor:
+                {
+                    return new string[] 
+                    {
+                        Enum_Layer.FloorWall.ToString(),
+                    };
+                }
+            default:
+                {
+                    return new string[] 
+                    {
+                        Enum_Layer.Wall.ToString(),
+                        Enum_Layer.FloorWall.ToString(),
+                        Enum_Layer.LeftWall.ToString(),
+                        Enum_Layer.RightWall.ToString(),
+                    };
+                }
+        }
     }
 
     public static Enum_Layer WallLayer2Enum(int layer)
@@ -183,10 +192,11 @@ public class MapUtil
     /// </summary>
     public enum SetType
     {
+        None = 0,
         /// <summary>
         /// 墙面
         /// </summary>
-        Wall = 0,
+        Wall,
         /// <summary>
         /// 墙面贴地面
         /// </summary>

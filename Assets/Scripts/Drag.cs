@@ -110,7 +110,6 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
             {
                 JerryEventMgr.DispatchEvent(Enum_Event.BackOne.ToString(), new object[] { MapUtil.m_SelectId });
             }
-            
         }
 
         if (m_InitData.isNew)
@@ -168,12 +167,12 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
                 break;
             case Enum_Layer.LeftWall:
                 {
-                    tmp.x -= m_GridSize.x / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustZVal;
+                    tmp.x -= m_GridSize.z / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustZVal;
                 }
                 break;
             case Enum_Layer.RightWall:
                 {
-                    tmp.x += m_GridSize.x / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustZVal;
+                    tmp.x += m_GridSize.z / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustZVal;
                 }
                 break;
         }
@@ -189,6 +188,48 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     {
         Vector3 pos = GetTmp();
         m_Offset = JerryUtil.GetClickPos() - Camera.main.WorldToScreenPoint(pos);
+    }
+
+    void Update()
+    {
+        if (m_Selected && Input.GetKeyDown(KeyCode.M))
+        {
+            m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos());
+            if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
+                    JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
+                    MapUtil.GetWallLayerNames(m_SetType))))
+            {
+                if (m_HitInfo.collider != null
+                    && m_HitInfo.collider.gameObject != null)
+                {
+                    FirstPos fp = new FirstPos();
+                    fp.pos = m_HitInfo.point;
+                    fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
+
+                    Debug.LogWarning("hi " + fp.wallType + " " + MapUtil.GetMap(fp.wallType).Pos2Grid(fp.pos));
+                }
+            }
+
+            m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos() - m_Offset);
+            if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
+                    JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
+                    MapUtil.GetWallLayerNames(m_SetType))))
+            {
+                if (m_HitInfo.collider != null
+                    && m_HitInfo.collider.gameObject != null)
+                {
+                    FirstPos fp = new FirstPos();
+                    fp.pos = m_HitInfo.point;
+                    fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
+
+                    Debug.LogWarning("hi_or " + fp.wallType + " " + MapUtil.GetMap(fp.wallType).Pos2Grid(fp.pos));
+                }
+            }
+        }
+        else if (m_Selected && Input.GetKeyDown(KeyCode.N))
+        {
+            Flag.Inst.Set2Pos(JerryUtil.GetClickPos() - m_Offset);
+        }
     }
 
     IEnumerator OnMouseDown()
@@ -213,21 +254,26 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         var camera = Camera.main;
         if (camera)
         {
-            //CalOffset();
+            CalOffset();
 
             while (Input.GetMouseButton(0))
             {
-                if (Util.Vector3Equal(JerryUtil.GetClickPos()/* - m_Offset*/, m_LastClickPos, MapUtil.m_MapGridUnityLen / 2))
+                if (Util.Vector3Equal(JerryUtil.GetClickPos() - m_Offset, m_LastClickPos))
                 {
                     yield return new WaitForEndOfFrame();
                     continue;
                 }
-                m_LastClickPos = JerryUtil.GetClickPos()/* - m_Offset*/;
+                m_LastClickPos = JerryUtil.GetClickPos() - m_Offset;
                 m_Ray = Camera.main.ScreenPointToRay(m_LastClickPos);
+                
+                //JerryDrawer.Draw<DrawerElementPath>()
+                    //.SetPoints(m_Ray.origin, m_Ray.direction * 10)
+                    //.SetColor(Color.red)
+                    //.SetLife(0.3f);
 
                 if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
                     JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
-                    MapUtil.GetWallLayerNames())))
+                    MapUtil.GetWallLayerNames(m_SetType))))
                 {
                     if (m_HitInfo.collider != null
                         && m_HitInfo.collider.gameObject != null)
@@ -239,22 +285,29 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
                         //Debug.LogWarning(fp.wallType + " xxx " + m_InitData.m_CurWall);
 
                         if (fp.wallType != m_InitData.m_CurWall
-                            || !Util.Vector3Equal(fp.pos, m_LastPos, MapUtil.m_MapGridUnityLen / 2))
+                            || !Util.Vector3Equal(fp.pos, m_LastPos))
                         {
                             m_LastPos = fp.pos;
 
                             if (fp.wallType == m_InitData.m_CurWall)
                             {
-                                Place2Pos(fp.pos);
+                                //Debug.LogWarning("aaaabbbb");
+                                if (Place2Pos(fp.pos, true))
+                                {
+                                    CalOffset();
+                                    //yield break;
+                                }
                             }
                             else
                             {
                                 if (fp.wallType != Enum_Layer.FloorWall
                                     && m_SetType != MapUtil.SetType.Floor)
                                 {
+                                    //Debug.LogWarning("aaaa");
                                     Init(fp.wallType, fp.pos);
                                     //yield return new WaitForEndOfFrame();
-                                    //CalOffset();
+                                    CalOffset();
+                                    //yield break;
                                 }
                             }
                         }
@@ -373,7 +426,8 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     /// </summary>
     /// <param name="pos"></param>
     /// <param name="canChangeWall">是否检测换面</param>
-    private void Place2Pos(Vector3 pos, bool canChangeWall = false)
+    /// <returns>是否切换了面</returns>
+    private bool Place2Pos(Vector3 pos, bool canChangeWall = false)
     {
         //Debug.LogWarning("pos1 " + MapUtil.Vector3String(pos) + " " + m_InitData.m_CurWall + " " + MapUtil.GetMap(m_InitData.m_CurWall).Pos2Grid(pos));
 
@@ -470,6 +524,8 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         }
 
         JudgePosOutScreen();
+
+        return changeType == Enum_Layer.None ? false : true;
     }
 
     private Vector3 AdjustPos(Vector3 pos)
