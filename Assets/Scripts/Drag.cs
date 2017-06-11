@@ -366,7 +366,9 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, true, ref m_Pos);
         Enum_Layer changeType = Enum_Layer.None;
 
-        //Debug.LogWarning(m_Pos.x + "  " + m_Pos.z + " sss " + m_InitData.m_MaxPos.x + " " + m_InitData.m_MaxPos.y + " " + m_InitData.m_MaxPos.z);
+        //Debug.LogWarning("pos=" + MapUtil.Vector3String(m_Pos)
+        //    + " Min:" + MapUtil.Vector3String(m_InitData.m_MinPos)
+        //    + " Max:" + MapUtil.Vector3String(m_InitData.m_MaxPos));
 
         if (m_InitData.m_CurWall == Enum_Layer.Wall)
         {
@@ -440,7 +442,8 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         else
         {
             //Debug.LogWarning("xxxxxxxxxxxxxx " + MapUtil.Vector3String(m_Pos)
-            //    + " Min:" + MapUtil.Vector3String(m_InitData.m_MinPos) + " Max:" + MapUtil.Vector3String(m_InitData.m_MaxPos)
+            //    + " Min:" + MapUtil.Vector3String(m_InitData.m_MinPos) 
+            //    + " Max:" + MapUtil.Vector3String(m_InitData.m_MaxPos)
             //    + " wall:" + m_InitData.m_CurWall);
             transform.position = m_Pos;
 
@@ -453,7 +456,7 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
 
     private Vector3 AdjustPos(Vector3 pos)
     {
-        //Debug.LogWarning("pp1=" + MapUtil.Vector3String(pos));
+        //Debug.LogWarning("pp1=" + MapUtil.Vector3String(pos) + " ad=" + MapUtil.Vector3String(m_InitData.m_AdjustPar));
         pos = pos - m_InitData.m_AdjustPar - MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos;
 
         Vector3 p1 = pos / MapUtil.m_MapGridUnityLen;

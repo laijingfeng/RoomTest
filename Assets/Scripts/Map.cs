@@ -206,7 +206,7 @@ public class Map
         else if(m_Type == Enum_Layer.LeftWall
             || m_Type == Enum_Layer.RightWall)
         {
-            if (size.z % 2 == 0)
+            if (size.x % 2 == 0)//不要怀疑就是size.x
             {
                 ret.z = 0;
             }
@@ -225,7 +225,7 @@ public class Map
             }
         }
 
-        //Debug.LogWarning("ret " + ret.x + " " + ret.y + " " + ret.z);
+        //Debug.LogWarning("size " + size + " ret " + ret.x + " " + ret.y + " " + ret.z + " " + m_Type);
 
         return ret;
     }
