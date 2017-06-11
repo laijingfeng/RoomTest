@@ -1,39 +1,21 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEngine.UI;
 using Jerry;
 
-public class Flag : MonoBehaviour
+public class  Flag : SingletonMono<Flag>
 {
     public Canvas m_Canvas;
+    private Image m_Img;
 
-    private static Flag m_Inst;
-    public static Flag Inst
+    public override void Awake()
     {
-        get
-        {
-            return m_Inst;
-        }
+        base.Awake();
+        m_Img = this.GetComponent<Image>();
     }
 
     public void Set2Pos(Vector3 pos)
     {
         this.transform.localPosition = JerryUtil.PosScreen2Canvas(m_Canvas, pos, this.transform);
-    }
-
-    void Awake()
-    {
-        m_Inst = this;
-    }
-
-    // Use this for initialization
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        m_Img.enabled = true;
     }
 }

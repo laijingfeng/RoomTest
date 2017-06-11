@@ -1,28 +1,20 @@
 ﻿using UnityEngine;
+using Jerry;
 
-public class MyShadow : MonoBehaviour
+public class MyShadow : SingletonMono<MyShadow>
 {
     private Renderer m_Render;
     private Color m_Color;
-    
-    private static MyShadow m_Inst;
-    public static MyShadow Inst
-    {
-        get
-        {
-            return m_Inst;
-        }
-    }
 
-    void Awake()
+    public override void Awake()
     {
+        base.Awake();
         m_Render = this.transform.GetComponent<Renderer>();
         if (m_Render != null)
         {
             m_Render.enabled = false;
         }
         m_Color = Color.green;
-        m_Inst = this;
     }
 
     /// <param name="size"></param>

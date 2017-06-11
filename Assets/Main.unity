@@ -578,7 +578,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 3, z: 3}
+  m_Size: {x: 1, y: 3, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &705261465 stripped
 Transform:
@@ -668,7 +668,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 3, z: 3}
+  m_Size: {x: 1, y: 3, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &846641293
 GameObject:
@@ -1163,6 +1163,8 @@ MonoBehaviour:
   m_CtrType: 2
   m_UseDragOne: 1
   m_DragingFactor: 60
+  m_OutScreenJudgeFactor: 50
+  m_OutScreenDragFactor: 4
   m_DragFactor: 0.02
   m_RotateFactor: 0.05
   m_DragBound: 6.04
@@ -1206,7 +1208,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 3, y: 3, z: 1}
+  m_Size: {x: 1, y: 3, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &1274781693 stripped
 Transform:
@@ -1619,7 +1621,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1758029477}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
   m_Name: 

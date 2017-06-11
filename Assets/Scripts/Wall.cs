@@ -3,7 +3,7 @@ using Jerry;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
-public class Wall : MonoBehaviour, IDragHandler, IBeginDragHandler
+public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
 {
     public Vector3 m_WallStartPos;
     public MapUtil.IVector3 m_WallSize;
@@ -23,6 +23,9 @@ public class Wall : MonoBehaviour, IDragHandler, IBeginDragHandler
     public bool m_UseDragOne = false;
     public float m_DragingFactor = 60f;
 
+    public float m_OutScreenJudgeFactor = 50;
+    public float m_OutScreenDragFactor = 5;
+
     public enum CtrObjType
     {
         OnlyClick = 0,
@@ -33,18 +36,9 @@ public class Wall : MonoBehaviour, IDragHandler, IBeginDragHandler
     private Ray m_Ray;
     private RaycastHit m_HitInfo;
 
-    private static Wall m_Inst;
-    public static Wall Inst
+    public override void Awake()
     {
-        get
-        {
-            return m_Inst;
-        }
-    }
-
-    void Awake()
-    {
-        m_Inst = this;
+        base.Awake();
 
         MapUtil.m_MapGridUnityLen = m_MapGridUnityLen;
 
@@ -195,13 +189,13 @@ public class Wall : MonoBehaviour, IDragHandler, IBeginDragHandler
                     fp.pos = m_HitInfo.point;
                     fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
 
-                    JerryDrawer.Draw<DrawerElementCube>()
-                        .SetColor(Color.black)
-                        .SetLife(3f)
-                        .SetPos(m_HitInfo.point)
-                        .SetSize(Vector3.one)
-                        .SetWire(false)
-                        .SetSizeFactor(0.2f);
+                    //JerryDrawer.Draw<DrawerElementCube>()
+                    //    .SetColor(Color.black)
+                    //    .SetLife(3f)
+                    //    .SetPos(m_HitInfo.point)
+                    //    .SetSize(Vector3.one)
+                    //    .SetWire(false)
+                    //    .SetSizeFactor(0.2f);
 
                     JerryEventMgr.DispatchEvent(Enum_Event.Place2Pos.ToString(), new object[] { fp });
                 }

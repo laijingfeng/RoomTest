@@ -258,18 +258,22 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
 
             while (Input.GetMouseButton(0))
             {
-                if (Util.Vector3Equal(JerryUtil.GetClickPos() - m_Offset, m_LastClickPos))
+                if (Util.Vector3Equal(JerryUtil.GetClickPos() - m_Offset, m_LastClickPos)
+                    && !JudgePosOutScreen())//移动屏幕的时候，相对位置永远不变，这样物体不会更随
                 {
+                    //Debug.LogWarning("d");
                     yield return new WaitForEndOfFrame();
+                    yield return new WaitForEndOfFrame();//减小频率
                     continue;
                 }
+                //Debug.LogWarning("dd");
                 m_LastClickPos = JerryUtil.GetClickPos() - m_Offset;
                 m_Ray = Camera.main.ScreenPointToRay(m_LastClickPos);
-                
+
                 //JerryDrawer.Draw<DrawerElementPath>()
-                    //.SetPoints(m_Ray.origin, m_Ray.direction * 10)
-                    //.SetColor(Color.red)
-                    //.SetLife(0.3f);
+                //.SetPoints(m_Ray.origin, m_Ray.direction * 10)
+                //.SetColor(Color.red)
+                //.SetLife(0.3f);
 
                 if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
                     JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
@@ -314,6 +318,7 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
                     }
                 }
                 yield return new WaitForEndOfFrame();
+                yield return new WaitForEndOfFrame();//减小频率
             }
         }
     }
@@ -381,44 +386,24 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
 
     #endregion 拖拽
 
-    private void JudgePosOutScreen()
+    private bool JudgePosOutScreen()
     {
         if (Wall.Inst.m_CtrType == Wall.CtrObjType.OnlyClick)
         {
-            return;
+            return false;
         }
 
-        this.StopCoroutine("IE_JudgePosOutScreen");
-        this.StartCoroutine("IE_JudgePosOutScreen");
-    }
-
-    private IEnumerator IE_JudgePosOutScreen()
-    {
-        while (true)
+        if (JerryUtil.GetClickPos().x < Wall.Inst.m_OutScreenJudgeFactor)
         {
-            if (JerryUtil.GetClickPos().x < 50)
-            {
-                if (Camera.main.transform.position.x < -4.8f)
-                {
-                    yield break;
-                }
-                //Debug.LogWarning("----");
-                Wall.Inst.DoDrag(-10);
-            }
-            else if (Screen.width - JerryUtil.GetClickPos().x < 50)
-            {
-                if (Camera.main.transform.position.x > 4.8f)
-                {
-                    yield break;
-                }
-                //Debug.LogWarning("++++");
-                Wall.Inst.DoDrag(10);
-            }
-            else
-            {
-                yield break;
-            }
+            Wall.Inst.DoDrag(-Wall.Inst.m_OutScreenDragFactor);
+            return true;
         }
+        else if (Screen.width - JerryUtil.GetClickPos().x < Wall.Inst.m_OutScreenJudgeFactor)
+        {
+            Wall.Inst.DoDrag(Wall.Inst.m_OutScreenDragFactor);
+            return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -522,8 +507,6 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
             SetOutLineColor(canSet ? Color.green : Color.red);
             MyShadow.Inst.SetColor(canSet ? Color.green : Color.red);
         }
-
-        JudgePosOutScreen();
 
         return changeType == Enum_Layer.None ? false : true;
     }
