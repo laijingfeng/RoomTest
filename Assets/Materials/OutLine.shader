@@ -53,6 +53,7 @@
 
 				OUT.pos = mul(scaleMat, IN.vertex);
 				OUT.pos = mul(UNITY_MATRIX_MVP, OUT.pos);
+				OUT.uv = IN.uv;
 				return OUT;
 			}
 
