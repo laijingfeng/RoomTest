@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Jerry;
+using UnityEngine.EventSystems;
 
-public class Drag : MonoBehaviour
+public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     /// <summary>
     /// 大小
@@ -48,8 +49,7 @@ public class Drag : MonoBehaviour
     /// </summary>
     /// <param name="wallType"></param>
     /// <param name="pos"></param>
-    /// <param name="first">刚进入到这个面</param>
-    public void Init(Enum_Layer wallType, Vector3 pos, bool first, bool fromClick = false)
+    public void Init(Enum_Layer wallType, Vector3 pos)
     {
         m_InitData = MapUtil.InitDrag(m_GridSize, m_SetType, m_InitData, wallType);
 
@@ -72,7 +72,7 @@ public class Drag : MonoBehaviour
                 }
                 break;
         }
-        Place2Pos(pos, first, fromClick);
+        Place2Pos(pos, false);
     }
 
     private Vector3 m_ClickDownPos = Vector3.zero;
@@ -113,7 +113,7 @@ public class Drag : MonoBehaviour
         if (m_InitData.isNew)
         {
             FirstPos fp = MapUtil.GetFirstPos(m_SetType);
-            Init(fp.wallType, fp.pos, true);
+            Init(fp.wallType, fp.pos);
         }
         else if (m_InitData.m_CurWall != Enum_Layer.None)
         {
@@ -193,6 +193,11 @@ public class Drag : MonoBehaviour
             m_ClickDownPos = JerryUtil.GetClickPos();
         }
 
+        if (!Wall.Inst.m_UseDragOne)
+        {
+            yield break;
+        }
+
         //下面是拖拽
         if (m_Selected == false
             || Wall.Inst.m_CtrType == Wall.CtrObjType.OnlyClick)
@@ -203,18 +208,18 @@ public class Drag : MonoBehaviour
         var camera = Camera.main;
         if (camera)
         {
-            CalOffset();
+            //CalOffset();
 
             while (Input.GetMouseButton(0))
             {
                 //JudgePosOutScreen();
 
-                if (Util.Vector3Equal(JerryUtil.GetClickPos() - m_Offset, m_LastClickPos, MapUtil.m_MapGridUnityLen / 2))
+                if (Util.Vector3Equal(JerryUtil.GetClickPos()/* - m_Offset*/, m_LastClickPos, MapUtil.m_MapGridUnityLen / 2))
                 {
                     yield return new WaitForEndOfFrame();
                     continue;
                 }
-                m_LastClickPos = JerryUtil.GetClickPos() - m_Offset;
+                m_LastClickPos = JerryUtil.GetClickPos()/* - m_Offset*/;
                 m_Ray = Camera.main.ScreenPointToRay(m_LastClickPos);
 
                 if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
@@ -230,7 +235,8 @@ public class Drag : MonoBehaviour
 
                         //Debug.LogWarning(fp.wallType + " xxx " + m_InitData.m_CurWall);
 
-                        if (!Util.Vector3Equal(fp.pos, m_LastPos, MapUtil.m_MapGridUnityLen / 2))
+                        if (fp.wallType != m_InitData.m_CurWall
+                            || !Util.Vector3Equal(fp.pos, m_LastPos, MapUtil.m_MapGridUnityLen / 2))
                         {
                             m_LastPos = fp.pos;
 
@@ -243,9 +249,9 @@ public class Drag : MonoBehaviour
                                 if (fp.wallType != Enum_Layer.FloorWall
                                     && m_SetType != MapUtil.SetType.Floor)
                                 {
-                                    Init(fp.wallType, fp.pos, true);
-                                    yield return new WaitForEndOfFrame();
-                                    CalOffset();
+                                    Init(fp.wallType, fp.pos);
+                                    //yield return new WaitForEndOfFrame();
+                                    //CalOffset();
                                 }
                             }
                         }
@@ -255,6 +261,69 @@ public class Drag : MonoBehaviour
             }
         }
     }
+
+    #region 拖拽
+
+    private Vector3 m_LastDragScreenPos;
+    private Vector3 m_DragOffset;
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        m_LastDragScreenPos = JerryUtil.GetClickPos();
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (Wall.Inst.m_UseDragOne)
+        {
+            return;
+        }
+
+        m_DragOffset = JerryUtil.GetClickPos() - m_LastDragScreenPos;
+        if (Mathf.Abs(m_DragOffset.x) < Wall.Inst.m_DragingFactor && Mathf.Abs(m_DragOffset.y) < Wall.Inst.m_DragingFactor)
+        {
+            return;
+        }
+        DoDrag(m_DragOffset);
+        m_LastDragScreenPos = JerryUtil.GetClickPos();
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+    }
+
+    private void DoDrag(Vector2 v)
+    {
+        v /= Wall.Inst.m_DragingFactor;
+        v *= MapUtil.m_MapGridUnityLen;
+        Vector3 pos = this.transform.position;
+        switch (m_InitData.m_CurWall)
+        {
+            case Enum_Layer.Wall:
+                {
+                    pos += new Vector3(v.x, v.y, 0);
+                }
+                break;
+            case Enum_Layer.LeftWall:
+                {
+                    pos += new Vector3(0, v.y, v.x);
+                }
+                break;
+            case Enum_Layer.RightWall:
+                {
+                    pos += new Vector3(0, v.y, -v.x);
+                }
+                break;
+            case Enum_Layer.FloorWall:
+                {
+                    pos += new Vector3(v.x, 0, v.y);
+                }
+                break;
+        }
+        Place2Pos(pos);
+    }
+
+    #endregion 拖拽
 
     private void JudgePosOutScreen()
     {
@@ -270,7 +339,7 @@ public class Drag : MonoBehaviour
                 return;
             }
             //Debug.LogWarning("----");
-            DragCamera.Inst.DoDrag(-10);
+            Wall.Inst.DoDrag(-10);
         }
         else if (Screen.width - JerryUtil.GetClickPos().x < 50)
         {
@@ -279,7 +348,7 @@ public class Drag : MonoBehaviour
                 return;
             }
             //Debug.LogWarning("++++");
-            DragCamera.Inst.DoDrag(10);
+            Wall.Inst.DoDrag(10);
         }
     }
 
@@ -287,8 +356,8 @@ public class Drag : MonoBehaviour
     /// 
     /// </summary>
     /// <param name="pos"></param>
-    /// <param name="first">当前面第一次设置位置</param>
-    private void Place2Pos(Vector3 pos, bool first = false, bool fromClick = false)
+    /// <param name="canChangeWall">是否检测换面</param>
+    private void Place2Pos(Vector3 pos, bool canChangeWall = false)
     {
         //Debug.LogWarning("pos1 " + MapUtil.Vector3String(pos) + " " + m_InitData.m_CurWall + " " + MapUtil.GetMap(m_InitData.m_CurWall).Pos2Grid(pos));
 
@@ -304,8 +373,7 @@ public class Drag : MonoBehaviour
             m_Pos.x = Mathf.Clamp(m_Pos.x, m_InitData.m_MinPos.x, m_InitData.m_MaxPos.x);
             if (m_Pos.x <= m_InitData.m_MinPos.x)
             {
-                //点的时候，不能会自动换墙
-                if (first || fromClick)
+                if (!canChangeWall)
                 {
                     m_Pos.x = m_InitData.m_MinPos.x + MapUtil.m_MapGridUnityLen;
                 }
@@ -316,8 +384,7 @@ public class Drag : MonoBehaviour
             }
             else if (m_Pos.x >= m_InitData.m_MaxPos.x)
             {
-                //点的时候，不能会自动换墙
-                if (first || fromClick)
+                if (!canChangeWall)
                 {
                     m_Pos.x = m_InitData.m_MaxPos.x - MapUtil.m_MapGridUnityLen;
                 }
@@ -338,8 +405,7 @@ public class Drag : MonoBehaviour
             m_Pos.z = Mathf.Clamp(m_Pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z);
             if (m_Pos.z >= m_InitData.m_MaxPos.z)
             {
-                //点的时候，不能会自动换墙
-                if (first || fromClick)
+                if (!canChangeWall)
                 {
                     m_Pos.z = m_InitData.m_MaxPos.z - MapUtil.m_MapGridUnityLen;
                 }
@@ -369,7 +435,7 @@ public class Drag : MonoBehaviour
             MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
             transform.position = m_Pos;
 
-            Init(changeType, m_Pos, true);
+            Init(changeType, m_Pos);
         }
         else
         {
@@ -422,6 +488,10 @@ public class Drag : MonoBehaviour
 
     #region 事件
 
+    /// <summary>
+    /// 点击放到一个位置
+    /// </summary>
+    /// <param name="args"></param>
     private void EventPlace2Pos(object[] args)
     {
         if (m_Selected == false)
@@ -435,14 +505,14 @@ public class Drag : MonoBehaviour
 
         if (fp.wallType == m_InitData.m_CurWall)
         {
-            Place2Pos(fp.pos, false, true);
+            Place2Pos(fp.pos, false);
         }
         else
         {
             if (m_SetType != MapUtil.SetType.Floor
                 && fp.wallType != Enum_Layer.FloorWall)
             {
-                Init(fp.wallType, fp.pos, true, true);
+                Init(fp.wallType, fp.pos);
             }
         }
     }
