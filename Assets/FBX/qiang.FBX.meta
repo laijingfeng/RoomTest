@@ -6,12 +6,26 @@ ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
     100000: //RootNode
+    100002: floorgrid
+    100004: wall004
+    100006: wallgrid
     400000: //RootNode
+    400002: floorgrid
+    400004: wall004
+    400006: wallgrid
     2300000: //RootNode
+    2300002: floorgrid
+    2300004: wall004
+    2300006: wallgrid
     3300000: //RootNode
+    3300002: floorgrid
+    3300004: wall004
+    3300006: wallgrid
     4300000: wall004
+    4300002: floorgrid
+    4300004: wallgrid
   materials:
-    importMaterials: 0
+    importMaterials: 1
     materialName: 0
     materialSearch: 1
   animations:
