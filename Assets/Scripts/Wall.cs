@@ -88,37 +88,65 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
         ClickPlaceObj();
     }
 
+    private GUILayoutOption[] m_GUIOpt1 = new GUILayoutOption[2] { GUILayout.MinWidth(100), GUILayout.MinHeight(60) };
+    private bool m_EditorMode = false;
+    public bool EditorMode
+    {
+        get
+        {
+            return m_EditorMode;
+        }
+    }
+
     void OnGUI()
     {
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("放置选中", GUILayout.MinHeight(60), GUILayout.MinWidth(100)))
+        if (GUILayout.Button("放置选中", m_GUIOpt1))
         {
+            if (!m_EditorMode)
+            {
+                Tip.Inst.ShowTip("请先进入[编辑模式]");
+                return;
+            }
+
             if (MapUtil.m_SelectId == 0
                 || MapUtil.m_SelectOK)
             {
-                Debug.LogWarning("没有选中家具");
+                Tip.Inst.ShowTip("没有选中家具");
                 return;
             }
             JerryEventMgr.DispatchEvent(Enum_Event.SetOne.ToString(), new object[] { MapUtil.m_SelectId });
         }
-        
-        if (GUILayout.Button("回收选中", GUILayout.MinHeight(60), GUILayout.MinWidth(100)))
+
+        if (GUILayout.Button("回收选中", m_GUIOpt1))
         {
+            if (!m_EditorMode)
+            {
+                Tip.Inst.ShowTip("请先进入[编辑模式]");
+                return;
+            }
+
             if (MapUtil.m_SelectId == 0
                 || MapUtil.m_SelectOK)
             {
-                Debug.LogWarning("没有选中家具");
+                Tip.Inst.ShowTip("没有选中家具");
                 return;
             }
             JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
         }
 
-        if (GUILayout.Button("随机一个", GUILayout.MinHeight(60), GUILayout.MinWidth(100)))
+        if (GUILayout.Button("随机一个", m_GUIOpt1))
         {
+            if (!m_EditorMode)
+            {
+                Tip.Inst.ShowTip("请先进入[编辑模式]");
+                return;
+            }
+
             Drag[] drags = this.transform.parent.GetComponentsInChildren<Drag>();
             if(drags == null || drags.Length <= 0)
             {
-                Debug.LogWarning("没有可用家具");
+                Tip.Inst.ShowTip("没有可用家具");
                 return;
             }
             List<Drag> usefullDrags = new List<Drag>();
@@ -131,12 +159,34 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
             }
             if (usefullDrags.Count <= 0)
             {
-                Debug.LogWarning("没有可用家具");
+                Tip.Inst.ShowTip("没有可用家具");
                 return;
             }
             int idx = Random.Range(0, usefullDrags.Count);
             usefullDrags[idx].ToScreen();
         }
+
+        GUI.color = m_EditorMode ? Color.green : Color.white;
+        if (GUILayout.Button("编辑模式", m_GUIOpt1))
+        {
+            m_EditorMode = !m_EditorMode;
+
+            if (MapUtil.m_SelectId == 0
+                || MapUtil.m_SelectOK)
+            {
+                return;
+            }
+            if (MapUtil.m_SelectNew)
+            {
+                JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
+            }
+            else
+            {
+                JerryEventMgr.DispatchEvent(Enum_Event.BackOne.ToString(), new object[] { MapUtil.m_SelectId });
+            }
+        }
+        GUI.color = Color.white;
+
         GUILayout.EndHorizontal();
     }
 

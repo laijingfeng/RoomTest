@@ -648,11 +648,11 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
             MyShadow.Inst.SetVisible(false);
             SetOutLineVisible(false);
 
-            Debug.LogWarning("设置OK");
+            Tip.Inst.ShowTip("设置OK");
         }
         else
         {
-            Debug.LogWarning("重叠");
+            Tip.Inst.ShowTip("重叠");
         }
     }
 

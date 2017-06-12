@@ -57,13 +57,21 @@ public enum Enum_Event
 {
     None = 0,
     SetOne,
+    
     /// <summary>
     /// 点击放到一个位置
     /// </summary>
     Place2Pos,
-    BackOne,
+
     /// <summary>
-    /// 放回背包
+    /// <para>撤回原位置</para>
+    /// <para>参数:id</para>
+    /// </summary>
+    BackOne,
+    
+    /// <summary>
+    /// <para>放回背包</para>
+    /// <para>参数:id</para>
     /// </summary>
     Back2Package,
 }
