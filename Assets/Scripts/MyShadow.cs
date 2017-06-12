@@ -47,6 +47,14 @@ public class MyShadow : SingletonMono<MyShadow>
         this.transform.eulerAngles = rotate;
     }
 
+    public bool CanSet
+    {
+        get
+        {
+            return m_Color == Color.red ? false : true;
+        }
+    }
+
     public void SetColor(Color col)
     {
         if (m_Render == null)

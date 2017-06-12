@@ -91,43 +91,50 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
 
     private GUILayoutOption[] m_GUIOpt1 = new GUILayoutOption[2] { GUILayout.MinWidth(100), GUILayout.MinHeight(60) };
     private bool m_EditorMode = false;
+    public bool EditorMode
+    {
+        get
+        {
+            return m_EditorMode;
+        }
+    }
 
     void OnGUI()
     {
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("放置选中", m_GUIOpt1))
-        {
-            if (!m_EditorMode)
-            {
-                Tip.Inst.ShowTip("请先进入[编辑模式]");
-                return;
-            }
+        //if (GUILayout.Button("放置选中", m_GUIOpt1))
+        //{
+        //    if (!m_EditorMode)
+        //    {
+        //        Tip.Inst.ShowTip("请先进入[编辑模式]");
+        //        return;
+        //    }
 
-            if (MapUtil.m_SelectId == 0
-                || MapUtil.m_SelectOK)
-            {
-                Tip.Inst.ShowTip("没有选中家具");
-                return;
-            }
-            JerryEventMgr.DispatchEvent(Enum_Event.SetOne.ToString(), new object[] { MapUtil.m_SelectId });
-        }
+        //    if (MapUtil.m_SelectId == 0
+        //        || MapUtil.m_SelectOK)
+        //    {
+        //        Tip.Inst.ShowTip("没有选中家具");
+        //        return;
+        //    }
+        //    JerryEventMgr.DispatchEvent(Enum_Event.SetOne.ToString(), new object[] { MapUtil.m_SelectId });
+        //}
 
-        if (GUILayout.Button("回收选中", m_GUIOpt1))
-        {
-            if (!m_EditorMode)
-            {
-                Tip.Inst.ShowTip("请先进入[编辑模式]");
-                return;
-            }
+        //if (GUILayout.Button("回收选中", m_GUIOpt1))
+        //{
+        //    if (!m_EditorMode)
+        //    {
+        //        Tip.Inst.ShowTip("请先进入[编辑模式]");
+        //        return;
+        //    }
 
-            if (MapUtil.m_SelectId == 0
-                || MapUtil.m_SelectOK)
-            {
-                Tip.Inst.ShowTip("没有选中家具");
-                return;
-            }
-            JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
-        }
+        //    if (MapUtil.m_SelectId == 0
+        //        || MapUtil.m_SelectOK)
+        //    {
+        //        Tip.Inst.ShowTip("没有选中家具");
+        //        return;
+        //    }
+        //    JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
+        //}
 
         if (GUILayout.Button("随机一个", m_GUIOpt1))
         {
@@ -381,6 +388,8 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
 
         Camera.main.transform.position = tmp1;
         Camera.main.transform.eulerAngles = tmp2;
+
+        UICtr.Inst.AdjustPos();
     }
 
     private void AdjustCamera()
@@ -401,6 +410,7 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
             yield return new WaitForEndOfFrame();
         }
         Camera.main.transform.position = tmp1;
+        UICtr.Inst.AdjustPos();
     }
 
     #endregion 移动镜头

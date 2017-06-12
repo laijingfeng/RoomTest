@@ -91,7 +91,10 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
             return;
         }
 
-        SelectSelf();
+        if (Wall.Inst.EditorMode)
+        {
+            SelectSelf();
+        }
     }
 
     /// <summary>
@@ -136,6 +139,7 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         MapUtil.m_SelectId = m_Id;
         MapUtil.m_SelectOK = false;
         MapUtil.m_SelectNew = m_InitData.isNew;
+        MapUtil.m_SelectDrag = this;
 
         m_InitData.isNew = false;
         this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.ActiveCube.ToString());
@@ -149,6 +153,7 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         MyShadow.Inst.SetVisible(true);
         MyShadow.Inst.SetColor(canSet ? Color.green : Color.red);
         MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(this.transform.position), this.transform.eulerAngles);
+        UICtr.Inst.ShowCtr();
     }
 
     private Vector3 GetTmp()
@@ -257,6 +262,9 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         {
             CalOffset();
 
+            //第一步先记录一下位置，不给走
+            m_LastClickPos = JerryUtil.GetClickPos() - m_Offset;
+
             while (Input.GetMouseButton(0))
             {
                 if (Util.Vector3Equal(JerryUtil.GetClickPos() - m_Offset, m_LastClickPos)
@@ -264,7 +272,7 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
                 {
                     //Debug.LogWarning("d");
                     yield return new WaitForEndOfFrame();
-                    yield return new WaitForEndOfFrame();//减小频率
+                    yield return new WaitForEndOfFrame();//等两帧，减小频率
                     continue;
                 }
                 //Debug.LogWarning("dd");
@@ -297,6 +305,7 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
                             if (fp.wallType == m_InitData.m_CurWall)
                             {
                                 //Debug.LogWarning("aaaabbbb");
+                                UICtr.Inst.HideCtr();
                                 if (Place2Pos(fp.pos, true))
                                 {
                                     CalOffset();
@@ -309,6 +318,7 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
                                     && m_SetType != MapUtil.SetType.Floor)
                                 {
                                     //Debug.LogWarning("aaaa");
+                                    UICtr.Inst.HideCtr();
                                     Init(fp.wallType, fp.pos);
                                     //yield return new WaitForEndOfFrame();
                                     CalOffset();
@@ -319,7 +329,13 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
                     }
                 }
                 yield return new WaitForEndOfFrame();
-                yield return new WaitForEndOfFrame();//减小频率
+                yield return new WaitForEndOfFrame();//等两帧，减小频率
+            }
+
+            if (m_Selected)
+            {
+                UICtr.Inst.ShowCtr();
+                //Debug.LogWarning("Click ShowCtr");
             }
         }
     }
@@ -576,6 +592,7 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
                 Init(fp.wallType, fp.pos);
             }
         }
+        UICtr.Inst.ShowCtr();
     }
 
     private void EventBack2Package(object[] args)
@@ -596,6 +613,7 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
 
         MyShadow.Inst.SetVisible(false);
         SetOutLineVisible(false);
+        UICtr.Inst.HideCtr();
 
         this.transform.position = new Vector3(0, 7, 0);
     }
@@ -622,6 +640,7 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
 
                 MyShadow.Inst.SetVisible(false);
                 SetOutLineVisible(false);
+                UICtr.Inst.HideCtr();
             }
         }
     }
@@ -647,6 +666,8 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
 
             MyShadow.Inst.SetVisible(false);
             SetOutLineVisible(false);
+            UICtr.Inst.HideCtr();
+            //Debug.LogWarning("SetHideCtr");
 
             Tip.Inst.ShowTip("设置OK");
         }
