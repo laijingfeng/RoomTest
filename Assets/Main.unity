@@ -95,6 +95,7 @@ GameObject:
   - 224: {fileID: 47852144}
   - 222: {fileID: 47852146}
   - 114: {fileID: 47852145}
+  - 114: {fileID: 47852147}
   m_Layer: 5
   m_Name: Tip
   m_TagString: Untagged
@@ -158,6 +159,17 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 47852143}
+--- !u!114 &47852147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 47852143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22b79725c24903d42ac30999986cfcec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &90821842 stripped
 Transform:
   m_PrefabParentObject: {fileID: 441690, guid: 05e7e9d4b130e9240a67cf26bde07814, type: 2}
@@ -1241,9 +1253,10 @@ MonoBehaviour:
   m_OutScreenDragFactor: 4
   m_DragFactor: 0.02
   m_RotateFactor: 0.05
+  m_DragBoundEditor: 4.8
   m_DragBound: 6.04
   m_RotateBound: 0
-  m_InUse: 1
+  m_DragCameraInUse: 1
 --- !u!1 &1263235080
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,6 +2,7 @@
 using Jerry;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using System.Collections;
 
 public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
 {
@@ -90,13 +91,6 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
 
     private GUILayoutOption[] m_GUIOpt1 = new GUILayoutOption[2] { GUILayout.MinWidth(100), GUILayout.MinHeight(60) };
     private bool m_EditorMode = false;
-    public bool EditorMode
-    {
-        get
-        {
-            return m_EditorMode;
-        }
-    }
 
     void OnGUI()
     {
@@ -144,7 +138,7 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
             }
 
             Drag[] drags = this.transform.parent.GetComponentsInChildren<Drag>();
-            if(drags == null || drags.Length <= 0)
+            if (drags == null || drags.Length <= 0)
             {
                 Tip.Inst.ShowTip("没有可用家具");
                 return;
@@ -171,11 +165,17 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
         {
             m_EditorMode = !m_EditorMode;
 
+            if (m_EditorMode)
+            {
+                AdjustCamera();
+            }
+
             if (MapUtil.m_SelectId == 0
                 || MapUtil.m_SelectOK)
             {
                 return;
             }
+            
             if (MapUtil.m_SelectNew)
             {
                 JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
@@ -276,10 +276,11 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
     public float m_DragFactor = 0.5f;
     public float m_RotateFactor = 0.5f;
 
+    public float m_DragBoundEditor = 4.8f;
     public float m_DragBound = 4.4f;
     public float m_RotateBound = 25;
 
-    public bool m_InUse = true;
+    public bool m_DragCameraInUse = true;
 
     private bool m_DragUsefull = false;
     //private Ray m_Ray;
@@ -287,7 +288,7 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (!m_InUse)
+        if (!m_DragCameraInUse)
         {
             return;
         }
@@ -313,7 +314,7 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (!m_InUse)
+        if (!m_DragCameraInUse)
         {
             return;
         }
@@ -336,9 +337,17 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
     private Vector3 tmp1;
     private Vector3 tmp2;
 
+    private float GetDragBound
+    {
+        get
+        {
+            return m_EditorMode ? m_DragBoundEditor : m_DragBound;
+        }
+    }
+
     public void DoDrag(float val)
     {
-        if (!m_InUse)
+        if (!m_DragCameraInUse)
         {
             return;
         }
@@ -347,15 +356,15 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
         tmp1 = Camera.main.transform.position;
         tmp2 = Camera.main.transform.eulerAngles;
 
-        if (tmp1.x >= m_DragBound && (tmp2.y > 0 || val > 0))
+        if (tmp1.x >= GetDragBound && (tmp2.y > 0 || val > 0))
         {
-            tmp1.x = m_DragBound;
+            tmp1.x = GetDragBound;
             tmp2.y += val * m_RotateFactor;
             tmp2.y = Mathf.Clamp(tmp2.y, 0, m_RotateBound);
         }
-        else if (tmp1.x <= -m_DragBound && (tmp2.y > 360 - m_RotateBound || val < 0))
+        else if (tmp1.x <= -GetDragBound && (tmp2.y > 360 - m_RotateBound || val < 0))
         {
-            tmp1.x = -m_DragBound;
+            tmp1.x = -GetDragBound;
             if (tmp2.y > 0)
             {
                 tmp2.y -= 360;
@@ -366,12 +375,32 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
         else
         {
             tmp1.x += val * m_DragFactor;
-            tmp1.x = Mathf.Clamp(tmp1.x, -m_DragBound, m_DragBound);
+            tmp1.x = Mathf.Clamp(tmp1.x, -GetDragBound, GetDragBound);
             tmp2.y = 0f;
         }
 
         Camera.main.transform.position = tmp1;
         Camera.main.transform.eulerAngles = tmp2;
+    }
+
+    private void AdjustCamera()
+    {
+        this.StopCoroutine("IE_AdjustCamera");
+        this.StartCoroutine("IE_AdjustCamera");
+    }
+
+    private IEnumerator IE_AdjustCamera()
+    {
+        tmp1 = Camera.main.transform.position;
+        tmp1.x = Mathf.Clamp(tmp1.x, -GetDragBound, GetDragBound);
+        //Debug.LogWarning(MapUtil.Vector3String(Camera.main.transform.position) + " ||| " + MapUtil.Vector3String(tmp1));
+        Vector3 v = Vector3.zero;
+        while (!Util.Vector3Equal(tmp1, Camera.main.transform.position, 0.05f))
+        {
+            Camera.main.transform.position = Vector3.SmoothDamp(Camera.main.transform.position, tmp1, ref v, Time.deltaTime * 5);
+            yield return new WaitForEndOfFrame();
+        }
+        Camera.main.transform.position = tmp1;
     }
 
     #endregion 移动镜头
