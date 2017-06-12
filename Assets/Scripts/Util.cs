@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Util
 {
@@ -50,6 +51,26 @@ public class Util
             return false;
         }
         return true;
+    }
+
+    public static bool ClickUI()
+    {
+        if (Input.GetMouseButtonDown(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began))
+        {
+#if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
+			if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+#else
+            if (EventSystem.current.IsPointerOverGameObject())
+#endif
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return false;
     }
 }
 

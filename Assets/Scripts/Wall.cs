@@ -1,10 +1,8 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using Jerry;
-using UnityEngine.EventSystems;
-using System.Collections.Generic;
-using System.Collections;
+using UnityEngine;
 
-public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
+public class Wall : SingletonMono<Wall>
 {
     public Vector3 m_WallStartPos;
     public MapUtil.IVector3 m_WallSize;
@@ -20,9 +18,6 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
 
     public float m_MapGridUnityLen;
     public CtrObjType m_CtrType = CtrObjType.ClickAndDrag;
-
-    public bool m_UseDragOne = false;
-    public float m_DragingFactor = 60f;
 
     public float m_OutScreenJudgeFactor = 50;
     public float m_OutScreenDragFactor = 5;
@@ -87,6 +82,11 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
     void Update()
     {
         ClickPlaceObj();
+
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    Debug.LogWarning("xxx " + Util.ClickUI());
+        //}
     }
 
     private GUILayoutOption[] m_GUIOpt1 = new GUILayoutOption[2] { GUILayout.MinWidth(100), GUILayout.MinHeight(60) };
@@ -136,6 +136,33 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
         //    JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
         //}
 
+        GUI.color = m_EditorMode ? Color.green : Color.white;
+        if (GUILayout.Button("编辑模式", m_GUIOpt1))
+        {
+            m_EditorMode = !m_EditorMode;
+
+            if (m_EditorMode)
+            {
+                DragCamera.Inst.AdjustCamera();
+            }
+
+            if (MapUtil.m_SelectId == 0
+                || MapUtil.m_SelectOK)
+            {
+                return;
+            }
+
+            if (MapUtil.m_SelectNew)
+            {
+                JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
+            }
+            else
+            {
+                JerryEventMgr.DispatchEvent(Enum_Event.BackOne.ToString(), new object[] { MapUtil.m_SelectId });
+            }
+        }
+        GUI.color = Color.white;
+
         if (GUILayout.Button("随机一个", m_GUIOpt1))
         {
             if (!m_EditorMode)
@@ -167,33 +194,6 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
             usefullDrags[idx].ToScreen();
         }
 
-        GUI.color = m_EditorMode ? Color.green : Color.white;
-        if (GUILayout.Button("编辑模式", m_GUIOpt1))
-        {
-            m_EditorMode = !m_EditorMode;
-
-            if (m_EditorMode)
-            {
-                AdjustCamera();
-            }
-
-            if (MapUtil.m_SelectId == 0
-                || MapUtil.m_SelectOK)
-            {
-                return;
-            }
-            
-            if (MapUtil.m_SelectNew)
-            {
-                JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
-            }
-            else
-            {
-                JerryEventMgr.DispatchEvent(Enum_Event.BackOne.ToString(), new object[] { MapUtil.m_SelectId });
-            }
-        }
-        GUI.color = Color.white;
-
         GUILayout.EndHorizontal();
     }
 
@@ -207,6 +207,11 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
     /// </summary>
     private void ClickPlaceObj()
     {
+        if (Util.ClickUI())
+        {
+            return;
+        }
+
         if (m_CtrType == CtrObjType.OnlyDrag)
         {
             return;
@@ -277,141 +282,4 @@ public class Wall : SingletonMono<Wall>, IDragHandler, IBeginDragHandler
     }
 
     #endregion 点击放置
-
-    #region 移动镜头
-
-    public float m_DragFactor = 0.5f;
-    public float m_RotateFactor = 0.5f;
-
-    public float m_DragBoundEditor = 4.8f;
-    public float m_DragBound = 4.4f;
-    public float m_RotateBound = 25;
-
-    public bool m_DragCameraInUse = true;
-
-    private bool m_DragUsefull = false;
-    //private Ray m_Ray;
-    //private RaycastHit m_HitInfo;
-
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        if (!m_DragCameraInUse)
-        {
-            return;
-        }
-
-        m_Ray = Camera.main.ScreenPointToRay(Util.GetClickPos());
-        if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
-            JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
-                new string[]
-                {
-                    Enum_Layer.ActiveCube.ToString()
-                })))
-        {
-            if (m_HitInfo.collider != null
-                && m_HitInfo.collider.gameObject != null)
-            {
-                //点到选中的物体，是移动物体，不移动镜头
-                m_DragUsefull = false;
-                return;
-            }
-        }
-        m_DragUsefull = true;
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (!m_DragCameraInUse)
-        {
-            return;
-        }
-
-        if (!m_DragUsefull)
-        {
-            return;
-        }
-
-        if (Mathf.Abs(eventData.delta.x) < 3f
-            || Mathf.Abs(eventData.delta.x) < Mathf.Abs(eventData.delta.y))
-        {
-            return;
-        }
-
-        //Debug.LogWarning("drag");
-        DoDrag(-eventData.delta.x);
-    }
-
-    private Vector3 tmp1;
-    private Vector3 tmp2;
-
-    private float GetDragBound
-    {
-        get
-        {
-            return m_EditorMode ? m_DragBoundEditor : m_DragBound;
-        }
-    }
-
-    public void DoDrag(float val)
-    {
-        if (!m_DragCameraInUse)
-        {
-            return;
-        }
-
-        //Debug.LogWarning("val=" + val);
-        tmp1 = Camera.main.transform.position;
-        tmp2 = Camera.main.transform.eulerAngles;
-
-        if (tmp1.x >= GetDragBound && (tmp2.y > 0 || val > 0))
-        {
-            tmp1.x = GetDragBound;
-            tmp2.y += val * m_RotateFactor;
-            tmp2.y = Mathf.Clamp(tmp2.y, 0, m_RotateBound);
-        }
-        else if (tmp1.x <= -GetDragBound && (tmp2.y > 360 - m_RotateBound || val < 0))
-        {
-            tmp1.x = -GetDragBound;
-            if (tmp2.y > 0)
-            {
-                tmp2.y -= 360;
-            }
-            tmp2.y += val * m_RotateFactor;
-            tmp2.y = Mathf.Clamp(tmp2.y, -m_RotateBound, 0);
-        }
-        else
-        {
-            tmp1.x += val * m_DragFactor;
-            tmp1.x = Mathf.Clamp(tmp1.x, -GetDragBound, GetDragBound);
-            tmp2.y = 0f;
-        }
-
-        Camera.main.transform.position = tmp1;
-        Camera.main.transform.eulerAngles = tmp2;
-
-        UICtr.Inst.AdjustPos();
-    }
-
-    private void AdjustCamera()
-    {
-        this.StopCoroutine("IE_AdjustCamera");
-        this.StartCoroutine("IE_AdjustCamera");
-    }
-
-    private IEnumerator IE_AdjustCamera()
-    {
-        tmp1 = Camera.main.transform.position;
-        tmp1.x = Mathf.Clamp(tmp1.x, -GetDragBound, GetDragBound);
-        //Debug.LogWarning(MapUtil.Vector3String(Camera.main.transform.position) + " ||| " + MapUtil.Vector3String(tmp1));
-        Vector3 v = Vector3.zero;
-        while (!Util.Vector3Equal(tmp1, Camera.main.transform.position, 0.05f))
-        {
-            Camera.main.transform.position = Vector3.SmoothDamp(Camera.main.transform.position, tmp1, ref v, Time.deltaTime * 5);
-            yield return new WaitForEndOfFrame();
-        }
-        Camera.main.transform.position = tmp1;
-        UICtr.Inst.AdjustPos();
-    }
-
-    #endregion 移动镜头
 }

@@ -3,7 +3,7 @@ using System.Collections;
 using Jerry;
 using UnityEngine.EventSystems;
 
-public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class Drag : MonoBehaviour
 {
     /// <summary>
     /// 大小
@@ -80,7 +80,8 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
 
     void OnMouseUp()
     {
-        if (m_Selected)
+        if (m_Selected
+            || Util.ClickUI())
         {
             return;
         }
@@ -198,56 +199,19 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
 
     void Update()
     {
-        if (m_Selected && Input.GetKeyDown(KeyCode.M))
-        {
-            m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos());
-            if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
-                    JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
-                    MapUtil.GetWallLayerNames(m_SetType))))
-            {
-                if (m_HitInfo.collider != null
-                    && m_HitInfo.collider.gameObject != null)
-                {
-                    FirstPos fp = new FirstPos();
-                    fp.pos = m_HitInfo.point;
-                    fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
-
-                    Debug.LogWarning("hi " + fp.wallType + " " + MapUtil.GetMap(fp.wallType).Pos2Grid(fp.pos));
-                }
-            }
-
-            m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos() - m_Offset);
-            if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
-                    JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
-                    MapUtil.GetWallLayerNames(m_SetType))))
-            {
-                if (m_HitInfo.collider != null
-                    && m_HitInfo.collider.gameObject != null)
-                {
-                    FirstPos fp = new FirstPos();
-                    fp.pos = m_HitInfo.point;
-                    fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
-
-                    Debug.LogWarning("hi_or " + fp.wallType + " " + MapUtil.GetMap(fp.wallType).Pos2Grid(fp.pos));
-                }
-            }
-        }
-        else if (m_Selected && Input.GetKeyDown(KeyCode.N))
-        {
-            Flag.Inst.Set2Pos(JerryUtil.GetClickPos() - m_Offset);
-        }
+        //UpdateCtr();
     }
 
     IEnumerator OnMouseDown()
     {
+        if (Util.ClickUI())
+        {
+            yield break;
+        }
+
         if (m_Selected == false)
         {
             m_ClickDownPos = JerryUtil.GetClickPos();
-        }
-
-        if (!Wall.Inst.m_UseDragOne)
-        {
-            yield break;
         }
 
         //下面是拖拽
@@ -340,69 +304,6 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         }
     }
 
-    #region 拖拽
-
-    private Vector3 m_LastDragScreenPos;
-    private Vector3 m_DragOffset;
-
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        m_LastDragScreenPos = JerryUtil.GetClickPos();
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (Wall.Inst.m_UseDragOne)
-        {
-            return;
-        }
-
-        m_DragOffset = JerryUtil.GetClickPos() - m_LastDragScreenPos;
-        if (Mathf.Abs(m_DragOffset.x) < Wall.Inst.m_DragingFactor && Mathf.Abs(m_DragOffset.y) < Wall.Inst.m_DragingFactor)
-        {
-            return;
-        }
-        DoDrag(m_DragOffset);
-        m_LastDragScreenPos = JerryUtil.GetClickPos();
-    }
-
-    public void OnEndDrag(PointerEventData eventData)
-    {
-    }
-
-    private void DoDrag(Vector2 v)
-    {
-        v /= Wall.Inst.m_DragingFactor;
-        v *= MapUtil.m_MapGridUnityLen;
-        Vector3 pos = this.transform.position;
-        switch (m_InitData.m_CurWall)
-        {
-            case Enum_Layer.Wall:
-                {
-                    pos += new Vector3(v.x, v.y, 0);
-                }
-                break;
-            case Enum_Layer.LeftWall:
-                {
-                    pos += new Vector3(0, v.y, v.x);
-                }
-                break;
-            case Enum_Layer.RightWall:
-                {
-                    pos += new Vector3(0, v.y, -v.x);
-                }
-                break;
-            case Enum_Layer.FloorWall:
-                {
-                    pos += new Vector3(v.x, 0, v.y);
-                }
-                break;
-        }
-        Place2Pos(pos);
-    }
-
-    #endregion 拖拽
-
     private bool JudgePosOutScreen()
     {
         if (Wall.Inst.m_CtrType == Wall.CtrObjType.OnlyClick)
@@ -412,12 +313,12 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
 
         if (JerryUtil.GetClickPos().x < Wall.Inst.m_OutScreenJudgeFactor)
         {
-            Wall.Inst.DoDrag(-Wall.Inst.m_OutScreenDragFactor);
+            DragCamera.Inst.DoDrag(-Wall.Inst.m_OutScreenDragFactor);
             return true;
         }
         else if (Screen.width - JerryUtil.GetClickPos().x < Wall.Inst.m_OutScreenJudgeFactor)
         {
-            Wall.Inst.DoDrag(Wall.Inst.m_OutScreenDragFactor);
+            DragCamera.Inst.DoDrag(Wall.Inst.m_OutScreenDragFactor);
             return true;
         }
         return false;
@@ -685,5 +586,47 @@ public class Drag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         Debug.LogWarning(this.name);
 
         SelectSelf();
+    }
+
+    private void UpdateCtr()
+    {
+        if (m_Selected && Input.GetKeyDown(KeyCode.M))
+        {
+            m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos());
+            if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
+                    JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
+                    MapUtil.GetWallLayerNames(m_SetType))))
+            {
+                if (m_HitInfo.collider != null
+                    && m_HitInfo.collider.gameObject != null)
+                {
+                    FirstPos fp = new FirstPos();
+                    fp.pos = m_HitInfo.point;
+                    fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
+
+                    Debug.LogWarning("hi " + fp.wallType + " " + MapUtil.GetMap(fp.wallType).Pos2Grid(fp.pos));
+                }
+            }
+
+            m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos() - m_Offset);
+            if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
+                    JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
+                    MapUtil.GetWallLayerNames(m_SetType))))
+            {
+                if (m_HitInfo.collider != null
+                    && m_HitInfo.collider.gameObject != null)
+                {
+                    FirstPos fp = new FirstPos();
+                    fp.pos = m_HitInfo.point;
+                    fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
+
+                    Debug.LogWarning("hi_or " + fp.wallType + " " + MapUtil.GetMap(fp.wallType).Pos2Grid(fp.pos));
+                }
+            }
+        }
+        else if (m_Selected && Input.GetKeyDown(KeyCode.N))
+        {
+            Flag.Inst.Set2Pos(JerryUtil.GetClickPos() - m_Offset);
+        }
     }
 }
