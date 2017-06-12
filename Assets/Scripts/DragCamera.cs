@@ -26,6 +26,7 @@ public class DragCamera : SingletonMono<DragCamera>
     private bool m_DragUsefull = false;
     private Vector3 m_LastPos;
     private Vector3 m_Offset;
+    private float m_OffsetTime = 0;
 
     private Vector3 tmp1;
     private Vector3 tmp2;
@@ -40,6 +41,8 @@ public class DragCamera : SingletonMono<DragCamera>
         if (Input.GetMouseButtonDown(0) 
             && !Util.ClickUI())
         {
+            this.StopCoroutine("IE_AdjustCamera");
+
             m_Ray = Camera.main.ScreenPointToRay(Util.GetClickPos());
             if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
                 JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
@@ -62,6 +65,18 @@ public class DragCamera : SingletonMono<DragCamera>
 
         if (Input.GetMouseButtonUp(0))
         {
+            if (m_DragUsefull)
+            {
+                if (Time.realtimeSinceStartup - m_OffsetTime < 1)
+                {
+                    //Debug.LogWarning("dd v=" + m_Offset.x);
+                    DoDrag(-m_Offset.x * 8, true);
+                }
+                //else
+                //{
+                //    Debug.LogWarning("ddx " + Time.realtimeSinceStartup + " " + m_OffsetTime);
+                //}
+            }
             m_DragUsefull = false;
         }
 
@@ -79,10 +94,11 @@ public class DragCamera : SingletonMono<DragCamera>
             return;
         }
         m_LastPos = JerryUtil.GetClickPos();
+        m_OffsetTime = Time.realtimeSinceStartup;
         DoDrag(-m_Offset.x);
     }
 
-    public void DoDrag(float val)
+    public void DoDrag(float val, bool smooth = false)
     {
         if (!m_DragCameraInUse)
         {
@@ -116,7 +132,15 @@ public class DragCamera : SingletonMono<DragCamera>
             tmp2.y = 0f;
         }
 
-        Camera.main.transform.position = tmp1;
+        if (smooth)
+        {
+            this.StopCoroutine("IE_AdjustCamera");
+            this.StartCoroutine("IE_AdjustCamera", tmp1);
+        }
+        else
+        {
+            Camera.main.transform.position = tmp1;
+        }
         Camera.main.transform.eulerAngles = tmp2;
 
         UICtr.Inst.AdjustPos();
@@ -124,20 +148,23 @@ public class DragCamera : SingletonMono<DragCamera>
 
     public void AdjustCamera()
     {
+        Vector3 pos = Camera.main.transform.position;
+        pos.x = Mathf.Clamp(tmp1.x, -GetDragBound, GetDragBound);
+
         this.StopCoroutine("IE_AdjustCamera");
-        this.StartCoroutine("IE_AdjustCamera");
+        this.StartCoroutine("IE_AdjustCamera", pos);
     }
 
-    private IEnumerator IE_AdjustCamera()
+    private IEnumerator IE_AdjustCamera(Vector3 pos)
     {
-        tmp1 = Camera.main.transform.position;
-        tmp1.x = Mathf.Clamp(tmp1.x, -GetDragBound, GetDragBound);
+        tmp1 = pos;
         //Debug.LogWarning(MapUtil.Vector3String(Camera.main.transform.position) + " ||| " + MapUtil.Vector3String(tmp1));
         Vector3 v = Vector3.zero;
         while (!Util.Vector3Equal(tmp1, Camera.main.transform.position, 0.05f))
         {
-            Camera.main.transform.position = Vector3.SmoothDamp(Camera.main.transform.position, tmp1, ref v, Time.deltaTime * 5);
+            Camera.main.transform.position = Vector3.SmoothDamp(Camera.main.transform.position, tmp1, ref v, Time.deltaTime * 15);
             yield return new WaitForEndOfFrame();
+            UICtr.Inst.AdjustPos();
         }
         Camera.main.transform.position = tmp1;
         UICtr.Inst.AdjustPos();
