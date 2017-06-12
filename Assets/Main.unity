@@ -1133,6 +1133,14 @@ Prefab:
       propertyPath: m_Materials.Array.data[1]
       value: 
       objectReference: {fileID: 2100000, guid: 4744081d4bcca654cb3f6f6c189dc854, type: 2}
+    - target: {fileID: 100002, guid: 5f5869cef3d14534a9ae5741eaa177e8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 100006, guid: 5f5869cef3d14534a9ae5741eaa177e8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5f5869cef3d14534a9ae5741eaa177e8, type: 3}
   m_IsPrefabParent: 0
@@ -2491,6 +2499,7 @@ GameObject:
   - 124: {fileID: 1987710378}
   - 81: {fileID: 1987710377}
   - 114: {fileID: 1987710383}
+  - 114: {fileID: 1987710382}
   m_Layer: 0
   m_Name: MainCamera
   m_TagString: MainCamera
@@ -2565,6 +2574,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+--- !u!114 &1987710382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1987710376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63a41ce66b6590a4890dc5dd52a64ca7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat: {fileID: 2100000, guid: 0596ea2727f939e43990cc1d5e95d5c3, type: 2}
+  color: {r: 0, g: 0, b: 0, a: 1}
+  pos1: {x: 0, y: 0, z: 0}
+  pos2: {x: 0, y: 0, z: 0}
+  m_WallCnt: 0
+  m_Floor: 0
 --- !u!114 &1987710383
 MonoBehaviour:
   m_ObjectHideFlags: 0

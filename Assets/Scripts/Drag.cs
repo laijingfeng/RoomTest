@@ -43,8 +43,6 @@ public class Drag : MonoBehaviour
         JerryEventMgr.AddEvent(Enum_Event.LoadData.ToString(), EventLoadData);
     }
 
-    
-
     void Update()
     {
         //UpdateCtr();
@@ -277,6 +275,7 @@ public class Drag : MonoBehaviour
 
         bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_GridSize);
 
+        Line.Inst.ShowGrid(m_SetType, m_GridSize.y);
         SetOutLineVisible(true);
         SetOutLineColor(canSet ? Color.green : Color.red);
         MyShadow.Inst.SetSize(m_GridSize.ToVector3(), m_SetType);
@@ -549,6 +548,7 @@ public class Drag : MonoBehaviour
         m_Selected = false;
         this.gameObject.layer = LayerMask.NameToLayer("Cube");
 
+        Line.Inst.HideGrid();
         MyShadow.Inst.SetVisible(false);
         SetOutLineVisible(false);
         UICtr.Inst.HideCtr();
@@ -581,6 +581,7 @@ public class Drag : MonoBehaviour
                 MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
                 this.transform.position = m_Pos;
 
+                Line.Inst.HideGrid();
                 MyShadow.Inst.SetVisible(false);
                 SetOutLineVisible(false);
                 UICtr.Inst.HideCtr();
@@ -612,6 +613,7 @@ public class Drag : MonoBehaviour
             MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
             this.transform.position = m_Pos;
 
+            Line.Inst.HideGrid();
             MyShadow.Inst.SetVisible(false);
             SetOutLineVisible(false);
             UICtr.Inst.HideCtr();

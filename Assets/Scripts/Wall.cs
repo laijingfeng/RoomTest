@@ -94,6 +94,8 @@ public class Wall : SingletonMono<Wall>
         //}
     }
 
+    #region GUI
+
     private GUILayoutOption[] m_GUIOpt1 = new GUILayoutOption[2] { GUILayout.MinWidth(100), GUILayout.MinHeight(80) };
     private bool m_EditorMode = false;
     public bool EditorMode
@@ -206,6 +208,8 @@ public class Wall : SingletonMono<Wall>
 
         GUILayout.EndHorizontal();
     }
+
+    #endregion GUI
 
     #region 点击放置
 
