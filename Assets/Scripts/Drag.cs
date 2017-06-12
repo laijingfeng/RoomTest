@@ -261,7 +261,7 @@ public class Drag : MonoBehaviour
             MapUtil.GetMap(m_InitData.m_CurWall).CleanOne(this.transform.position, m_GridSize);
         }
 
-        //Debug.LogWarning("xxx");
+        //Debug.LogWarning("xxx " + m_InitData.isNew + " " + m_InitData.m_CurWall);
 
         MapUtil.m_SelectId = m_Id;
         MapUtil.m_SelectOK = false;
@@ -600,6 +600,8 @@ public class Drag : MonoBehaviour
         {
             return;
         }
+
+        //Debug.LogWarning((m_InitData == null) + " x " + m_InitData.m_CurWall + " " + this.name);
 
         if (MapUtil.GetMap(m_InitData.m_CurWall).SetOne(this.transform.position, m_GridSize))
         {
