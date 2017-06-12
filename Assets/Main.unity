@@ -1688,7 +1688,7 @@ MonoBehaviour:
   m_MapGridUnityLen: 0.5
   m_CtrType: 2
   m_OutScreenJudgeFactor: 50
-  m_OutScreenDragFactor: 4
+  m_OutScreenDragFactor: 6
 --- !u!1 &1263235080
 GameObject:
   m_ObjectHideFlags: 0
@@ -2663,7 +2663,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_DragCameraInUse: 1
-  m_DragFactor: 0.005
+  m_DragFactor: 0.01
   m_RotateFactor: 0.05
   m_DragBoundEditor: 4.8
   m_DragBound: 6.04

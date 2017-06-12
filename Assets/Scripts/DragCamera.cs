@@ -6,7 +6,7 @@ public class DragCamera : SingletonMono<DragCamera>
 {
     public bool m_DragCameraInUse = true;
     
-    public float m_DragFactor = 0.5f;
+    public float m_DragFactor = 0.05f;
     public float m_RotateFactor = 0.5f;
 
     public float m_DragBoundEditor = 4.8f;
