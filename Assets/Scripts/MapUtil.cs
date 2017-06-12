@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using Jerry;
-using System.Collections.Generic;
-using Jerry;
 
 public class MapUtil
 {
