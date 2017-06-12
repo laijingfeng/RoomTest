@@ -79,7 +79,7 @@ public class DragCamera : SingletonMono<DragCamera>
             return;
         }
         m_LastPos = JerryUtil.GetClickPos();
-        DoDrag(m_Offset.x);
+        DoDrag(-m_Offset.x);
     }
 
     public void DoDrag(float val)
