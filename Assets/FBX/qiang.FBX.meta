@@ -9,10 +9,14 @@ ModelImporter:
     100002: floorgrid
     100004: wall004
     100006: wallgrid
+    100008: Camera001
+    100010: Camera002
     400000: //RootNode
     400002: floorgrid
     400004: wall004
     400006: wallgrid
+    400008: Camera001
+    400010: Camera002
     2300000: //RootNode
     2300002: floorgrid
     2300004: wall004
@@ -25,7 +29,7 @@ ModelImporter:
     4300002: floorgrid
     4300004: wallgrid
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 0
     materialSearch: 1
   animations:
