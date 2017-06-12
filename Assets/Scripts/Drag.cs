@@ -22,9 +22,6 @@ public class Drag : MonoBehaviour
     /// </summary>
     private bool m_Selected = false;
 
-    private Vector3 m_Pos;
-    private Vector3 m_LastPos;
-
     private Renderer m_Render;
 
     public DragInitData m_InitData = null;
@@ -42,6 +39,16 @@ public class Drag : MonoBehaviour
         JerryEventMgr.AddEvent(Enum_Event.Place2Pos.ToString(), EventPlace2Pos);
         JerryEventMgr.AddEvent(Enum_Event.BackOne.ToString(), EventBackOne);
         JerryEventMgr.AddEvent(Enum_Event.Back2Package.ToString(), EventBack2Package);
+        JerryEventMgr.AddEvent(Enum_Event.SavePos.ToString(), EventSavePos);
+        JerryEventMgr.AddEvent(Enum_Event.LoadData.ToString(), EventLoadData);
+    }
+
+    
+
+    void Update()
+    {
+        //UpdateCtr();
+        JudgeDrag();
     }
 
     /// <summary>
@@ -52,138 +59,21 @@ public class Drag : MonoBehaviour
     public void Init(Enum_Layer wallType, Vector3 pos)
     {
         m_InitData = MapUtil.InitDrag(m_GridSize, m_SetType, m_InitData, wallType);
-
-        switch (m_InitData.m_CurWall)
-        {
-            case Enum_Layer.LeftWall:
-                {
-                    this.transform.eulerAngles = new Vector3(0, -90, 0);
-                }
-                break;
-            case Enum_Layer.RightWall:
-                {
-                    this.transform.eulerAngles = new Vector3(0, 90, 0);
-                }
-                break;
-            case Enum_Layer.Wall:
-            case Enum_Layer.FloorWall:
-                {
-                    this.transform.eulerAngles = Vector3.zero;
-                }
-                break;
-        }
+        this.transform.eulerAngles = MapUtil.GetMap(m_InitData.m_CurWall).GetObjEulerAngles();
         Place2Pos(pos, false);
     }
 
-    private Vector3 m_ClickDownPos = Vector3.zero;
-    private Vector3 m_ClickUpPos = Vector3.zero;
+    #region 拖拽和选中
 
-    /// <summary>
-    /// 选中
-    /// </summary>
-    private void SelectSelf()
-    {
-        if (MapUtil.m_SelectId != 0
-            && !MapUtil.m_SelectOK)
-        {
-            if (MapUtil.m_SelectNew)
-            {
-                JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
-            }
-            else
-            {
-                JerryEventMgr.DispatchEvent(Enum_Event.BackOne.ToString(), new object[] { MapUtil.m_SelectId });
-            }
-        }
-
-        if (m_InitData.isNew)
-        {
-            FirstPos fp = MapUtil.GetFirstPos(m_SetType);
-            //Debug.LogWarning(fp.pos + " x " + fp.wallType + " " + m_SetType);
-            Init(fp.wallType, fp.pos);
-        }
-        else if (m_InitData.m_CurWall != Enum_Layer.None)
-        {
-            //先浮起来，再记录，保持回退时一致性
-            m_Pos = this.transform.position;
-            MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, true, ref m_Pos);
-            this.transform.position = m_Pos;
-
-            m_InitData.m_LastPos = m_Pos;
-            m_InitData.m_LastWall = m_InitData.m_CurWall;
-
-            MapUtil.GetMap(m_InitData.m_CurWall).CleanOne(this.transform.position, m_GridSize);
-        }
-
-        //Debug.LogWarning("xxx");
-
-        MapUtil.m_SelectId = m_Id;
-        MapUtil.m_SelectOK = false;
-        MapUtil.m_SelectNew = m_InitData.isNew;
-        MapUtil.m_SelectDrag = this;
-
-        m_InitData.isNew = false;
-        this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.ActiveCube.ToString());
-        m_Selected = true;
-
-        bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_GridSize);
-
-        SetOutLineVisible(true);
-        SetOutLineColor(canSet ? Color.green : Color.red);
-        MyShadow.Inst.SetSize(m_GridSize.ToVector3(), m_SetType);
-        MyShadow.Inst.SetVisible(true);
-        MyShadow.Inst.SetColor(canSet ? Color.green : Color.red);
-        MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(this.transform.position), this.transform.eulerAngles);
-        UICtr.Inst.ShowCtr();
-    }
-
-    private Vector3 GetTmp()
-    {
-        Vector3 tmp = this.transform.position;
-        switch (m_InitData.m_CurWall)
-        {
-            case Enum_Layer.FloorWall:
-                {
-                    tmp.y -= m_GridSize.y / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustZVal;
-                }
-                break;
-            case Enum_Layer.Wall:
-                {
-                    tmp.z += m_GridSize.z / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustZVal;
-                }
-                break;
-            case Enum_Layer.LeftWall:
-                {
-                    tmp.x -= m_GridSize.z / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustZVal;
-                }
-                break;
-            case Enum_Layer.RightWall:
-                {
-                    tmp.x += m_GridSize.z / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustZVal;
-                }
-                break;
-        }
-        return tmp;
-    }
+    private bool m_InDraging = false;
 
     private Ray m_Ray;
     private RaycastHit m_HitInfo;
     private Vector3 m_LastDragingPos;
     private Vector3 m_Offset;
 
-    private void CalOffset()
-    {
-        Vector3 pos = GetTmp();
-        m_Offset = JerryUtil.GetClickPos() - Camera.main.WorldToScreenPoint(pos);
-    }
-
-    void Update()
-    {
-        //UpdateCtr();
-        JudgeDrag();
-    }
-
-    private bool m_InDraging = false;
+    private Vector3 m_ClickDownPos = Vector3.zero;
+    private Vector3 m_ClickUpPos = Vector3.zero;
 
     private void JudgeDrag()
     {
@@ -231,21 +121,6 @@ public class Drag : MonoBehaviour
                 }
             }
         }
-    }
-
-    private bool ClickMe()
-    {
-        m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos());
-
-        if (Physics.Raycast(m_Ray, out m_HitInfo, 100))
-        {
-            if (m_HitInfo.collider.gameObject != null
-                && m_HitInfo.collider.gameObject == this.gameObject)
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     private IEnumerator IE_DoDrag()
@@ -350,6 +225,131 @@ public class Drag : MonoBehaviour
         }
         return false;
     }
+
+    /// <summary>
+    /// 选中
+    /// </summary>
+    private void SelectSelf()
+    {
+        if (MapUtil.m_SelectId != 0
+            && !MapUtil.m_SelectOK)
+        {
+            if (MapUtil.m_SelectNew)
+            {
+                JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
+            }
+            else
+            {
+                JerryEventMgr.DispatchEvent(Enum_Event.BackOne.ToString(), new object[] { MapUtil.m_SelectId });
+            }
+        }
+
+        if (m_InitData.isNew)
+        {
+            FirstPos fp = MapUtil.GetFirstPos(m_SetType);
+            //Debug.LogWarning(fp.pos + " x " + fp.wallType + " " + m_SetType);
+            Init(fp.wallType, fp.pos);
+        }
+        else if (m_InitData.m_CurWall != Enum_Layer.None)
+        {
+            //先浮起来，再记录，保持回退时一致性
+            m_Pos = this.transform.position;
+            MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, true, ref m_Pos);
+            this.transform.position = m_Pos;
+
+            m_InitData.m_LastPos = m_Pos;
+            m_InitData.m_LastWall = m_InitData.m_CurWall;
+
+            MapUtil.GetMap(m_InitData.m_CurWall).CleanOne(this.transform.position, m_GridSize);
+        }
+
+        //Debug.LogWarning("xxx");
+
+        MapUtil.m_SelectId = m_Id;
+        MapUtil.m_SelectOK = false;
+        MapUtil.m_SelectNew = m_InitData.isNew;
+        MapUtil.m_SelectDrag = this;
+
+        m_InitData.isNew = false;
+        this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.ActiveCube.ToString());
+        m_Selected = true;
+        m_InitData.isSeted = false;
+
+        bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_GridSize);
+
+        SetOutLineVisible(true);
+        SetOutLineColor(canSet ? Color.green : Color.red);
+        MyShadow.Inst.SetSize(m_GridSize.ToVector3(), m_SetType);
+        MyShadow.Inst.SetVisible(true);
+        MyShadow.Inst.SetColor(canSet ? Color.green : Color.red);
+        MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(this.transform.position), this.transform.eulerAngles);
+        UICtr.Inst.ShowCtr();
+    }
+
+    #region 辅助
+
+    private bool ClickMe()
+    {
+        m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos());
+
+        if (Physics.Raycast(m_Ray, out m_HitInfo, 100))
+        {
+            if (m_HitInfo.collider.gameObject != null
+                && m_HitInfo.collider.gameObject == this.gameObject)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 获得贴墙点
+    /// </summary>
+    /// <returns></returns>
+    private Vector3 GetWallPos()
+    {
+        Vector3 tmp = this.transform.position;
+        switch (m_InitData.m_CurWall)
+        {
+            case Enum_Layer.FloorWall:
+                {
+                    tmp.y -= m_GridSize.y / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustZVal;
+                }
+                break;
+            case Enum_Layer.Wall:
+                {
+                    tmp.z += m_GridSize.z / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustZVal;
+                }
+                break;
+            case Enum_Layer.LeftWall:
+                {
+                    tmp.x -= m_GridSize.z / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustZVal;
+                }
+                break;
+            case Enum_Layer.RightWall:
+                {
+                    tmp.x += m_GridSize.z / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustZVal;
+                }
+                break;
+        }
+        return tmp;
+    }
+
+    private void CalOffset()
+    {
+        Vector3 pos = GetWallPos();
+        m_Offset = JerryUtil.GetClickPos() - Camera.main.WorldToScreenPoint(pos);
+    }
+
+    #endregion 辅助
+
+    #endregion 拖拽和选中
+
+    #region 放置
+
+    private Vector3 m_Pos;
+    private Vector3 m_LastPos;
 
     /// <summary>
     /// 
@@ -481,6 +481,10 @@ public class Drag : MonoBehaviour
         return Mathf.Abs(v1 - x) > Mathf.Abs(v2 - x) ? v2 : v1;
     }
 
+    #endregion 放置
+
+    #region 描边
+
     private void SetOutLineVisible(bool show)
     {
         m_Render.material.SetFloat("_Scale", show ? 1.02f : 1f);
@@ -490,6 +494,8 @@ public class Drag : MonoBehaviour
     {
         m_Render.material.SetColor("_OutlineColor", col);
     }
+
+    #endregion 描边
 
     #region 事件
 
@@ -523,6 +529,10 @@ public class Drag : MonoBehaviour
         UICtr.Inst.ShowCtr();
     }
 
+    /// <summary>
+    /// 撤回背包
+    /// </summary>
+    /// <param name="args"></param>
     private void EventBack2Package(object[] args)
     {
         int id = (int)args[0];
@@ -546,6 +556,10 @@ public class Drag : MonoBehaviour
         this.transform.position = new Vector3(0, 7, 0);
     }
 
+    /// <summary>
+    /// 放回原处
+    /// </summary>
+    /// <param name="args"></param>
     private void EventBackOne(object[] args)
     {
         int id = (int)args[0];
@@ -561,6 +575,7 @@ public class Drag : MonoBehaviour
                 m_InitData.m_CurWall = m_InitData.m_LastWall;
 
                 m_Selected = false;
+                m_InitData.isSeted = true;
                 this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.Cube.ToString());
                 m_Pos = m_InitData.m_LastPos;
                 MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
@@ -573,6 +588,10 @@ public class Drag : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 放置
+    /// </summary>
+    /// <param name="args"></param>
     private void EventSetOne(object[] args)
     {
         int id = (int)args[0];
@@ -587,6 +606,7 @@ public class Drag : MonoBehaviour
             MapUtil.m_SelectId = 0;
 
             m_Selected = false;
+            m_InitData.isSeted = true;
             this.gameObject.layer = LayerMask.NameToLayer("Cube");
             m_Pos = this.transform.position;
             MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
@@ -603,6 +623,54 @@ public class Drag : MonoBehaviour
         {
             Tip.Inst.ShowTip("重叠");
         }
+    }
+
+    /// <summary>
+    /// 存档
+    /// </summary>
+    /// <param name="args"></param>
+    private void EventSavePos(object[] args)
+    {
+        if (!m_InitData.isSeted)
+        {
+            return;
+        }
+        SaveData data = new SaveData();
+        data.wallCode = m_InitData.m_CurWall.GetHashCode();
+        data.pos = new MapUtil.IVector3((this.transform.position - MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos) / (0.5f * MapUtil.m_MapGridUnityLen));
+        PlayerPrefs.SetString("cube_" + m_Id, JsonUtility.ToJson(data));
+    }
+
+    private void EventLoadData(object[] args)
+    {
+        string sdata = PlayerPrefs.GetString("cube_" + m_Id, "");
+        if (string.IsNullOrEmpty(sdata))
+        {
+            return;
+        }
+        SaveData data = JsonUtility.FromJson<SaveData>(sdata);
+        if (data == null)
+        {
+            return;
+        }
+        Enum_Layer wall = (Enum_Layer)data.wallCode;
+
+        m_InitData = MapUtil.InitDrag(m_GridSize, m_SetType, m_InitData, wall);
+        m_InitData.isSeted = true;
+        m_InitData.isNew = false;
+        this.transform.eulerAngles = MapUtil.GetMap(m_InitData.m_CurWall).GetObjEulerAngles();
+        this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos + data.pos.MulVal(0.5f * MapUtil.m_MapGridUnityLen);
+    }
+
+    [System.Serializable]
+    public class SaveData
+    {
+        /// <summary>
+        /// 位置半个格子的几倍
+        /// </summary>
+        public MapUtil.IVector3 pos;
+
+        public int wallCode;
     }
 
     #endregion 事件

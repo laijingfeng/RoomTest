@@ -784,4 +784,25 @@ public class Map
         //Debug.LogWarning("corner=" + ret + " min=" + min + " pos=" + pos);
         return ret;
     }
+
+    public Vector3 GetObjEulerAngles()
+    {
+        switch (m_Type)
+        {
+            case Enum_Layer.LeftWall:
+                {
+                    return new Vector3(0, -90, 0);
+                }
+            case Enum_Layer.RightWall:
+                {
+                    return new Vector3(0, 90, 0);
+                }
+            case Enum_Layer.Wall:
+            case Enum_Layer.FloorWall:
+                {
+                    return Vector3.zero;
+                }
+        }
+        return Vector3.zero;
+    }
 }

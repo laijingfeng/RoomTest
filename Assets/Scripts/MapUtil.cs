@@ -250,6 +250,11 @@ public class MapUtil
         {
             return string.Format("({0},{1},{2})", x, y, z);
         }
+
+        public Vector3 MulVal(float val)
+        {
+            return ToVector3() * val;
+        }
     }
 
     public static string Vector3String(Vector3 v)

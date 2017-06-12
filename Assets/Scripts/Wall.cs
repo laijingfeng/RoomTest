@@ -79,6 +79,11 @@ public class Wall : SingletonMono<Wall>
 #endif
     }
 
+    void Start()
+    {
+        JerryEventMgr.DispatchEvent(Enum_Event.LoadData.ToString());
+    }
+
     void Update()
     {
         ClickPlaceObj();
@@ -89,7 +94,7 @@ public class Wall : SingletonMono<Wall>
         //}
     }
 
-    private GUILayoutOption[] m_GUIOpt1 = new GUILayoutOption[2] { GUILayout.MinWidth(100), GUILayout.MinHeight(60) };
+    private GUILayoutOption[] m_GUIOpt1 = new GUILayoutOption[2] { GUILayout.MinWidth(100), GUILayout.MinHeight(80) };
     private bool m_EditorMode = false;
     public bool EditorMode
     {
@@ -162,6 +167,11 @@ public class Wall : SingletonMono<Wall>
             }
         }
         GUI.color = Color.white;
+
+        if (GUILayout.Button("保存方案", m_GUIOpt1))
+        {
+            JerryEventMgr.DispatchEvent(Enum_Event.SavePos.ToString());
+        }
 
         if (GUILayout.Button("随机一个", m_GUIOpt1))
         {

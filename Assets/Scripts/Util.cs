@@ -95,6 +95,13 @@ public enum Enum_Event
     /// <para>参数:id</para>
     /// </summary>
     Back2Package,
+
+    /// <summary>
+    /// 存档位置
+    /// </summary>
+    SavePos,
+
+    LoadData,
 }
 
 public enum Enum_Layer
@@ -117,7 +124,14 @@ public class DragInitData
     public Vector3 m_MaxPos;
     public Vector3 m_AdjustPar;
 
+    /// <summary>
+    /// 是否是新的，没有放置过
+    /// </summary>
     public bool isNew = false;
+    /// <summary>
+    /// 是否是放好的
+    /// </summary>
+    public bool isSeted = false;
 
     public Enum_Layer m_CurWall = Enum_Layer.None;
     public Vector3 m_CurPos = Vector3.zero;
