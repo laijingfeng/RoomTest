@@ -91,7 +91,8 @@ MonoBehaviour:
     x: 5
     y: 2
     z: 2
-  m_SetType: 1
+  m_SetType: 2
+  m_Id: 12
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

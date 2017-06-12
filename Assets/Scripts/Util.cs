@@ -32,7 +32,7 @@ public class Util
         return pos;
     }
 
-    private static int m_IdFactor = 0;
+    private static int m_IdFactor = 100;
     public static int IDGenerator(int id)
     {
         if (id == 0)

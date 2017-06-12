@@ -15,7 +15,7 @@ public class Drag : MonoBehaviour
     /// <summary>
     /// id
     /// </summary>
-    private int m_Id;
+    public int m_Id;
 
     /// <summary>
     /// 选中
