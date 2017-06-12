@@ -78,26 +78,6 @@ public class Drag : MonoBehaviour
     private Vector3 m_ClickDownPos = Vector3.zero;
     private Vector3 m_ClickUpPos = Vector3.zero;
 
-    void OnMouseUp()
-    {
-        if (m_Selected
-            || Util.ClickUI())
-        {
-            return;
-        }
-
-        m_ClickUpPos = JerryUtil.GetClickPos();
-        if (!Util.Vector3Equal(m_ClickUpPos, m_ClickDownPos))
-        {
-            return;
-        }
-
-        if (Wall.Inst.EditorMode)
-        {
-            SelectSelf();
-        }
-    }
-
     /// <summary>
     /// 选中
     /// </summary>
@@ -188,7 +168,7 @@ public class Drag : MonoBehaviour
 
     private Ray m_Ray;
     private RaycastHit m_HitInfo;
-    private Vector3 m_LastClickPos;
+    private Vector3 m_LastDragingPos;
     private Vector3 m_Offset;
 
     private void CalOffset()
@@ -200,107 +180,154 @@ public class Drag : MonoBehaviour
     void Update()
     {
         //UpdateCtr();
+        JudgeDrag();
     }
 
-    IEnumerator OnMouseDown()
+    private bool m_InDraging = false;
+
+    private void JudgeDrag()
     {
-        if (Util.ClickUI())
+        if (Input.GetMouseButtonDown(0))
         {
-            yield break;
-        }
-
-        if (m_Selected == false)
-        {
-            m_ClickDownPos = JerryUtil.GetClickPos();
-        }
-
-        //下面是拖拽
-        if (m_Selected == false
-            || Wall.Inst.m_CtrType == Wall.CtrObjType.OnlyClick)
-        {
-            yield break;
-        }
-
-        var camera = Camera.main;
-        if (camera)
-        {
-            CalOffset();
-
-            //第一步先记录一下位置，不给走
-            m_LastClickPos = JerryUtil.GetClickPos() - m_Offset;
-
-            while (Input.GetMouseButton(0))
+            if (Util.ClickUI()
+                || !ClickMe())
             {
-                if (Util.Vector3Equal(JerryUtil.GetClickPos() - m_Offset, m_LastClickPos)
-                    && !JudgePosOutScreen())//移动屏幕的时候，相对位置永远不变，这样物体不会更随
+                return;
+            }
+
+            if (!m_Selected)
+            {
+                m_ClickDownPos = JerryUtil.GetClickPos();
+                return;
+            }
+            else
+            {
+                if (Wall.Inst.m_CtrType != Wall.CtrObjType.OnlyClick)
                 {
-                    //Debug.LogWarning("d");
-                    yield return new WaitForEndOfFrame();
-                    yield return new WaitForEndOfFrame();//等两帧，减小频率
-                    continue;
+                    m_InDraging = true;
+                    this.StopCoroutine("IE_DoDrag");
+                    this.StartCoroutine("IE_DoDrag");
                 }
-                //Debug.LogWarning("dd");
-                m_LastClickPos = JerryUtil.GetClickPos() - m_Offset;
-                m_Ray = Camera.main.ScreenPointToRay(m_LastClickPos);
+            }
+        }
 
-                //JerryDrawer.Draw<DrawerElementPath>()
-                //.SetPoints(m_Ray.origin, m_Ray.direction * 10)
-                //.SetColor(Color.red)
-                //.SetLife(0.3f);
+        if (Input.GetMouseButtonUp(0))
+        {
+            m_InDraging = false;
 
-                if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
+            if (Util.ClickUI())
+            {
+                return;
+            }
+
+            if (!m_Selected)
+            {
+                m_ClickUpPos = JerryUtil.GetClickPos();
+                if (Util.Vector3Equal(m_ClickUpPos, m_ClickDownPos, 2)
+                    && Wall.Inst.EditorMode)
+                {
+                    SelectSelf();
+                    return;
+                }
+            }
+        }
+    }
+
+    private bool ClickMe()
+    {
+        m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos());
+
+        if (Physics.Raycast(m_Ray, out m_HitInfo, 100))
+        {
+            if (m_HitInfo.collider.gameObject != null
+                && m_HitInfo.collider.gameObject == this.gameObject)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private IEnumerator IE_DoDrag()
+    {
+        Camera camera = Camera.main;
+        if (camera == null)
+        {
+            yield break;
+        }
+
+        CalOffset();
+
+        //第一步，先记录一下位置，不给走
+        m_LastDragingPos = JerryUtil.GetClickPos() - m_Offset;
+
+        while (m_InDraging)
+        {
+            if (Util.Vector3Equal(JerryUtil.GetClickPos() - m_Offset, m_LastDragingPos, 2)
+                    && !JudgePosOutScreen())//移动屏幕的时候，相对位置永远不变，这样物体不会更随
+            {
+                //Debug.LogWarning("d");
+                yield return new WaitForEndOfFrame();
+                yield return new WaitForEndOfFrame();//等两帧，减小频率
+                continue;
+            }
+
+            m_LastDragingPos = JerryUtil.GetClickPos() - m_Offset;
+            m_Ray = Camera.main.ScreenPointToRay(m_LastDragingPos);
+
+            if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
                     JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
                     MapUtil.GetWallLayerNames(m_SetType))))
+            {
+                if (m_HitInfo.collider != null
+                    && m_HitInfo.collider.gameObject != null)
                 {
-                    if (m_HitInfo.collider != null
-                        && m_HitInfo.collider.gameObject != null)
+                    FirstPos fp = new FirstPos();
+                    fp.pos = m_HitInfo.point;
+                    fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
+
+                    //Debug.LogWarning(fp.wallType + " xxx " + m_InitData.m_CurWall);
+
+                    if (fp.wallType != m_InitData.m_CurWall
+                        || !Util.Vector3Equal(fp.pos, m_LastPos))
                     {
-                        FirstPos fp = new FirstPos();
-                        fp.pos = m_HitInfo.point;
-                        fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
+                        m_LastPos = fp.pos;
 
-                        //Debug.LogWarning(fp.wallType + " xxx " + m_InitData.m_CurWall);
-
-                        if (fp.wallType != m_InitData.m_CurWall
-                            || !Util.Vector3Equal(fp.pos, m_LastPos))
+                        if (fp.wallType == m_InitData.m_CurWall)
                         {
-                            m_LastPos = fp.pos;
-
-                            if (fp.wallType == m_InitData.m_CurWall)
+                            //Debug.LogWarning("aaaabbbb");
+                            UICtr.Inst.HideCtr();
+                            if (Place2Pos(fp.pos, true))
                             {
-                                //Debug.LogWarning("aaaabbbb");
-                                UICtr.Inst.HideCtr();
-                                if (Place2Pos(fp.pos, true))
-                                {
-                                    CalOffset();
-                                    //yield break;
-                                }
+                                CalOffset();
+                                //yield break;
                             }
-                            else
+                        }
+                        else
+                        {
+                            if (fp.wallType != Enum_Layer.FloorWall
+                                && m_SetType != MapUtil.SetType.Floor)
                             {
-                                if (fp.wallType != Enum_Layer.FloorWall
-                                    && m_SetType != MapUtil.SetType.Floor)
-                                {
-                                    //Debug.LogWarning("aaaa");
-                                    UICtr.Inst.HideCtr();
-                                    Init(fp.wallType, fp.pos);
-                                    //yield return new WaitForEndOfFrame();
-                                    CalOffset();
-                                    //yield break;
-                                }
+                                //Debug.LogWarning("aaaa");
+                                UICtr.Inst.HideCtr();
+                                Init(fp.wallType, fp.pos);
+                                //yield return new WaitForEndOfFrame();
+                                CalOffset();
+                                //yield break;
                             }
                         }
                     }
                 }
-                yield return new WaitForEndOfFrame();
-                yield return new WaitForEndOfFrame();//等两帧，减小频率
             }
 
-            if (m_Selected)
-            {
-                UICtr.Inst.ShowCtr();
-                //Debug.LogWarning("Click ShowCtr");
-            }
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();//等两帧，减小频率
+        }
+
+        if (m_Selected)
+        {
+            UICtr.Inst.ShowCtr();
+            //Debug.LogWarning("Click ShowCtr");
         }
     }
 
