@@ -26,7 +26,8 @@ public class DragCamera : SingletonMono<DragCamera>
     private bool m_DragUsefull = false;
     private Vector3 m_LastPos;
     private Vector3 m_Offset;
-    private float m_OffsetTime = 0;
+    private Vector3 m_LastOffset = Vector3.zero;
+    private float m_LastOffsetTime = 0;
 
     private Vector3 tmp1;
     private Vector3 tmp2;
@@ -67,14 +68,14 @@ public class DragCamera : SingletonMono<DragCamera>
         {
             if (m_DragUsefull)
             {
-                if (Time.realtimeSinceStartup - m_OffsetTime < 1)
+                if (Time.realtimeSinceStartup - m_LastOffsetTime < 0.2f)
                 {
-                    //Debug.LogWarning("dd v=" + m_Offset.x);
-                    DoDrag(-m_Offset.x * 8, true);
+                    //Debug.LogWarning("dd v=" + m_LastOffset.x);
+                    DoDrag(-m_LastOffset.x * 8, true);
                 }
                 //else
                 //{
-                //    Debug.LogWarning("ddx " + Time.realtimeSinceStartup + " " + m_OffsetTime);
+                //    Debug.LogWarning("ddx " + Time.realtimeSinceStartup + " " + m_LastOffsetTime);
                 //}
             }
             m_DragUsefull = false;
@@ -94,7 +95,8 @@ public class DragCamera : SingletonMono<DragCamera>
             return;
         }
         m_LastPos = JerryUtil.GetClickPos();
-        m_OffsetTime = Time.realtimeSinceStartup;
+        m_LastOffset = m_Offset;
+        m_LastOffsetTime = Time.realtimeSinceStartup;
         DoDrag(-m_Offset.x);
     }
 
