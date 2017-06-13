@@ -6,11 +6,11 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: diban
-  m_Shader: {fileID: 10752, guid: 0000000000000000f000000000000000, type: 0}
+  m_Name: qiangmian_00
+  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
-  m_CustomRenderQueue: 2000
+  m_CustomRenderQueue: -1
   stringTagMap: {}
   m_SavedProperties:
     serializedVersion: 2
@@ -19,9 +19,9 @@ Material:
         first:
           name: _MainTex
         second:
-          m_Texture: {fileID: 2800000, guid: 88d961d0474e1af48b44365499ff20d2, type: 3}
-          m_Scale: {x: 3, y: 3.5}
-          m_Offset: {x: -1, y: -1.25}
+          m_Texture: {fileID: 2800000, guid: 03f5d080bec0abc41a5e4052b7001227, type: 3}
+          m_Scale: {x: 3, y: 1}
+          m_Offset: {x: -1, y: 0}
       data:
         first:
           name: _BumpMap
@@ -135,4 +135,4 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: 0, g: 0.16862746, b: 0.04705883, a: 1}
+        second: {r: 1, g: 1, b: 1, a: 1}

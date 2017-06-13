@@ -1,43 +1,27 @@
 fileFormatVersion: 2
-guid: 5f5869cef3d14534a9ae5741eaa177e8
-timeCreated: 1497090831
+guid: b1328b3ed8ece5a47a8c55d73818cb16
+timeCreated: 1497357205
 licenseType: Pro
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
     100000: //RootNode
-    100002: floorgrid
-    100004: wall004
-    100006: wallgrid
-    100008: Camera001
-    100010: Camera002
-    100012: Object004
-    100014: Object005
+    100002: Object005
+    100004: wallgrid
+    100006: floorgrid
     400000: //RootNode
-    400002: floorgrid
-    400004: wall004
-    400006: wallgrid
-    400008: Camera001
-    400010: Camera002
-    400012: Object004
-    400014: Object005
-    2300000: //RootNode
-    2300002: floorgrid
-    2300004: wall004
-    2300006: wallgrid
-    2300008: Object004
-    2300010: Object005
-    3300000: //RootNode
-    3300002: floorgrid
-    3300004: wall004
-    3300006: wallgrid
-    3300008: Object004
-    3300010: Object005
-    4300000: wall004
-    4300002: floorgrid
-    4300004: wallgrid
-    4300006: Object004
-    4300008: Object005
+    400002: Object005
+    400004: wallgrid
+    400006: floorgrid
+    2300000: Object005
+    2300002: wallgrid
+    2300004: floorgrid
+    3300000: Object005
+    3300002: wallgrid
+    3300004: floorgrid
+    4300000: wallgrid
+    4300002: Object005
+    4300004: floorgrid
   materials:
     importMaterials: 0
     materialName: 0
