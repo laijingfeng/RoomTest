@@ -84,7 +84,7 @@ public class Furniture : MonoBehaviour
 
     void Update()
     {
-        //UpdateCtr();
+        UpdateCtr();
         TryDrag();
     }
 
@@ -187,7 +187,6 @@ public class Furniture : MonoBehaviour
             if (Util.Vector3Equal(JerryUtil.GetClickPos() - m_Offset, m_LastDragingPos, 2)
                     && !JudgePosOutScreen())//移动屏幕的时候，相对位置永远不变，这样物体不会更随
             {
-                //Debug.LogWarning("d");
                 yield return new WaitForEndOfFrame();
                 yield return new WaitForEndOfFrame();//等两帧，减小频率
                 continue;
@@ -216,7 +215,6 @@ public class Furniture : MonoBehaviour
 
                         if (fp.wallType == m_InitData.m_CurWall)
                         {
-                            //Debug.LogWarning("aaaabbbb");
                             UI_Ctr.Inst.HideCtr();
                             if (Place2Pos(fp.pos, true))
                             {
@@ -229,7 +227,7 @@ public class Furniture : MonoBehaviour
                             if (fp.wallType != Enum_Layer.FloorWall
                                 && m_Config.setType != MapUtil.SetType.Floor)
                             {
-                                //Debug.LogWarning("aaaa");
+                                //Debug.LogWarning("aaaa================");
                                 UI_Ctr.Inst.HideCtr();
                                 Init2Wall(m_InitData.m_CurWall, fp.wallType, fp.pos);
                                 //yield return new WaitForEndOfFrame();
@@ -336,6 +334,7 @@ public class Furniture : MonoBehaviour
 
         if (Physics.Raycast(m_Ray, out m_HitInfo, 100))
         {
+            //Debug.LogWarning("Hit=" + m_HitInfo.collider.gameObject.name);
             if (m_HitInfo.collider.gameObject != null
                 && m_HitInfo.collider.gameObject == this.gameObject)
             {
@@ -345,42 +344,10 @@ public class Furniture : MonoBehaviour
         return false;
     }
 
-    /// <summary>
-    /// 获得贴墙点
-    /// </summary>
-    /// <returns></returns>
-    private Vector3 GetWallPos()
-    {
-        Vector3 tmp = this.transform.position;
-        switch (m_InitData.m_CurWall)
-        {
-            case Enum_Layer.FloorWall:
-                {
-                    tmp.y -= m_Config.size.y / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustFurn2WallPar;
-                }
-                break;
-            case Enum_Layer.Wall:
-                {
-                    tmp.z += m_Config.size.z / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustFurn2WallPar;
-                }
-                break;
-            case Enum_Layer.LeftWall:
-                {
-                    tmp.x -= m_Config.size.z / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustFurn2WallPar;
-                }
-                break;
-            case Enum_Layer.RightWall:
-                {
-                    tmp.x += m_Config.size.z / 2.0f * MapUtil.m_MapGridUnityLen + MapUtil.m_AdjustFurn2WallPar;
-                }
-                break;
-        }
-        return tmp;
-    }
-
     private void CalOffset()
     {
-        Vector3 pos = GetWallPos();
+        Vector3 pos = MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall2(m_Config.size, false, this.transform.position);
+        Debug.LogWarning("xxx " + pos);
         m_Offset = JerryUtil.GetClickPos() - Camera.main.WorldToScreenPoint(pos);
     }
 
