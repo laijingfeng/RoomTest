@@ -241,7 +241,7 @@ public class MapUtil
     /// 整型Vector3
     /// </summary>
     [System.Serializable]
-    public class IVector3
+    public struct IVector3
     {
         public int x;
         public int y;

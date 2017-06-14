@@ -347,7 +347,7 @@ public class Furniture : MonoBehaviour
     private void CalOffset()
     {
         Vector3 pos = MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall2(m_Config.size, false, this.transform.position);
-        Debug.LogWarning("xxx " + pos);
+        //Debug.LogWarning("xxx " + pos);
         m_Offset = JerryUtil.GetClickPos() - Camera.main.WorldToScreenPoint(pos);
     }
 
