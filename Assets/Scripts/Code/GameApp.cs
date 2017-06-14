@@ -23,7 +23,7 @@ public class GameApp : SingletonMono<GameApp>
     [Header("Other Settings")]
 
     public float m_MapGridUnityLen;
-    
+
     public float m_OutScreenJudgeFactor = 50;
     public float m_OutScreenDragFactor = 5;
     public float m_HouseHeight = 4.6f;
@@ -153,7 +153,7 @@ public class GameApp : SingletonMono<GameApp>
     void OnGUI()
     {
         GUILayout.BeginHorizontal();
-        
+
         GUI.color = m_EditorMode ? Color.green : Color.white;
         if (GUILayout.Button("编辑模式", m_GUIOpt1))
         {
@@ -210,10 +210,10 @@ public class GameApp : SingletonMono<GameApp>
                 UI_Tip.Inst.ShowTip("请先进入[编辑模式]");
                 return;
             }
-            houses[curFloor].AddOneFurniture();
+            houses[CurNodeIdx].AddOneFurniture();
         }
 
-        if (GUILayout.Button("往上一楼", m_GUIOpt1))
+        if (GUILayout.Button(string.Format("上楼({0})", curFloor), m_GUIOpt1))
         {
             if (UpDowning)
             {
@@ -228,7 +228,7 @@ public class GameApp : SingletonMono<GameApp>
             ToFloor(curFloor + 1);
         }
 
-        if (GUILayout.Button("往下一楼", m_GUIOpt1))
+        if (GUILayout.Button(string.Format("下楼({0})", curFloor), m_GUIOpt1))
         {
             if (UpDowning)
             {
@@ -256,7 +256,7 @@ public class GameApp : SingletonMono<GameApp>
     private IEnumerator IE_ToFloor(int f)
     {
         CreateHouse((curHouseNodeIdx + 1) % HOUSE_NODE_CNT, f);
-        
+
         yield return new WaitForEndOfFrame();
 
         Vector3 pos = Camera.main.transform.position;
