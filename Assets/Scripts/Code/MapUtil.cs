@@ -33,6 +33,14 @@ public class MapUtil
         m_FloorWall.Init(Enum_Layer.FloorWall);
     }
 
+    public static void ResetMap()
+    {
+        m_LeftSideWall.Reset();
+        m_Wall.Reset();
+        m_RightSideWall.Reset();
+        m_FloorWall.Reset();
+    }
+
     public static Map GetMap(Enum_Layer type)
     {
         switch (type)
@@ -200,6 +208,7 @@ public class MapUtil
     /// <summary>
     /// 放置类型
     /// </summary>
+    [System.Serializable]
     public enum SetType
     {
         None = 0,

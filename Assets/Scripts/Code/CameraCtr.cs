@@ -20,7 +20,7 @@ public class CameraCtr : SingletonMono<CameraCtr>
     {
         get
         {
-            return WallConfig.Inst.EditorMode ? m_DragBoundEditor : m_DragBound;
+            return GameApp.Inst.EditorMode ? m_DragBoundEditor : m_DragBound;
         }
     }
 
@@ -42,7 +42,17 @@ public class CameraCtr : SingletonMono<CameraCtr>
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) 
+        TryDrag();
+    }
+
+    private void TryDrag()
+    {
+        if (GameApp.Inst.UpDowning)
+        {
+            return;
+        }
+
+        if (Input.GetMouseButtonDown(0)
             && !Util.ClickUI())
         {
             this.StopCoroutine("IE_AdjustCamera");

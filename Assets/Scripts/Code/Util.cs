@@ -33,7 +33,7 @@ public class Util
     }
 
     private static int m_IdFactor = 100;
-    public static int IDGenerator(int id)
+    public static int IDGenerator(int id = 0)
     {
         if (id == 0)
         {
@@ -97,13 +97,13 @@ public enum Enum_Event
     Back2Package,
 
     /// <summary>
-    /// 存档位置
+    /// <para>存档</para>
+    /// <para>参数:无</para>
     /// </summary>
-    SavePos,
-
-    LoadData,
+    SaveCurHouseData,
 }
 
+[System.Serializable]
 public enum Enum_Layer
 {
     None = 0,

@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using Jerry;
+﻿using Jerry;
+using UnityEngine;
 
 public class GridMgr : SingletonMono<GridMgr>
 {
@@ -9,11 +9,27 @@ public class GridMgr : SingletonMono<GridMgr>
     public int m_WallEnd = 0;
     public bool m_Floor = false;
 
-    public Transform m_FloorGrid;
-    public Transform[] m_WallGrid;
+    private const int WALL_GRID_CNT = 6;
 
-    void Start()
+    private Transform m_FloorGrid;
+    private Transform[] m_WallGrid;
+
+    public override void Awake()
     {
+        base.Awake();
+        m_FloorGrid = this.transform.FindChild("FloorGrid");
+        m_WallGrid = new Transform[WALL_GRID_CNT];
+        for (int i = 0; i < WALL_GRID_CNT; i++)
+        {
+            m_WallGrid[i] = this.transform.FindChild(string.Format("WallGrid{0}", i));
+        }
+    }
+
+    public void RefreshPos()
+    {
+        Vector3 pos = this.transform.position;
+        pos.y = GameApp.Inst.GetHouseYOffset;
+        this.transform.position = pos;
     }
 
     public void HideGrid()
