@@ -81,6 +81,22 @@ public class GameApp : SingletonMono<GameApp>
 
         houses = new House[HOUSE_NODE_CNT];
 
+        MapUtil.m_MapGridUnityLen = GameApp.Inst.m_MapGridUnityLen;
+
+        MapUtil.m_Wall.m_StartPos = m_WallStartPos;
+        MapUtil.m_Wall.m_Size = m_WallSize;
+
+        MapUtil.m_LeftSideWall.m_StartPos = m_LeftSideWallStartPos;
+        MapUtil.m_LeftSideWall.m_Size = m_LeftSideWallSize;
+
+        MapUtil.m_RightSideWall.m_StartPos = m_RightSideWallStartPos;
+        MapUtil.m_RightSideWall.m_Size = m_RightSideWallSize;
+
+        MapUtil.m_FloorWall.m_StartPos = m_FloorWallStartPos;
+        MapUtil.m_FloorWall.m_Size = m_FloorWallSize;
+
+        MapUtil.Init();
+
         if (m_DrawGrid)
         {
 #if UNITY_EDITOR
@@ -110,28 +126,12 @@ public class GameApp : SingletonMono<GameApp>
 #endif
         }
 
-        MapUtil.m_MapGridUnityLen = GameApp.Inst.m_MapGridUnityLen;
-
-        MapUtil.m_Wall.m_StartPos = m_WallStartPos;
-        MapUtil.m_Wall.m_Size = m_WallSize;
-
-        MapUtil.m_LeftSideWall.m_StartPos = m_LeftSideWallStartPos;
-        MapUtil.m_LeftSideWall.m_Size = m_LeftSideWallSize;
-
-        MapUtil.m_RightSideWall.m_StartPos = m_RightSideWallStartPos;
-        MapUtil.m_RightSideWall.m_Size = m_RightSideWallSize;
-
-        MapUtil.m_FloorWall.m_StartPos = m_FloorWallStartPos;
-        MapUtil.m_FloorWall.m_Size = m_FloorWallSize;
-
-        MapUtil.Init();
-
         CreateHouse(0, 0);
     }
 
     #region GUI
 
-    private GUILayoutOption[] m_GUIOpt1 = new GUILayoutOption[2] { GUILayout.MinWidth(100), GUILayout.MinHeight(80) };
+    private GUILayoutOption[] m_GUIOpt1 = new GUILayoutOption[2] { GUILayout.MinWidth(80), GUILayout.MinHeight(80) };
     private bool m_EditorMode = false;
     public bool EditorMode
     {
@@ -174,6 +174,8 @@ public class GameApp : SingletonMono<GameApp>
             {
                 return;
             }
+
+            Debug.LogWarning(" " + MapUtil.m_SelectId + " " + MapUtil.m_SelectNew + " " + MapUtil.m_SelectOK);
 
             if (MapUtil.m_SelectNew)
             {
@@ -248,16 +250,20 @@ public class GameApp : SingletonMono<GameApp>
     {
         m_IsUpDowning = true;
         this.StopCoroutine("IE_ToFloor");
-        this.StartCoroutine("IE_ToFloor");
+        this.StartCoroutine("IE_ToFloor", f);
     }
 
     private IEnumerator IE_ToFloor(int f)
     {
+        CreateHouse((curHouseNodeIdx + 1) % HOUSE_NODE_CNT, f);
+        
+        yield return new WaitForEndOfFrame();
+
         Vector3 pos = Camera.main.transform.position;
         pos.y = 3.38f + f * m_HouseHeight;
         while (!Util.Vector3Equal(pos, Camera.main.transform.position, 0.01f))
         {
-            Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, pos, Time.deltaTime * 15);
+            Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, pos, Time.deltaTime * 5);
             yield return new WaitForEndOfFrame();
         }
         Camera.main.transform.position = pos;
@@ -276,6 +282,7 @@ public class GameApp : SingletonMono<GameApp>
         curHouseNodeIdx = houseNodeIdx;
         curFloor = floor;
         GridMgr.Inst.RefreshPos();
+        MapUtil.ResetMapStartPosY();
 
         //回到上一次的房子
         if (houses[curHouseNodeIdx] != null
@@ -284,7 +291,7 @@ public class GameApp : SingletonMono<GameApp>
             return;
         }
 
-        MapUtil.ResetMap();
+        MapUtil.ResetMapFlag();
         //新房子
         houses[curHouseNodeIdx] = JerryUtil.CloneGo<House>(new JerryUtil.CloneGoData()
         {

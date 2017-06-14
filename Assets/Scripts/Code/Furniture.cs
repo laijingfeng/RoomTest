@@ -42,6 +42,7 @@ public class Furniture : MonoBehaviour
         JerryEventMgr.AddEvent(Enum_Event.Back2Package.ToString(), EventBack2Package);
 
         _awaked = true;
+        TryWork();
     }
 
     void OnDestroy()
@@ -61,6 +62,7 @@ public class Furniture : MonoBehaviour
         m_Config = config;
         m_SaveData = saveData;
         _inited = true;
+        TryWork();
     }
 
     private void TryWork()
@@ -109,6 +111,7 @@ public class Furniture : MonoBehaviour
     {
         if (GameApp.Inst.UpDowning)
         {
+            //Debug.LogWarning("click 0");
             return;
         }
 
@@ -117,20 +120,25 @@ public class Furniture : MonoBehaviour
             if (Util.ClickUI()
                 || !ClickMe())
             {
+                //Debug.LogWarning("click 1");
                 return;
             }
 
             if (!m_Selected)
             {
+                //Debug.LogWarning("click 2");
                 m_ClickDownPos = JerryUtil.GetClickPos();
                 return;
             }
             else
             {
+                //Debug.LogWarning("click 3");
                 m_InDraging = true;
                 this.StopCoroutine("IE_DoDrag");
                 this.StartCoroutine("IE_DoDrag");
             }
+
+            //Debug.LogWarning("click 3_1");
         }
 
         if (Input.GetMouseButtonUp(0))
@@ -139,19 +147,24 @@ public class Furniture : MonoBehaviour
 
             if (Util.ClickUI())
             {
+                //Debug.LogWarning("click 4");
                 return;
             }
 
             if (!m_Selected)
             {
+                //Debug.LogWarning("click 5");
                 m_ClickUpPos = JerryUtil.GetClickPos();
                 if (Util.Vector3Equal(m_ClickUpPos, m_ClickDownPos, 2)
                     && GameApp.Inst.EditorMode)
                 {
+                    //Debug.LogWarning("click 6");
                     SelectSelf();
                     return;
                 }
             }
+
+            //Debug.LogWarning("click 6_1");
         }
     }
 
@@ -599,6 +612,11 @@ public class Furniture : MonoBehaviour
             {
                 m_InitData.m_CurWall = m_InitData.m_LastWall;
 
+                MapUtil.m_SelectId = 0;
+                MapUtil.m_SelectOK = true;
+                MapUtil.m_SelectNew = false;
+                MapUtil.m_SelectDrag = null;
+
                 m_Selected = false;
                 m_InitData.isSeted = true;
                 this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.Cube.ToString());
@@ -632,8 +650,10 @@ public class Furniture : MonoBehaviour
 
         if (MapUtil.GetMap(m_InitData.m_CurWall).SetOne(this.transform.position, m_Config.size))
         {
-            MapUtil.m_SelectOK = true;
             MapUtil.m_SelectId = 0;
+            MapUtil.m_SelectOK = true;
+            MapUtil.m_SelectNew = false;
+            MapUtil.m_SelectDrag = null;
 
             m_Selected = false;
             m_InitData.isSeted = true;

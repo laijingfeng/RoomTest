@@ -49,6 +49,8 @@ public class CameraCtr : SingletonMono<CameraCtr>
     {
         if (GameApp.Inst.UpDowning)
         {
+            this.StopCoroutine("IE_AdjustCamera");
+            m_DragUsefull = false;
             return;
         }
 

@@ -33,12 +33,20 @@ public class MapUtil
         m_FloorWall.Init(Enum_Layer.FloorWall);
     }
 
-    public static void ResetMap()
+    public static void ResetMapStartPosY()
     {
-        m_LeftSideWall.Reset();
-        m_Wall.Reset();
-        m_RightSideWall.Reset();
-        m_FloorWall.Reset();
+        m_LeftSideWall.ResetMapStartPosY();
+        m_Wall.ResetMapStartPosY();
+        m_RightSideWall.ResetMapStartPosY();
+        m_FloorWall.ResetMapStartPosY();
+    }
+
+    public static void ResetMapFlag()
+    {
+        m_LeftSideWall.ResetMapFlag();
+        m_Wall.ResetMapFlag();
+        m_RightSideWall.ResetMapFlag();
+        m_FloorWall.ResetMapFlag();
     }
 
     public static Map GetMap(Enum_Layer type)

@@ -57,7 +57,12 @@ public class Map
         }
     }
 
-    public void Reset()
+    public void ResetMapStartPosY()
+    {
+        m_StartPos.y = GameApp.Inst.GetHouseYOffset;
+    }
+
+    public void ResetMapFlag()
     {
         if (m_Type == Enum_Layer.Wall)
         {
@@ -89,7 +94,6 @@ public class Map
                 }
             }
         }
-        m_StartPos.y = GameApp.Inst.GetHouseYOffset;
     }
 
     public Vector3 AdjustZ2(Vector3 pos)
@@ -335,7 +339,7 @@ public class Map
         MapUtil.IVector3 max = Pos2Grid(GetCornerPos(pos, size, false));
 
         //Debug.LogWarning("min=" + min.ToString() + " max=" + max.ToString() + " size=" + size
-        //    + " type=" + m_Type + " pos=" + MapUtil.Vector3String(pos) + " main=" + mainJudge);
+            //+ " type=" + m_Type + " pos=" + MapUtil.Vector3String(pos) + " main=" + mainJudge + " " + GameApp.Inst.CurNodeIdx);
 
         for (int i = min.x; i <= max.x; i++)
         {
@@ -541,6 +545,10 @@ public class Map
     {
         MapUtil.IVector3 min = Pos2Grid(GetCornerPos(pos, size, true));
         MapUtil.IVector3 max = Pos2Grid(GetCornerPos(pos, size, false));
+
+        //Debug.LogWarning("xxx " + GameApp.Inst.CurNodeIdx + " size=" + size + " pos=" + MapUtil.Vector3String(pos)
+        //    + " min=" + min + " max=" + max);
+
         for (int i = min.x; i <= max.x; i++)
         {
             for (int j = min.y; j <= max.y; j++)

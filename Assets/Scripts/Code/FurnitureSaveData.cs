@@ -82,14 +82,20 @@ public class FurnitureUtil
         string sdata = PlayerPrefs.GetString(GetSaveKey(floor), "");
         if (!string.IsNullOrEmpty(sdata))
         {
-            ret = JsonUtility.FromJson<List<FurnitureSaveData>>(sdata);
+            FurnitureSaveDataSet s = JsonUtility.FromJson<FurnitureSaveDataSet>(sdata);
+            if (s != null)
+            {
+                ret = s.saveDatas;
+            }
         }
         return ret;
     }
 
     public static void SaveFurnitureData(int floor, List<FurnitureSaveData> datas)
     {
-        PlayerPrefs.SetString(GetSaveKey(floor), JsonUtility.ToJson(datas));
+        FurnitureSaveDataSet s = new FurnitureSaveDataSet() { saveDatas = datas };
+        //Debug.LogWarning("save=" + JsonUtility.ToJson(s, true) + " " + datas.Count);
+        PlayerPrefs.SetString(GetSaveKey(floor), JsonUtility.ToJson(s));
     }
 
     public static string GetSaveKey(int floor)
@@ -111,6 +117,12 @@ public class FurnitureUtil
         });
         return t;
     }
+}
+
+[System.Serializable]
+public class FurnitureSaveDataSet
+{
+    public List<FurnitureSaveData> saveDatas = new List<FurnitureSaveData>();
 }
 
 [System.Serializable]
