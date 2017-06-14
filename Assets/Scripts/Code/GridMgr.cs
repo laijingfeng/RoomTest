@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Jerry;
 
-public class Line : SingletonMono<Line>
+public class GridMgr : SingletonMono<GridMgr>
 {
     [Range(0, 6)]
     public int m_WallCnt = 0;

@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using Jerry;
 
-public class Tip : SingletonMono<Tip>
+public class UI_Tip : SingletonMono<UI_Tip>
 {
     private Text m_Text;
 

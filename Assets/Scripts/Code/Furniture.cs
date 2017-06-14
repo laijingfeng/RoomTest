@@ -3,7 +3,10 @@ using System.Collections;
 using Jerry;
 using UnityEngine.EventSystems;
 
-public class Drag : MonoBehaviour
+/// <summary>
+/// 家具
+/// </summary>
+public class Furniture : MonoBehaviour
 {
     /// <summary>
     /// 大小
@@ -90,7 +93,7 @@ public class Drag : MonoBehaviour
             }
             else
             {
-                if (Wall.Inst.m_CtrType != Wall.CtrObjType.OnlyClick)
+                if (WallConfig.Inst.m_CtrType != WallConfig.CtrObjType.OnlyClick)
                 {
                     m_InDraging = true;
                     this.StopCoroutine("IE_DoDrag");
@@ -112,7 +115,7 @@ public class Drag : MonoBehaviour
             {
                 m_ClickUpPos = JerryUtil.GetClickPos();
                 if (Util.Vector3Equal(m_ClickUpPos, m_ClickDownPos, 2)
-                    && Wall.Inst.EditorMode)
+                    && WallConfig.Inst.EditorMode)
                 {
                     SelectSelf();
                     return;
@@ -169,7 +172,7 @@ public class Drag : MonoBehaviour
                         if (fp.wallType == m_InitData.m_CurWall)
                         {
                             //Debug.LogWarning("aaaabbbb");
-                            UICtr.Inst.HideCtr();
+                            UI_Ctr.Inst.HideCtr();
                             if (Place2Pos(fp.pos, true))
                             {
                                 CalOffset();
@@ -182,7 +185,7 @@ public class Drag : MonoBehaviour
                                 && m_SetType != MapUtil.SetType.Floor)
                             {
                                 //Debug.LogWarning("aaaa");
-                                UICtr.Inst.HideCtr();
+                                UI_Ctr.Inst.HideCtr();
                                 Init(fp.wallType, fp.pos);
                                 //yield return new WaitForEndOfFrame();
                                 CalOffset();
@@ -199,26 +202,26 @@ public class Drag : MonoBehaviour
 
         if (m_Selected)
         {
-            UICtr.Inst.ShowCtr();
+            UI_Ctr.Inst.ShowCtr();
             //Debug.LogWarning("Click ShowCtr");
         }
     }
 
     private bool JudgePosOutScreen()
     {
-        if (Wall.Inst.m_CtrType == Wall.CtrObjType.OnlyClick)
+        if (WallConfig.Inst.m_CtrType == WallConfig.CtrObjType.OnlyClick)
         {
             return false;
         }
 
-        if (JerryUtil.GetClickPos().x < Wall.Inst.m_OutScreenJudgeFactor)
+        if (JerryUtil.GetClickPos().x < WallConfig.Inst.m_OutScreenJudgeFactor)
         {
-            DragCamera.Inst.DoDrag(-Wall.Inst.m_OutScreenDragFactor);
+            CameraCtr.Inst.DoDrag(-WallConfig.Inst.m_OutScreenDragFactor);
             return true;
         }
-        else if (Screen.width - JerryUtil.GetClickPos().x < Wall.Inst.m_OutScreenJudgeFactor)
+        else if (Screen.width - JerryUtil.GetClickPos().x < WallConfig.Inst.m_OutScreenJudgeFactor)
         {
-            DragCamera.Inst.DoDrag(Wall.Inst.m_OutScreenDragFactor);
+            CameraCtr.Inst.DoDrag(WallConfig.Inst.m_OutScreenDragFactor);
             return true;
         }
         return false;
@@ -275,14 +278,14 @@ public class Drag : MonoBehaviour
 
         bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_GridSize);
 
-        Line.Inst.ShowGrid(m_SetType, m_GridSize.y);
+        GridMgr.Inst.ShowGrid(m_SetType, m_GridSize.y);
         SetOutLineVisible(true);
         SetOutLineColor(canSet ? Color.green : Color.red);
-        MyShadow.Inst.SetSize(m_GridSize.ToVector3(), m_SetType);
-        MyShadow.Inst.SetVisible(true);
-        MyShadow.Inst.SetColor(canSet ? Color.green : Color.red);
-        MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(this.transform.position), this.transform.eulerAngles);
-        UICtr.Inst.ShowCtr();
+        FurnitureShadow.Inst.SetSize(m_GridSize.ToVector3(), m_SetType);
+        FurnitureShadow.Inst.SetVisible(true);
+        FurnitureShadow.Inst.SetColor(canSet ? Color.green : Color.red);
+        FurnitureShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(this.transform.position), this.transform.eulerAngles);
+        UI_Ctr.Inst.ShowCtr();
     }
 
     #region 辅助
@@ -447,9 +450,9 @@ public class Drag : MonoBehaviour
             transform.position = m_Pos;
 
             bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_GridSize);
-            MyShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(this.transform.position), this.transform.eulerAngles);
+            FurnitureShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ2(this.transform.position), this.transform.eulerAngles);
             SetOutLineColor(canSet ? Color.green : Color.red);
-            MyShadow.Inst.SetColor(canSet ? Color.green : Color.red);
+            FurnitureShadow.Inst.SetColor(canSet ? Color.green : Color.red);
         }
 
         return changeType == Enum_Layer.None ? false : true;
@@ -525,7 +528,7 @@ public class Drag : MonoBehaviour
                 Init(fp.wallType, fp.pos);
             }
         }
-        UICtr.Inst.ShowCtr();
+        UI_Ctr.Inst.ShowCtr();
     }
 
     /// <summary>
@@ -548,10 +551,10 @@ public class Drag : MonoBehaviour
         m_Selected = false;
         this.gameObject.layer = LayerMask.NameToLayer("Cube");
 
-        Line.Inst.HideGrid();
-        MyShadow.Inst.SetVisible(false);
+        GridMgr.Inst.HideGrid();
+        FurnitureShadow.Inst.SetVisible(false);
         SetOutLineVisible(false);
-        UICtr.Inst.HideCtr();
+        UI_Ctr.Inst.HideCtr();
 
         this.transform.position = new Vector3(0, 7, 0);
     }
@@ -581,10 +584,10 @@ public class Drag : MonoBehaviour
                 MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
                 this.transform.position = m_Pos;
 
-                Line.Inst.HideGrid();
-                MyShadow.Inst.SetVisible(false);
+                GridMgr.Inst.HideGrid();
+                FurnitureShadow.Inst.SetVisible(false);
                 SetOutLineVisible(false);
-                UICtr.Inst.HideCtr();
+                UI_Ctr.Inst.HideCtr();
             }
         }
     }
@@ -615,17 +618,17 @@ public class Drag : MonoBehaviour
             MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
             this.transform.position = m_Pos;
 
-            Line.Inst.HideGrid();
-            MyShadow.Inst.SetVisible(false);
+            GridMgr.Inst.HideGrid();
+            FurnitureShadow.Inst.SetVisible(false);
             SetOutLineVisible(false);
-            UICtr.Inst.HideCtr();
+            UI_Ctr.Inst.HideCtr();
             //Debug.LogWarning("SetHideCtr");
 
-            Tip.Inst.ShowTip("设置OK");
+            UI_Tip.Inst.ShowTip("设置OK");
         }
         else
         {
-            Tip.Inst.ShowTip("重叠");
+            UI_Tip.Inst.ShowTip("重叠");
         }
     }
 

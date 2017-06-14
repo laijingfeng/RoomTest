@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using Jerry;
 
-public class MyShadow : SingletonMono<MyShadow>
+/// <summary>
+/// 家具投影
+/// </summary>
+public class FurnitureShadow : SingletonMono<FurnitureShadow>
 {
     private Renderer m_Render;
     private Color m_Color;

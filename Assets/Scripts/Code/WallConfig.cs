@@ -2,7 +2,7 @@
 using Jerry;
 using UnityEngine;
 
-public class Wall : SingletonMono<Wall>
+public class WallConfig : SingletonMono<WallConfig>
 {
     public Vector3 m_WallStartPos;
     public MapUtil.IVector3 m_WallSize;
@@ -150,7 +150,7 @@ public class Wall : SingletonMono<Wall>
 
             if (m_EditorMode)
             {
-                DragCamera.Inst.AdjustCamera();
+                CameraCtr.Inst.AdjustCamera();
             }
 
             if (MapUtil.m_SelectId == 0
@@ -179,17 +179,17 @@ public class Wall : SingletonMono<Wall>
         {
             if (!m_EditorMode)
             {
-                Tip.Inst.ShowTip("请先进入[编辑模式]");
+                UI_Tip.Inst.ShowTip("请先进入[编辑模式]");
                 return;
             }
 
-            Drag[] drags = this.transform.parent.GetComponentsInChildren<Drag>();
+            Furniture[] drags = this.transform.parent.GetComponentsInChildren<Furniture>();
             if (drags == null || drags.Length <= 0)
             {
-                Tip.Inst.ShowTip("没有可用家具");
+                UI_Tip.Inst.ShowTip("没有可用家具");
                 return;
             }
-            List<Drag> usefullDrags = new List<Drag>();
+            List<Furniture> usefullDrags = new List<Furniture>();
             for (int i = 0; i < drags.Length; i++)
             {
                 if (drags[i].m_InitData.isNew)
@@ -199,7 +199,7 @@ public class Wall : SingletonMono<Wall>
             }
             if (usefullDrags.Count <= 0)
             {
-                Tip.Inst.ShowTip("没有可用家具");
+                UI_Tip.Inst.ShowTip("没有可用家具");
                 return;
             }
             int idx = Random.Range(0, usefullDrags.Count);

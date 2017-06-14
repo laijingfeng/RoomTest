@@ -2,7 +2,10 @@
 using Jerry;
 using UnityEngine;
 
-public class DragCamera : SingletonMono<DragCamera>
+/// <summary>
+/// 相机控制
+/// </summary>
+public class CameraCtr : SingletonMono<CameraCtr>
 {
     public bool m_DragCameraInUse = true;
     
@@ -17,7 +20,7 @@ public class DragCamera : SingletonMono<DragCamera>
     {
         get
         {
-            return Wall.Inst.EditorMode ? m_DragBoundEditor : m_DragBound;
+            return WallConfig.Inst.EditorMode ? m_DragBoundEditor : m_DragBound;
         }
     }
 
@@ -145,7 +148,7 @@ public class DragCamera : SingletonMono<DragCamera>
         }
         Camera.main.transform.eulerAngles = tmp2;
 
-        UICtr.Inst.AdjustPos();
+        UI_Ctr.Inst.AdjustPos();
     }
 
     public void AdjustCamera()
@@ -166,9 +169,9 @@ public class DragCamera : SingletonMono<DragCamera>
         {
             Camera.main.transform.position = Vector3.SmoothDamp(Camera.main.transform.position, tmp1, ref v, Time.deltaTime * 15);
             yield return new WaitForEndOfFrame();
-            UICtr.Inst.AdjustPos();
+            UI_Ctr.Inst.AdjustPos();
         }
         Camera.main.transform.position = tmp1;
-        UICtr.Inst.AdjustPos();
+        UI_Ctr.Inst.AdjustPos();
     }
 }

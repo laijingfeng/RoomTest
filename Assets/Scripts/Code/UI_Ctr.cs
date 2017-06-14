@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using Jerry;
 
-public class UICtr : SingletonMono<UICtr>
+public class UI_Ctr : SingletonMono<UI_Ctr>
 {
     public Canvas m_Canvas;
 
@@ -38,7 +38,7 @@ public class UICtr : SingletonMono<UICtr>
             }
             else
             {
-                Tip.Inst.ShowTip("重叠");
+                UI_Tip.Inst.ShowTip("重叠");
             }
         };
 
@@ -68,7 +68,7 @@ public class UICtr : SingletonMono<UICtr>
         
         m_Cancel.gameObject.SetActive(!MapUtil.m_SelectNew);
         
-        m_CanSet = MyShadow.Inst.CanSet;
+        m_CanSet = FurnitureShadow.Inst.CanSet;
         m_SetBkg.color = m_CanSet ? Color.green : Color.red;
         
         m_Node.gameObject.SetActive(true);

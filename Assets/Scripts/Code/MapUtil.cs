@@ -12,7 +12,7 @@ public class MapUtil
     /// </summary>
     public static bool m_SelectOK = true;
     public static bool m_SelectNew = false;
-    public static Drag m_SelectDrag = null;
+    public static Furniture m_SelectDrag = null;
 
     public static float m_MapGridUnityLen;
     public static float m_AdjustZVal = 0.1f;//不要大于格子单位
