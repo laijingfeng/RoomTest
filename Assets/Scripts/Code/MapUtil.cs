@@ -15,7 +15,10 @@ public class MapUtil
     public static Furniture m_SelectDrag = null;
 
     public static float m_MapGridUnityLen;
-    public static float m_AdjustZVal = 0.1f;//不要大于格子单位
+    /// <summary>
+    /// 不要大于格子单位
+    /// </summary>
+    public static float m_AdjustFurn2WallPar = 0.1f;
 
     public static Map m_LeftSideWall = new Map();
     public static Map m_Wall = new Map();
@@ -251,6 +254,13 @@ public class MapUtil
             z = _z;
         }
 
+        public IVector3(IVector3 v)
+        {
+            x = v.x;
+            y = v.y;
+            z = v.z;
+        }
+
         public IVector3(Vector3 v)
         {
             x = (int)v.x;
@@ -277,5 +287,19 @@ public class MapUtil
     public static string Vector3String(Vector3 v)
     {
         return string.Format("({0},{1},{2})", v.x, v.y, v.z);
+    }
+
+    public static MapUtil.IVector3 ChangeObjSize(MapUtil.IVector3 size, Enum_Layer fromType, Enum_Layer toType)
+    {
+        MapUtil.IVector3 ret = new MapUtil.IVector3(size);
+        if (((fromType == Enum_Layer.LeftWall || fromType == Enum_Layer.RightWall)
+            && (toType == Enum_Layer.FloorWall || toType == Enum_Layer.Wall)) ||
+            ((fromType == Enum_Layer.FloorWall || fromType == Enum_Layer.Wall)
+            && (toType == Enum_Layer.LeftWall || toType == Enum_Layer.RightWall)))
+        {
+            ret.x = size.z;
+            ret.z = size.x;
+        }
+        return ret;
     }
 }

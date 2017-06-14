@@ -3,55 +3,42 @@
 public class Map
 {
     /// <summary>
-    /// 地图大小
+    /// 地图大小，XYZ三个方向
     /// </summary>
     public MapUtil.IVector3 m_Size;
     public Vector3 m_StartPos;
-    public bool[, ,] m_Flag;
-    public Enum_Layer m_Type;
 
+    private Enum_Layer m_Type;
+
+    /// <summary>
+    /// 地图大小，XY两个方向
+    /// </summary>
+    private MapUtil.IVector3 m_SizeXY;
+    /// <summary>
+    /// 地图标记
+    /// </summary>
+    private bool[, ,] m_Flag;
+
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    /// <param name="type"></param>
     public void Init(Enum_Layer type)
     {
         m_Type = type;
-        if (m_Type == Enum_Layer.Wall)
+
+        m_SizeXY = new MapUtil.IVector3(0, 0, 0);
+        m_SizeXY.x = (m_Type == Enum_Layer.Wall || m_Type == Enum_Layer.FloorWall) ? m_Size.x : m_Size.z;
+        m_SizeXY.y = (m_Type == Enum_Layer.FloorWall) ? m_Size.z : m_Size.y;
+
+        m_Flag = new bool[2, m_SizeXY.x, m_SizeXY.y];
+        for (int k = 0; k < 2; k++)
         {
-            m_Flag = new bool[2, m_Size.x, m_Size.y];
-            for (int k = 0; k < 2; k++)
+            for (int i = 0; i < m_SizeXY.x; i++)
             {
-                for (int i = 0; i < m_Size.x; i++)
+                for (int j = 0; j < m_SizeXY.y; j++)
                 {
-                    for (int j = 0; j < m_Size.y; j++)
-                    {
-                        m_Flag[k, i, j] = false;
-                    }
-                }
-            }
-        }
-        else if (m_Type == Enum_Layer.FloorWall)
-        {
-            m_Flag = new bool[2, m_Size.x, m_Size.z];
-            for (int k = 0; k < 2; k++)
-            {
-                for (int i = 0; i < m_Size.x; i++)
-                {
-                    for (int j = 0; j < m_Size.z; j++)
-                    {
-                        m_Flag[k, i, j] = false;
-                    }
-                }
-            }
-        }
-        else
-        {
-            m_Flag = new bool[2, m_Size.z, m_Size.y];
-            for (int k = 0; k < 2; k++)
-            {
-                for (int i = 0; i < m_Size.z; i++)
-                {
-                    for (int j = 0; j < m_Size.y; j++)
-                    {
-                        m_Flag[k, i, j] = false;
-                    }
+                    m_Flag[k, i, j] = false;
                 }
             }
         }
@@ -64,144 +51,116 @@ public class Map
 
     public void ResetMapFlag()
     {
-        if (m_Type == Enum_Layer.Wall)
+        for (int i = 0; i < m_SizeXY.x; i++)
         {
-            for (int i = 0; i < m_Size.x; i++)
+            for (int j = 0; j < m_SizeXY.y; j++)
             {
-                for (int j = 0; j < m_Size.y; j++)
-                {
-                    m_Flag[GameApp.Inst.CurNodeIdx, i, j] = false;
-                }
-            }
-        }
-        else if (m_Type == Enum_Layer.FloorWall)
-        {
-            for (int i = 0; i < m_Size.x; i++)
-            {
-                for (int j = 0; j < m_Size.z; j++)
-                {
-                    m_Flag[GameApp.Inst.CurNodeIdx, i, j] = false;
-                }
-            }
-        }
-        else
-        {
-            for (int i = 0; i < m_Size.z; i++)
-            {
-                for (int j = 0; j < m_Size.y; j++)
-                {
-                    m_Flag[GameApp.Inst.CurNodeIdx, i, j] = false;
-                }
+                m_Flag[GameApp.Inst.CurNodeIdx, i, j] = false;
             }
         }
     }
 
-    public Vector3 AdjustZ2(Vector3 pos)
+    /// <summary>
+    /// 粘着墙
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <param name="interval">默认是影子的配置</param>
+    /// <returns></returns>
+    public Vector3 Adjust2Wall(Vector3 pos, float interval = 0.01f)
     {
         if (m_Type == Enum_Layer.Wall)
         {
-            pos.z = m_StartPos.z - 0.01f;
+            pos.z = m_StartPos.z - interval;
         }
         else if (m_Type == Enum_Layer.LeftWall)
         {
-            pos.x = m_StartPos.x + 0.01f;
+            pos.x = m_StartPos.x + interval;
         }
         else if (m_Type == Enum_Layer.RightWall)
         {
-            pos.x = m_StartPos.x - 0.01f;
+            pos.x = m_StartPos.x - interval;
         }
         else if (m_Type == Enum_Layer.FloorWall)
         {
-            pos.y = m_StartPos.y + 0.01f;
+            pos.y = m_StartPos.y + interval;
         }
         return pos;
     }
 
-    public void AdjustZ(MapUtil.IVector3 size, bool floating, ref Vector3 pos)
+    /// <summary>
+    /// 家具粘着墙
+    /// </summary>
+    /// <param name="size">size指的是xyz方向的长度，所以到侧墙，x和z应该互换</param>
+    /// <param name="floating"></param>
+    /// <param name="pos"></param>
+    public Vector3 AdjustFurn2Wall2(MapUtil.IVector3 size, bool floating, Vector3 pos)
     {
         if (m_Type == Enum_Layer.Wall)
         {
-            pos.z = m_StartPos.z - size.z * MapUtil.m_MapGridUnityLen / 2.0f;
+            pos.z = m_StartPos.z - size.z * MapUtil.m_MapGridUnityLen * 0.5f;
             if (floating)
             {
-                pos.z -= MapUtil.m_AdjustZVal;
+                pos.z -= MapUtil.m_AdjustFurn2WallPar;
             }
         }
         else if (m_Type == Enum_Layer.LeftWall)
         {
-            pos.x = m_StartPos.x + size.z * MapUtil.m_MapGridUnityLen / 2.0f;
+            pos.x = m_StartPos.x + size.x * MapUtil.m_MapGridUnityLen * 0.5f;
             if (floating)
             {
-                pos.x += MapUtil.m_AdjustZVal;
+                pos.x += MapUtil.m_AdjustFurn2WallPar;
             }
         }
         else if (m_Type == Enum_Layer.RightWall)
         {
-            pos.x = m_StartPos.x - size.z * MapUtil.m_MapGridUnityLen / 2.0f;
+            pos.x = m_StartPos.x - size.x * MapUtil.m_MapGridUnityLen * 0.5f;
             if (floating)
             {
-                pos.x -= MapUtil.m_AdjustZVal;
+                pos.x -= MapUtil.m_AdjustFurn2WallPar;
             }
         }
         else if (m_Type == Enum_Layer.FloorWall)
         {
-            pos.y = m_StartPos.y + size.y * MapUtil.m_MapGridUnityLen / 2.0f;
+            pos.y = m_StartPos.y + size.y * MapUtil.m_MapGridUnityLen * 0.5f;
             if (floating)
             {
-                pos.y += MapUtil.m_AdjustZVal;
+                pos.y += MapUtil.m_AdjustFurn2WallPar;
             }
         }
+        return pos;
     }
 
+    /// <summary>
+    /// 家具粘着墙
+    /// </summary>
+    /// <param name="size">size指的是xyz方向的长度，所以到侧墙，x和z应该互换</param>
+    /// <param name="floating"></param>
+    /// <param name="pos"></param>
+    public void AdjustFurn2Wall(MapUtil.IVector3 size, bool floating, ref Vector3 pos)
+    {
+        pos = AdjustFurn2Wall2(size, floating, pos);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="size">size指的是xyz方向的长度，所以到侧墙，x和z应该互换</param>
+    /// <param name="setType"></param>
+    /// <param name="data"></param>
     public void GetMinMaxPos(MapUtil.IVector3 size, MapUtil.SetType setType, ref DragInitData data)
     {
-        if (m_Type == Enum_Layer.Wall)
+        data.m_MinPos = m_StartPos + size.MulVal(MapUtil.m_MapGridUnityLen * 0.5f);
+        data.m_MaxPos = m_StartPos + m_Size.MulVal(MapUtil.m_MapGridUnityLen) - size.MulVal(MapUtil.m_MapGridUnityLen * 0.5f);
+        if (setType == MapUtil.SetType.WallOnFloor)
         {
-            data.m_MinPos = m_StartPos
-                + new Vector3(size.x * MapUtil.m_MapGridUnityLen / 2, size.y * MapUtil.m_MapGridUnityLen / 2, 0);
-
-            data.m_MaxPos = m_StartPos
-            + new Vector3(m_Size.x * MapUtil.m_MapGridUnityLen, m_Size.y * MapUtil.m_MapGridUnityLen, 0)
-            - new Vector3(size.x * MapUtil.m_MapGridUnityLen / 2, size.y * MapUtil.m_MapGridUnityLen / 2, 0);
-
-            if (setType == MapUtil.SetType.WallOnFloor)
-            {
-                data.m_MaxPos.y = data.m_MinPos.y;
-            }
-            else if (setType == MapUtil.SetType.Wall)
-            {
-                data.m_MinPos.y += MapUtil.m_MapGridUnityLen;
-            }
+            data.m_MaxPos.y = data.m_MinPos.y;
         }
-        else if (m_Type == Enum_Layer.LeftWall
-            || m_Type == Enum_Layer.RightWall)
+        else if (setType == MapUtil.SetType.Wall)//墙上的不能贴地
         {
-            data.m_MinPos = m_StartPos
-                + new Vector3(0, size.y * MapUtil.m_MapGridUnityLen / 2, size.x * MapUtil.m_MapGridUnityLen / 2);
-
-            data.m_MaxPos = m_StartPos
-            + new Vector3(0, m_Size.y * MapUtil.m_MapGridUnityLen, m_Size.z * MapUtil.m_MapGridUnityLen)
-            - new Vector3(0, size.y * MapUtil.m_MapGridUnityLen / 2, size.x * MapUtil.m_MapGridUnityLen / 2);
-
-            if (setType == MapUtil.SetType.WallOnFloor)
-            {
-                data.m_MaxPos.y = data.m_MinPos.y;
-            }
-            else if (setType == MapUtil.SetType.Wall)
-            {
-                data.m_MinPos.y += MapUtil.m_MapGridUnityLen;
-            }
-        }
-        else if (m_Type == Enum_Layer.FloorWall)
-        {
-            data.m_MinPos = m_StartPos
-                + new Vector3(size.x * MapUtil.m_MapGridUnityLen / 2, 0, size.z * MapUtil.m_MapGridUnityLen / 2);
-
-            data.m_MaxPos = m_StartPos
-            + new Vector3(m_Size.x * MapUtil.m_MapGridUnityLen, 0, m_Size.z * MapUtil.m_MapGridUnityLen)
-            - new Vector3(size.x * MapUtil.m_MapGridUnityLen / 2, 0, size.z * MapUtil.m_MapGridUnityLen / 2);
+            data.m_MinPos.y += MapUtil.m_MapGridUnityLen;
         }
 
+        //墙面可以互跳
         if (m_Type == Enum_Layer.Wall)
         {
             data.m_MinPos.x -= MapUtil.m_MapGridUnityLen;
@@ -213,133 +172,109 @@ public class Map
             data.m_MaxPos.z += MapUtil.m_MapGridUnityLen;
         }
 
+        data.m_MinPos = Adjust2Wall(data.m_MinPos, 0f);
+        data.m_MaxPos = Adjust2Wall(data.m_MaxPos, 0f);
+
         //Debug.LogWarning("min=" + MapUtil.Vector3String(data.m_MinPos) + " max=" + MapUtil.Vector3String(data.m_MaxPos) + " size=" + size);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="size">size指的是xyz方向的长度，所以到侧墙，x和z应该互换</param>
+    /// <returns></returns>
     public Vector3 GetAdjustPar(MapUtil.IVector3 size)
     {
         Vector3 ret = Vector3.one;
-        if (m_Type == Enum_Layer.Wall)
+
+        if ((size.x & 1) == 0)
         {
-            if (size.x % 2 == 0)
-            {
-                ret.x = 0;
-            }
-            else
-            {
-                ret.x = MapUtil.m_MapGridUnityLen / 2;
-            }
-
-            if (size.y % 2 == 0)
-            {
-                ret.y = 0;
-            }
-            else
-            {
-                ret.y = MapUtil.m_MapGridUnityLen / 2;
-            }
-        }
-        else if (m_Type == Enum_Layer.FloorWall)
-        {
-            if (size.x % 2 == 0)
-            {
-                ret.x = 0;
-            }
-            else
-            {
-                ret.x = MapUtil.m_MapGridUnityLen / 2;
-            }
-
-            if (size.z % 2 == 0)
-            {
-                ret.z = 0;
-            }
-            else
-            {
-                ret.z = MapUtil.m_MapGridUnityLen / 2;
-            }
-        }
-        else if (m_Type == Enum_Layer.LeftWall
-            || m_Type == Enum_Layer.RightWall)
-        {
-            if (size.x % 2 == 0)//不要怀疑就是size.x
-            {
-                ret.z = 0;
-            }
-            else
-            {
-                ret.z = MapUtil.m_MapGridUnityLen / 2;
-            }
-
-            if (size.y % 2 == 0)
-            {
-                ret.y = 0;
-            }
-            else
-            {
-                ret.y = MapUtil.m_MapGridUnityLen / 2;
-            }
-        }
-
-        //Debug.LogWarning("size " + size + " ret " + ret.x + " " + ret.y + " " + ret.z + " " + m_Type);
-
-        return ret;
-    }
-
-    /// <summary>
-    /// 格子是(x,y)
-    /// </summary>
-    /// <param name="grid"></param>
-    /// <returns></returns>
-    public Vector3 Grid2Pos(Vector3 grid)
-    {
-        Vector3 ret = Vector3.zero;
-        if (m_Type == Enum_Layer.Wall)
-        {
-            ret.x = m_StartPos.x + MapUtil.m_MapGridUnityLen / 2 + grid.x * MapUtil.m_MapGridUnityLen;
+            ret.x = 0;
         }
         else
         {
-            ret.z = m_StartPos.z + MapUtil.m_MapGridUnityLen / 2 + grid.x * MapUtil.m_MapGridUnityLen;
+            ret.x = MapUtil.m_MapGridUnityLen / 2;
         }
-        ret.y = m_StartPos.y + MapUtil.m_MapGridUnityLen / 2 + grid.y * MapUtil.m_MapGridUnityLen;
+
+        if ((size.y & 1) == 0)
+        {
+            ret.y = 0;
+        }
+        else
+        {
+            ret.y = MapUtil.m_MapGridUnityLen / 2;
+        }
+
+        if ((size.z & 1) == 0)
+        {
+            ret.z = 0;
+        }
+        else
+        {
+            ret.z = MapUtil.m_MapGridUnityLen / 2;
+        }
+
+        //Debug.LogWarning("size=" + size + " ret=" + MapUtil.Vector3String(ret) + " " + m_Type);
+
         return ret;
     }
 
     /// <summary>
-    /// 格子归到(x,y)表示
+    /// 格子是(x,y,z)
+    /// </summary>
+    /// <param name="grid"></param>
+    /// <returns></returns>
+    public Vector3 Grid2Pos(MapUtil.IVector3 grid)
+    {
+        Vector3 ret = m_StartPos + Vector3.one * MapUtil.m_MapGridUnityLen * 0.5f + grid.MulVal(MapUtil.m_MapGridUnityLen);
+        ret = Adjust2Wall(ret, 0f);
+        return ret;
+    }
+
+    /// <summary>
+    /// 格子归到(x,y,z)表示
     /// </summary>
     /// <param name="pos"></param>
     /// <returns></returns>
     public MapUtil.IVector3 Pos2Grid(Vector3 pos)
     {
         MapUtil.IVector3 ret = new MapUtil.IVector3(0, 0, 0);
-        if (m_Type == Enum_Layer.Wall)
-        {
-            ret.x = Mathf.RoundToInt((pos.x - (m_StartPos.x + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
-            ret.y = Mathf.RoundToInt((pos.y - (m_StartPos.y + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
-        }
-        else if (m_Type == Enum_Layer.LeftWall
-            || m_Type == Enum_Layer.RightWall)
-        {
-            ret.x = Mathf.RoundToInt((pos.z - (m_StartPos.z + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
-            ret.y = Mathf.RoundToInt((pos.y - (m_StartPos.y + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
-        }
-        else if (m_Type == Enum_Layer.FloorWall)
-        {
-            ret.x = Mathf.RoundToInt((pos.x - (m_StartPos.x + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
-            ret.y = Mathf.RoundToInt((pos.z - (m_StartPos.z + MapUtil.m_MapGridUnityLen / 2)) / MapUtil.m_MapGridUnityLen);
-        }
+        pos = (pos - (m_StartPos + Vector3.one * MapUtil.m_MapGridUnityLen * 0.5f)) / MapUtil.m_MapGridUnityLen;
+
+        ret.x = Mathf.RoundToInt(pos.x);
+        ret.y = Mathf.RoundToInt(pos.y);
+        ret.z = Mathf.RoundToInt(pos.z);
+
         return ret;
     }
 
+    /// <summary>
+    /// 格子(x,y,z)->(x,y)
+    /// </summary>
+    /// <param name="grid"></param>
+    /// <returns></returns>
+    private MapUtil.IVector3 GridXYZ2XY(MapUtil.IVector3 grid)
+    {
+        MapUtil.IVector3 ret = new MapUtil.IVector3(0, 0, 0);
+        ret.x = (m_Type == Enum_Layer.Wall || m_Type == Enum_Layer.FloorWall) ? grid.x : grid.z;
+        ret.y = (m_Type == Enum_Layer.FloorWall) ? grid.z : grid.y;
+        return ret;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <param name="size">size指的是xyz方向的长度，所以到侧墙，x和z应该互换</param>
+    /// <param name="mainJudge"></param>
+    /// <returns></returns>
     public bool JudgeSet(Vector3 pos, MapUtil.IVector3 size, bool mainJudge = true)
     {
-        MapUtil.IVector3 min = Pos2Grid(GetCornerPos(pos, size, true));
-        MapUtil.IVector3 max = Pos2Grid(GetCornerPos(pos, size, false));
+        MapUtil.IVector3 min = GridXYZ2XY(Pos2Grid(GetCornerPos(pos, size, true)));
+        MapUtil.IVector3 max = GridXYZ2XY(Pos2Grid(GetCornerPos(pos, size, false)));
 
         //Debug.LogWarning("min=" + min.ToString() + " max=" + max.ToString() + " size=" + size
-            //+ " type=" + m_Type + " pos=" + MapUtil.Vector3String(pos) + " main=" + mainJudge + " " + GameApp.Inst.CurNodeIdx);
+        //+ " type=" + m_Type + " pos=" + MapUtil.Vector3String(pos) + " main=" + mainJudge + " " + GameApp.Inst.CurNodeIdx);
 
         for (int i = min.x; i <= max.x; i++)
         {
@@ -358,7 +293,7 @@ public class Map
             {
                 if (min.x == 0)
                 {
-                    ret = MapUtil.GetMap(Enum_Layer.LeftWall).JudgeSet(pos + new Vector3(0, 0, MapUtil.m_AdjustZVal), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    ret = MapUtil.GetMap(Enum_Layer.LeftWall).JudgeSet(AdjustFurn2Wall2(size, false, pos), size, false);
                     if (ret == false)
                     {
                         return ret;
@@ -366,7 +301,7 @@ public class Map
                 }
                 if (max.x + 1 == m_Size.x)
                 {
-                    ret = MapUtil.GetMap(Enum_Layer.RightWall).JudgeSet(pos + new Vector3(0, 0, MapUtil.m_AdjustZVal), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    ret = MapUtil.GetMap(Enum_Layer.RightWall).JudgeSet(AdjustFurn2Wall2(size, false, pos), size, false);
                     if (ret == false)
                     {
                         return ret;
@@ -375,7 +310,7 @@ public class Map
 
                 if (min.y == 0)
                 {
-                    ret = MapUtil.GetMap(Enum_Layer.FloorWall).JudgeSet(pos + new Vector3(0, 0, MapUtil.m_AdjustZVal), new MapUtil.IVector3(size.x, size.y, size.z), false);
+                    ret = MapUtil.GetMap(Enum_Layer.FloorWall).JudgeSet(AdjustFurn2Wall2(size, false, pos), size, false);
                     if (ret == false)
                     {
                         return ret;
@@ -386,7 +321,7 @@ public class Map
             {
                 if (max.x + 1 == m_Size.z)
                 {
-                    ret = MapUtil.GetMap(Enum_Layer.Wall).JudgeSet(pos - new Vector3(MapUtil.m_AdjustZVal, 0, 0), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    ret = MapUtil.GetMap(Enum_Layer.Wall).JudgeSet(AdjustFurn2Wall2(size, false, pos), size, false);
                     if (ret == false)
                     {
                         return ret;
@@ -395,7 +330,7 @@ public class Map
 
                 if (min.y == 0)
                 {
-                    ret = MapUtil.GetMap(Enum_Layer.FloorWall).JudgeSet(pos - new Vector3(0, 0, MapUtil.m_AdjustZVal), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    ret = MapUtil.GetMap(Enum_Layer.FloorWall).JudgeSet(AdjustFurn2Wall2(size, false, pos), size, false);
                     if (ret == false)
                     {
                         return ret;
@@ -406,7 +341,7 @@ public class Map
             {
                 if (max.x + 1 == m_Size.z)
                 {
-                    ret = MapUtil.GetMap(Enum_Layer.Wall).JudgeSet(pos + new Vector3(MapUtil.m_AdjustZVal, 0, 0), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    ret = MapUtil.GetMap(Enum_Layer.Wall).JudgeSet(AdjustFurn2Wall2(size, false, pos), size, false);
                     if (ret == false)
                     {
                         return ret;
@@ -415,7 +350,7 @@ public class Map
 
                 if (min.y == 0)
                 {
-                    ret = MapUtil.GetMap(Enum_Layer.FloorWall).JudgeSet(pos + new Vector3(0, 0, MapUtil.m_AdjustZVal), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    ret = MapUtil.GetMap(Enum_Layer.FloorWall).JudgeSet(AdjustFurn2Wall2(size, false, pos), size, false);
                     if (ret == false)
                     {
                         return ret;
@@ -426,7 +361,7 @@ public class Map
             {
                 if (max.y + 1 == m_Size.z)
                 {
-                    ret = MapUtil.GetMap(Enum_Layer.Wall).JudgeSet(pos - new Vector3(0, MapUtil.m_AdjustZVal, 0), new MapUtil.IVector3(size.x, size.y, size.z), false);
+                    ret = MapUtil.GetMap(Enum_Layer.Wall).JudgeSet(AdjustFurn2Wall2(size, false, pos), size, false);
                     if (ret == false)
                     {
                         return ret;
@@ -435,7 +370,7 @@ public class Map
 
                 if (min.x == 0)
                 {
-                    ret = MapUtil.GetMap(Enum_Layer.LeftWall).JudgeSet(pos - new Vector3(0, MapUtil.m_AdjustZVal, 0), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    ret = MapUtil.GetMap(Enum_Layer.LeftWall).JudgeSet(AdjustFurn2Wall2(size, false, pos), size, false);
                     if (ret == false)
                     {
                         return ret;
@@ -444,7 +379,7 @@ public class Map
 
                 if (max.x + 1 == m_Size.x)
                 {
-                    ret = MapUtil.GetMap(Enum_Layer.RightWall).JudgeSet(pos - new Vector3(0, MapUtil.m_AdjustZVal, 0), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    ret = MapUtil.GetMap(Enum_Layer.RightWall).JudgeSet(AdjustFurn2Wall2(size, false, pos), size, false);
                     if (ret == false)
                     {
                         return ret;
@@ -465,8 +400,8 @@ public class Map
             }
         }
 
-        MapUtil.IVector3 min = Pos2Grid(GetCornerPos(pos, size, true));
-        MapUtil.IVector3 max = Pos2Grid(GetCornerPos(pos, size, false));
+        MapUtil.IVector3 min = GridXYZ2XY(Pos2Grid(GetCornerPos(pos, size, true)));
+        MapUtil.IVector3 max = GridXYZ2XY(Pos2Grid(GetCornerPos(pos, size, false)));
 
         for (int i = min.x; i <= max.x; i++)
         {
@@ -484,56 +419,56 @@ public class Map
             {
                 if (min.x == 0)
                 {
-                    MapUtil.GetMap(Enum_Layer.LeftWall).SetOne(pos + new Vector3(0, 0, MapUtil.m_AdjustZVal), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.LeftWall).SetOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
                 if (max.x + 1 == m_Size.x)
                 {
-                    MapUtil.GetMap(Enum_Layer.RightWall).SetOne(pos + new Vector3(0, 0, MapUtil.m_AdjustZVal), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.RightWall).SetOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
                 if (min.y == 0)
                 {
-                    MapUtil.GetMap(Enum_Layer.FloorWall).SetOne(pos + new Vector3(0, 0, MapUtil.m_AdjustZVal), new MapUtil.IVector3(size.x, size.y, size.z), false);
+                    MapUtil.GetMap(Enum_Layer.FloorWall).SetOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
             }
             else if (m_Type == Enum_Layer.LeftWall)
             {
                 if (max.x + 1 == m_Size.z)
                 {
-                    MapUtil.GetMap(Enum_Layer.Wall).SetOne(pos - new Vector3(MapUtil.m_AdjustZVal, 0, 0), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.Wall).SetOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
 
                 if (min.y == 0)
                 {
-                    MapUtil.GetMap(Enum_Layer.FloorWall).SetOne(pos - new Vector3(0, 0, MapUtil.m_AdjustZVal), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.FloorWall).SetOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
             }
             else if (m_Type == Enum_Layer.RightWall)
             {
                 if (max.x + 1 == m_Size.z)
                 {
-                    MapUtil.GetMap(Enum_Layer.Wall).SetOne(pos + new Vector3(MapUtil.m_AdjustZVal, 0, 0), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.Wall).SetOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
 
                 if (min.y == 0)
                 {
-                    MapUtil.GetMap(Enum_Layer.FloorWall).SetOne(pos + new Vector3(0, 0, MapUtil.m_AdjustZVal), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.FloorWall).SetOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
             }
             else if (m_Type == Enum_Layer.FloorWall)
             {
                 if (max.y + 1 == m_Size.z)
                 {
-                    MapUtil.GetMap(Enum_Layer.Wall).SetOne(pos - new Vector3(0, MapUtil.m_AdjustZVal, 0), new MapUtil.IVector3(size.x, size.y, size.z), false);
+                    MapUtil.GetMap(Enum_Layer.Wall).SetOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
 
                 if (min.x == 0)
                 {
-                    MapUtil.GetMap(Enum_Layer.LeftWall).SetOne(pos - new Vector3(0, MapUtil.m_AdjustZVal, 0), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.LeftWall).SetOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
 
                 if (max.x + 1 == m_Size.x)
                 {
-                    MapUtil.GetMap(Enum_Layer.RightWall).SetOne(pos - new Vector3(0, MapUtil.m_AdjustZVal, 0), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.RightWall).SetOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
             }
         }
@@ -543,8 +478,8 @@ public class Map
 
     public void CleanOne(Vector3 pos, MapUtil.IVector3 size, bool mainJudge = true)
     {
-        MapUtil.IVector3 min = Pos2Grid(GetCornerPos(pos, size, true));
-        MapUtil.IVector3 max = Pos2Grid(GetCornerPos(pos, size, false));
+        MapUtil.IVector3 min = GridXYZ2XY(Pos2Grid(GetCornerPos(pos, size, true)));
+        MapUtil.IVector3 max = GridXYZ2XY(Pos2Grid(GetCornerPos(pos, size, false)));
 
         //Debug.LogWarning("xxx " + GameApp.Inst.CurNodeIdx + " size=" + size + " pos=" + MapUtil.Vector3String(pos)
         //    + " min=" + min + " max=" + max);
@@ -563,57 +498,57 @@ public class Map
             {
                 if (min.x == 0)
                 {
-                    MapUtil.GetMap(Enum_Layer.LeftWall).CleanOne(pos + new Vector3(0, 0, MapUtil.m_AdjustZVal), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.LeftWall).CleanOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
                 if (max.x + 1 == m_Size.x)
                 {
-                    MapUtil.GetMap(Enum_Layer.RightWall).CleanOne(pos + new Vector3(0, 0, MapUtil.m_AdjustZVal), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.RightWall).CleanOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
 
                 if (min.y == 0)
                 {
-                    MapUtil.GetMap(Enum_Layer.FloorWall).CleanOne(pos + new Vector3(0, 0, MapUtil.m_AdjustZVal), new MapUtil.IVector3(size.x, size.y, size.z), false);
+                    MapUtil.GetMap(Enum_Layer.FloorWall).CleanOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
             }
             else if (m_Type == Enum_Layer.LeftWall)
             {
                 if (max.x + 1 == m_Size.z)
                 {
-                    MapUtil.GetMap(Enum_Layer.Wall).CleanOne(pos - new Vector3(MapUtil.m_AdjustZVal, 0, 0), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.Wall).CleanOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
 
                 if (min.y == 0)
                 {
-                    MapUtil.GetMap(Enum_Layer.FloorWall).CleanOne(pos - new Vector3(0, 0, MapUtil.m_AdjustZVal), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.FloorWall).CleanOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
             }
             else if (m_Type == Enum_Layer.RightWall)
             {
                 if (max.x + 1 == m_Size.z)
                 {
-                    MapUtil.GetMap(Enum_Layer.Wall).CleanOne(pos + new Vector3(MapUtil.m_AdjustZVal, 0, 0), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.Wall).CleanOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
 
                 if (min.y == 0)
                 {
-                    MapUtil.GetMap(Enum_Layer.FloorWall).CleanOne(pos + new Vector3(0, 0, MapUtil.m_AdjustZVal), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.FloorWall).CleanOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
             }
             else if (m_Type == Enum_Layer.FloorWall)
             {
                 if (max.y + 1 == m_Size.z)
                 {
-                    MapUtil.GetMap(Enum_Layer.Wall).CleanOne(pos - new Vector3(0, MapUtil.m_AdjustZVal, 0), new MapUtil.IVector3(size.x, size.y, size.z), false);
+                    MapUtil.GetMap(Enum_Layer.Wall).CleanOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
 
                 if (min.x == 0)
                 {
-                    MapUtil.GetMap(Enum_Layer.LeftWall).CleanOne(pos - new Vector3(0, MapUtil.m_AdjustZVal, 0), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.LeftWall).CleanOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
 
                 if (max.x + 1 == m_Size.x)
                 {
-                    MapUtil.GetMap(Enum_Layer.RightWall).CleanOne(pos - new Vector3(0, MapUtil.m_AdjustZVal, 0), new MapUtil.IVector3(size.z, size.y, size.x), false);
+                    MapUtil.GetMap(Enum_Layer.RightWall).CleanOne(AdjustFurn2Wall2(size, false, pos), size, false);
                 }
             }
         }
@@ -623,224 +558,64 @@ public class Map
     /// 
     /// </summary>
     /// <param name="pos"></param>
-    /// <param name="size"></param>
+    /// <param name="size">size指的是xyz方向的长度，所以到侧墙，x和z应该互换</param>
     /// <param name="min"></param>
     /// <returns></returns>
     public Vector3 GetCornerPos(Vector3 pos, MapUtil.IVector3 size, bool min)
     {
         Vector3 ret = m_StartPos;
-        if (min)
+        int mulPar = min ? 1 : -1;
+
+        if ((size.x & 1) == 0)
         {
-            if (m_Type == Enum_Layer.Wall)
+            if (size.x == 0)
             {
-                if (size.x % 2 == 0)
-                {
-                    if (size.x == 0)
-                    {
-                        ret.x = m_StartPos.x + (m_Size.x + 2) * MapUtil.m_MapGridUnityLen;//大于MAX
-                    }
-                    else
-                    {
-                        ret.x = pos.x - ((size.x - 1) / 2 + 0.5f) * MapUtil.m_MapGridUnityLen;
-                    }
-                }
-                else
-                {
-                    ret.x = pos.x - (size.x / 2) * MapUtil.m_MapGridUnityLen;
-                }
-
-                if (size.y % 2 == 0)
-                {
-                    if (size.y == 0)
-                    {
-                        ret.y = m_StartPos.y + (m_Size.y + 2) * MapUtil.m_MapGridUnityLen;//大于MAX
-                    }
-                    else
-                    {
-                        ret.y = pos.y - ((size.y - 1) / 2 + 0.5f) * MapUtil.m_MapGridUnityLen;
-                    }
-                }
-                else
-                {
-                    ret.y = pos.y - (size.y / 2) * MapUtil.m_MapGridUnityLen;
-                }
+                ret.x = m_StartPos.x + (m_Size.x + 1 + mulPar) * MapUtil.m_MapGridUnityLen;//MIN要大于MAX，都大于边界
             }
-            else if (m_Type == Enum_Layer.LeftWall
-                || m_Type == Enum_Layer.RightWall)
+            else
             {
-                if (size.x % 2 == 0)
-                {
-                    if (size.x == 0)
-                    {
-                        ret.z = m_StartPos.z + (m_Size.z + 2) * MapUtil.m_MapGridUnityLen;//大于MAX
-                    }
-                    else
-                    {
-                        ret.z = pos.z - (size.x / 2 - 1 + 0.5f) * MapUtil.m_MapGridUnityLen;
-                    }
-                }
-                else
-                {
-                    ret.z = pos.z - (size.x / 2) * MapUtil.m_MapGridUnityLen;
-                }
-
-                if (size.y % 2 == 0)
-                {
-                    if (size.y == 0)
-                    {
-                        ret.y = m_StartPos.y + (m_Size.y + 2) * MapUtil.m_MapGridUnityLen;//大于MAX
-                    }
-                    else
-                    {
-                        ret.y = pos.y - (size.y / 2 - 1 + 0.5f) * MapUtil.m_MapGridUnityLen;
-                    }
-                }
-                else
-                {
-                    ret.y = pos.y - (size.y / 2) * MapUtil.m_MapGridUnityLen;
-                }
-            }
-            else if (m_Type == Enum_Layer.FloorWall)
-            {
-                if (size.x % 2 == 0)
-                {
-                    if (size.x == 0)
-                    {
-                        ret.x = m_StartPos.x + (m_Size.x + 2) * MapUtil.m_MapGridUnityLen;//大于MAX
-                    }
-                    else
-                    {
-                        ret.x = pos.x - (size.x / 2 - 1 + 0.5f) * MapUtil.m_MapGridUnityLen;
-                    }
-                }
-                else
-                {
-                    ret.x = pos.x - (size.x / 2) * MapUtil.m_MapGridUnityLen;
-                }
-
-                if (size.z % 2 == 0)
-                {
-                    if (size.z == 0)
-                    {
-                        ret.z = m_StartPos.z + (m_Size.z + 2) * MapUtil.m_MapGridUnityLen;//大于MAX
-                    }
-                    else
-                    {
-                        ret.z = pos.z - (size.z / 2 - 1 + 0.5f) * MapUtil.m_MapGridUnityLen;
-                    }
-                }
-                else
-                {
-                    ret.z = pos.z - (size.z / 2) * MapUtil.m_MapGridUnityLen;
-                }
+                ret.x = pos.x - mulPar * ((size.x - 1) / 2 + 0.5f) * MapUtil.m_MapGridUnityLen;
             }
         }
         else
         {
-            if (m_Type == Enum_Layer.Wall)
-            {
-                if (size.x % 2 == 0)
-                {
-                    if (size.x == 0)
-                    {
-                        ret.x = m_StartPos.x + m_Size.x * MapUtil.m_MapGridUnityLen;
-                    }
-                    else
-                    {
-                        ret.x = pos.x + (size.x / 2 - 1 + 0.5f) * MapUtil.m_MapGridUnityLen;
-                    }
-                }
-                else
-                {
-                    ret.x = pos.x + (size.x / 2) * MapUtil.m_MapGridUnityLen;
-                }
+            ret.x = pos.x - mulPar * (size.x / 2) * MapUtil.m_MapGridUnityLen;
+        }
 
-                if (size.y % 2 == 0)
-                {
-                    if (size.y == 0)
-                    {
-                        ret.y = m_StartPos.y + m_Size.y * MapUtil.m_MapGridUnityLen;
-                    }
-                    else
-                    {
-                        ret.y = pos.y + (size.y / 2 - 1 + 0.5f) * MapUtil.m_MapGridUnityLen;
-                    }
-                }
-                else
-                {
-                    ret.y = pos.y + (size.y / 2) * MapUtil.m_MapGridUnityLen;
-                }
+        if ((size.y & 1) == 0)
+        {
+            if (size.y == 0)
+            {
+                ret.y = m_StartPos.y + (m_Size.y + 1 + mulPar) * MapUtil.m_MapGridUnityLen;//MIN要大于MAX，都大于边界
             }
-            else if (m_Type == Enum_Layer.LeftWall
-                || m_Type == Enum_Layer.RightWall)
+            else
             {
-                if (size.x % 2 == 0)
-                {
-                    if (size.x == 0)
-                    {
-                        ret.z = m_StartPos.z + m_Size.z * MapUtil.m_MapGridUnityLen;
-                    }
-                    else
-                    {
-                        ret.z = pos.z + (size.x / 2 - 1 + 0.5f) * MapUtil.m_MapGridUnityLen;
-                    }
-                }
-                else
-                {
-                    ret.z = pos.z + (size.x / 2) * MapUtil.m_MapGridUnityLen;
-                }
-
-                if (size.y % 2 == 0)
-                {
-                    if (size.y == 0)
-                    {
-                        ret.y = m_StartPos.y + m_Size.y * MapUtil.m_MapGridUnityLen;
-                    }
-                    else
-                    {
-                        ret.y = pos.y + (size.y / 2 - 1 + 0.5f) * MapUtil.m_MapGridUnityLen;
-                    }
-                }
-                else
-                {
-                    ret.y = pos.y + (size.y / 2) * MapUtil.m_MapGridUnityLen;
-                }
-            }
-            else if (m_Type == Enum_Layer.FloorWall)
-            {
-                if (size.x % 2 == 0)
-                {
-                    if (size.x == 0)
-                    {
-                        ret.x = m_StartPos.x + m_Size.x * MapUtil.m_MapGridUnityLen;
-                    }
-                    else
-                    {
-                        ret.x = pos.x + ((size.x - 1) / 2 + 0.5f) * MapUtil.m_MapGridUnityLen;
-                    }
-                }
-                else
-                {
-                    ret.x = pos.x + (size.x / 2) * MapUtil.m_MapGridUnityLen;
-                }
-
-                if (size.z % 2 == 0)
-                {
-                    if (size.z == 0)
-                    {
-                        ret.z = m_StartPos.z + m_Size.z * MapUtil.m_MapGridUnityLen;
-                    }
-                    else
-                    {
-                        ret.z = pos.z + (size.z / 2 - 1 + 0.5f) * MapUtil.m_MapGridUnityLen;
-                    }
-                }
-                else
-                {
-                    ret.z = pos.z + (size.z / 2) * MapUtil.m_MapGridUnityLen;
-                }
+                ret.y = pos.y - mulPar * ((size.y - 1) / 2 + 0.5f) * MapUtil.m_MapGridUnityLen;
             }
         }
+        else
+        {
+            ret.y = pos.y - mulPar * (size.y / 2) * MapUtil.m_MapGridUnityLen;
+        }
+
+        if ((size.z & 1) == 0)
+        {
+            if (size.z == 0)
+            {
+                ret.z = m_StartPos.z + (m_Size.z + 1 + mulPar) * MapUtil.m_MapGridUnityLen;//MIN要大于MAX，都大于边界
+            }
+            else
+            {
+                ret.z = pos.z - mulPar * (size.z / 2 - 1 + 0.5f) * MapUtil.m_MapGridUnityLen;
+            }
+        }
+        else
+        {
+            ret.z = pos.z - mulPar * (size.z / 2) * MapUtil.m_MapGridUnityLen;
+        }
+
+        ret = Adjust2Wall(ret, 0f);
+
         //Debug.LogWarning("corner=" + ret + " min=" + min + " pos=" + pos);
         return ret;
     }

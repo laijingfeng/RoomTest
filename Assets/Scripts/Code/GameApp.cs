@@ -175,7 +175,7 @@ public class GameApp : SingletonMono<GameApp>
                 return;
             }
 
-            Debug.LogWarning(" " + MapUtil.m_SelectId + " " + MapUtil.m_SelectNew + " " + MapUtil.m_SelectOK);
+            //Debug.LogWarning(" " + MapUtil.m_SelectId + " " + MapUtil.m_SelectNew + " " + MapUtil.m_SelectOK);
 
             if (MapUtil.m_SelectNew)
             {
