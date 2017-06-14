@@ -283,6 +283,27 @@ public class MapUtil
         return string.Format("({0},{1},{2})", v.x, v.y, v.z);
     }
 
+    public static Vector3 GetObjEulerAngles(Enum_Layer wallType)
+    {
+        switch (wallType)
+        {
+            case Enum_Layer.LeftWall:
+                {
+                    return new Vector3(0, -90, 0);
+                }
+            case Enum_Layer.RightWall:
+                {
+                    return new Vector3(0, 90, 0);
+                }
+            case Enum_Layer.Wall:
+            case Enum_Layer.FloorWall:
+                {
+                    return Vector3.zero;
+                }
+        }
+        return Vector3.zero;
+    }
+
     public static MapUtil.IVector3 ChangeObjSize(MapUtil.IVector3 size, Enum_Layer fromType, Enum_Layer toType)
     {
         MapUtil.IVector3 ret = new MapUtil.IVector3(size);

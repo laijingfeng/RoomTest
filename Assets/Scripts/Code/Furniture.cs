@@ -92,7 +92,7 @@ public class Furniture : MonoBehaviour
     {
         m_Config.size = MapUtil.ChangeObjSize(m_Config.size, fromWall, toWall);
         m_InitData = MapUtil.InitDrag(m_Config.size, m_Config.setType, m_InitData, toWall);
-        this.transform.eulerAngles = MapUtil.GetMap(m_InitData.m_CurWall).GetObjEulerAngles();
+        this.transform.eulerAngles = MapUtil.GetObjEulerAngles(m_InitData.m_CurWall);
         Place2Pos(pos, false);
     }
 
@@ -594,7 +594,7 @@ public class Furniture : MonoBehaviour
                 MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall(m_Config.size, false, ref m_Pos);
 
                 this.transform.position = m_Pos;
-                this.transform.eulerAngles = MapUtil.GetMap(m_InitData.m_CurWall).GetObjEulerAngles();
+                this.transform.eulerAngles = MapUtil.GetObjEulerAngles(m_InitData.m_CurWall);
 
                 GridMgr.Inst.HideGrid();
                 FurnitureShadow.Inst.SetVisible(false);
@@ -726,7 +726,7 @@ public class Furniture : MonoBehaviour
         m_InitData = MapUtil.InitDrag(m_Config.size, m_Config.setType, m_InitData, m_SaveData.saveWall);
         m_InitData.isSeted = true;
         m_InitData.isNew = false;
-        this.transform.eulerAngles = MapUtil.GetMap(m_InitData.m_CurWall).GetObjEulerAngles();
+        this.transform.eulerAngles = MapUtil.GetObjEulerAngles(m_InitData.m_CurWall);
         this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos + m_SaveData.savePos.MulVal(GameApp.Inst.m_MapGridUnityLenHalf);
 
         MapUtil.GetMap(m_InitData.m_CurWall).SetOne(this.transform.position, m_Config.size);
