@@ -93,7 +93,7 @@ public class Furniture : MonoBehaviour
             }
             else
             {
-                if (WallConfig.Inst.m_CtrType != WallConfig.CtrObjType.OnlyClick)
+                if (GameApp.Inst.m_CtrType != GameApp.CtrObjType.OnlyClick)
                 {
                     m_InDraging = true;
                     this.StopCoroutine("IE_DoDrag");
@@ -209,19 +209,19 @@ public class Furniture : MonoBehaviour
 
     private bool JudgePosOutScreen()
     {
-        if (WallConfig.Inst.m_CtrType == WallConfig.CtrObjType.OnlyClick)
+        if (GameApp.Inst.m_CtrType == GameApp.CtrObjType.OnlyClick)
         {
             return false;
         }
 
-        if (JerryUtil.GetClickPos().x < WallConfig.Inst.m_OutScreenJudgeFactor)
+        if (JerryUtil.GetClickPos().x < GameApp.Inst.m_OutScreenJudgeFactor)
         {
-            CameraCtr.Inst.DoDrag(-WallConfig.Inst.m_OutScreenDragFactor);
+            CameraCtr.Inst.DoDrag(-GameApp.Inst.m_OutScreenDragFactor);
             return true;
         }
-        else if (Screen.width - JerryUtil.GetClickPos().x < WallConfig.Inst.m_OutScreenJudgeFactor)
+        else if (Screen.width - JerryUtil.GetClickPos().x < GameApp.Inst.m_OutScreenJudgeFactor)
         {
-            CameraCtr.Inst.DoDrag(WallConfig.Inst.m_OutScreenDragFactor);
+            CameraCtr.Inst.DoDrag(GameApp.Inst.m_OutScreenDragFactor);
             return true;
         }
         return false;

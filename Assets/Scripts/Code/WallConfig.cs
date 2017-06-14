@@ -4,30 +4,21 @@ using UnityEngine;
 
 public class WallConfig : SingletonMono<WallConfig>
 {
+    [Header("Wall Settings")]
     public Vector3 m_WallStartPos;
     public MapUtil.IVector3 m_WallSize;
 
+    [Header("LeftSide Settings")]
     public Vector3 m_LeftSideWallStartPos;
     public MapUtil.IVector3 m_LeftSideWallSize;
 
+    [Header("RightSide Settings")]
     public Vector3 m_RightSideWallStartPos;
     public MapUtil.IVector3 m_RightSideWallSize;
 
+    [Header("Floor Settings")]
     public Vector3 m_FloorWallStartPos;
     public MapUtil.IVector3 m_FloorWallSize;
-
-    public float m_MapGridUnityLen;
-    public CtrObjType m_CtrType = CtrObjType.ClickAndDrag;
-
-    public float m_OutScreenJudgeFactor = 50;
-    public float m_OutScreenDragFactor = 5;
-
-    public enum CtrObjType
-    {
-        OnlyClick = 0,
-        OnlyDrag,
-        ClickAndDrag,
-    }
 
     private Ray m_Ray;
     private RaycastHit m_HitInfo;
@@ -36,7 +27,7 @@ public class WallConfig : SingletonMono<WallConfig>
     {
         base.Awake();
 
-        MapUtil.m_MapGridUnityLen = m_MapGridUnityLen;
+        MapUtil.m_MapGridUnityLen = GameApp.Inst.m_MapGridUnityLen;
 
         MapUtil.m_Wall.m_StartPos = m_WallStartPos;
         MapUtil.m_Wall.m_Size = m_WallSize;
@@ -226,7 +217,7 @@ public class WallConfig : SingletonMono<WallConfig>
             return;
         }
 
-        if (m_CtrType == CtrObjType.OnlyDrag)
+        if (GameApp.Inst.m_CtrType == GameApp.CtrObjType.OnlyDrag)
         {
             return;
         }
@@ -275,7 +266,7 @@ public class WallConfig : SingletonMono<WallConfig>
 
                     JerryEventMgr.DispatchEvent(Enum_Event.Place2Pos.ToString(), new object[] { fp });
                 }
-                else if (m_CtrType == CtrObjType.OnlyClick
+                else if (GameApp.Inst.m_CtrType == GameApp.CtrObjType.OnlyClick
                     && m_HitInfo.collider.gameObject.layer == LayerMask.NameToLayer(Enum_Layer.ActiveCube.ToString()))
                 {
                     if (Physics.Raycast(m_Ray, out m_HitInfo, 100, JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false), MapUtil.GetWallLayerNames())))
