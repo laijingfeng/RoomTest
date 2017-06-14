@@ -85,6 +85,7 @@ public class FurnitureUtil
             FurnitureSaveDataSet s = JsonUtility.FromJson<FurnitureSaveDataSet>(sdata);
             if (s != null)
             {
+                //Debug.LogWarning("loadCnt=" + JsonUtility.ToJson(s, true));
                 ret = s.saveDatas;
             }
         }

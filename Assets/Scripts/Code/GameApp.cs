@@ -288,6 +288,7 @@ public class GameApp : SingletonMono<GameApp>
         if (houses[curHouseNodeIdx] != null
             && houses[curHouseNodeIdx].floor == curFloor)
         {
+            //Debug.LogWarning(curFloor);
             return;
         }
 
@@ -300,7 +301,7 @@ public class GameApp : SingletonMono<GameApp>
             active = true,
             clean = true,
         });
-        houses[curHouseNodeIdx].Init(curFloor);
         houseNode[curHouseNodeIdx].position = new Vector3(0, GetHouseYOffset, 0);
+        houses[curHouseNodeIdx].Init(curFloor);
     }
 }
