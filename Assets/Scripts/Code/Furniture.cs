@@ -574,7 +574,9 @@ public class Furniture : MonoBehaviour
                 this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.Cube.ToString());
                 m_Pos = m_InitData.m_LastPos;
                 MapUtil.GetMap(m_InitData.m_CurWall).AdjustZ(m_GridSize, false, ref m_Pos);
+                
                 this.transform.position = m_Pos;
+                this.transform.eulerAngles = MapUtil.GetMap(m_InitData.m_CurWall).GetObjEulerAngles();
 
                 GridMgr.Inst.HideGrid();
                 FurnitureShadow.Inst.SetVisible(false);

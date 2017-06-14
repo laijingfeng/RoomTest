@@ -4,7 +4,9 @@ using Jerry;
 public class GridMgr : SingletonMono<GridMgr>
 {
     [Range(0, 6)]
-    public int m_WallCnt = 0;
+    public int m_WallStart = 0;
+    [Range(0, 6)]
+    public int m_WallEnd = 0;
     public bool m_Floor = false;
 
     public Transform m_FloorGrid;
@@ -17,7 +19,7 @@ public class GridMgr : SingletonMono<GridMgr>
     public void HideGrid()
     {
         m_Floor = false;
-        m_WallCnt = 0;
+        m_WallEnd = 0;
         RefreshGrid();
     }
 
@@ -32,12 +34,14 @@ public class GridMgr : SingletonMono<GridMgr>
                 break;
             case MapUtil.SetType.WallOnFloor:
                 {
-                    m_WallCnt = par;
+                    m_WallStart = 0;
+                    m_WallEnd = par;
                 }
                 break;
             case MapUtil.SetType.Wall:
                 {
-                    m_WallCnt = 6;
+                    m_WallStart = 1;
+                    m_WallEnd = 6;
                 }
                 break;
         }
@@ -57,7 +61,7 @@ public class GridMgr : SingletonMono<GridMgr>
             {
                 if (i < m_WallGrid.Length)
                 {
-                    m_WallGrid[i].gameObject.SetActive(m_WallCnt > i);
+                    m_WallGrid[i].gameObject.SetActive(m_WallEnd > i && i >= m_WallStart);
                 }
             }
         }

@@ -120,6 +120,10 @@ public class Map
             {
                 data.m_MaxPos.y = data.m_MinPos.y;
             }
+            else if(setType == MapUtil.SetType.Wall)
+            {
+                data.m_MinPos.y += MapUtil.m_MapGridUnityLen;
+            }
         }
         else if (m_Type == Enum_Layer.LeftWall
             || m_Type == Enum_Layer.RightWall)
@@ -134,6 +138,10 @@ public class Map
             if (setType == MapUtil.SetType.WallOnFloor)
             {
                 data.m_MaxPos.y = data.m_MinPos.y;
+            }
+            else if (setType == MapUtil.SetType.Wall)
+            {
+                data.m_MinPos.y += MapUtil.m_MapGridUnityLen;
             }
         }
         else if (m_Type == Enum_Layer.FloorWall)

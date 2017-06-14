@@ -132,6 +132,10 @@ Prefab:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 404746, guid: 0a1da885052ab1146baf08576b0cb411, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 0a1da885052ab1146baf08576b0cb411, type: 2}
   m_IsPrefabParent: 0
@@ -186,6 +190,10 @@ Prefab:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 404746, guid: 0a1da885052ab1146baf08576b0cb411, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 0a1da885052ab1146baf08576b0cb411, type: 2}
   m_IsPrefabParent: 0
@@ -238,6 +246,10 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 104326, guid: 0a1da885052ab1146baf08576b0cb411, type: 2}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 404746, guid: 0a1da885052ab1146baf08576b0cb411, type: 2}
+      propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -410,7 +422,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_MapGridUnityLen: 0.5
-  m_CtrType: 2
   m_OutScreenJudgeFactor: 50
   m_OutScreenDragFactor: 5
 --- !u!1 &131996450
@@ -1429,7 +1440,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &710573656
 Transform:
   m_ObjectHideFlags: 0
@@ -1577,6 +1588,10 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 104326, guid: 0a1da885052ab1146baf08576b0cb411, type: 2}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 404746, guid: 0a1da885052ab1146baf08576b0cb411, type: 2}
+      propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -2282,6 +2297,10 @@ Prefab:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 404746, guid: 0a1da885052ab1146baf08576b0cb411, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 0a1da885052ab1146baf08576b0cb411, type: 2}
   m_IsPrefabParent: 0
@@ -2426,6 +2445,7 @@ MonoBehaviour:
     x: 24
     y: 0
     z: 8
+  m_DrawGrid: 0
 --- !u!1 &1211800934
 GameObject:
   m_ObjectHideFlags: 0
@@ -2512,7 +2532,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63a41ce66b6590a4890dc5dd52a64ca7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_WallCnt: 0
+  m_WallStart: 0
+  m_WallEnd: 0
   m_Floor: 0
   m_FloorGrid: {fileID: 1491104179}
   m_WallGrid:
@@ -2567,6 +2588,10 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 104326, guid: 0a1da885052ab1146baf08576b0cb411, type: 2}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 404746, guid: 0a1da885052ab1146baf08576b0cb411, type: 2}
+      propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
