@@ -68,6 +68,7 @@ public class Map
     /// <returns></returns>
     public Vector3 Adjust2Wall(Vector3 pos, float interval = 0.01f)
     {
+        //Debug.LogWarning("pos=" + MapUtil.Vector3String(pos) + " " + m_Type);
         if (m_Type == Enum_Layer.Wall)
         {
             pos.z = m_StartPos.z - interval;
@@ -172,8 +173,8 @@ public class Map
             data.m_MaxPos.z += GameApp.Inst.m_MapGridUnityLen;
         }
 
-        data.m_MinPos = Adjust2Wall(data.m_MinPos, 0f);
-        data.m_MaxPos = Adjust2Wall(data.m_MaxPos, 0f);
+        data.m_MinPos = AdjustFurn2Wall2(size, false, data.m_MinPos);
+        data.m_MaxPos = AdjustFurn2Wall2(size, false, data.m_MaxPos);
 
         //Debug.LogWarning("min=" + MapUtil.Vector3String(data.m_MinPos) + " max=" + MapUtil.Vector3String(data.m_MaxPos) + " size=" + size);
     }
@@ -220,18 +221,6 @@ public class Map
     }
 
     /// <summary>
-    /// 格子是(x,y,z)
-    /// </summary>
-    /// <param name="grid"></param>
-    /// <returns></returns>
-    public Vector3 Grid2Pos(MapUtil.IVector3 grid)
-    {
-        Vector3 ret = m_StartPos + Vector3.one * GameApp.Inst.m_MapGridUnityLenHalf + grid.MulVal(GameApp.Inst.m_MapGridUnityLen);
-        ret = Adjust2Wall(ret, 0f);
-        return ret;
-    }
-
-    /// <summary>
     /// 格子归到(x,y,z)表示
     /// </summary>
     /// <param name="pos"></param>
@@ -239,7 +228,7 @@ public class Map
     public MapUtil.IVector3 Pos2Grid(Vector3 pos)
     {
         MapUtil.IVector3 ret = new MapUtil.IVector3(0, 0, 0);
-        pos = (pos - m_StartPos) / GameApp.Inst.m_MapGridUnityLen - Vector3.one;
+        pos = (pos - (m_StartPos + Vector3.one * GameApp.Inst.m_MapGridUnityLenHalf)) / GameApp.Inst.m_MapGridUnityLen;
 
         ret.x = Mathf.RoundToInt(pos.x);
         ret.y = Mathf.RoundToInt(pos.y);
@@ -307,6 +296,14 @@ public class Map
 
         MapUtil.IVector3 min = GridXYZ2XY(Pos2Grid(GetCornerPos(pos, size, true)));
         MapUtil.IVector3 max = GridXYZ2XY(Pos2Grid(GetCornerPos(pos, size, false)));
+
+        //Debug.LogWarning("min=" + min
+        //    + " max=" + max
+        //    + "\npos=" + MapUtil.Vector3String(pos)
+        //    + " size=" + size
+        //    + "\nmain=" + mainJudge
+        //    + " type=" + workType
+        //    + " wall=" + m_Type);
 
         for (int i = min.x; i <= max.x; i++)
         {
@@ -425,6 +422,10 @@ public class Map
         {
             ret = posx - mulPar * (sizex / 2) * GameApp.Inst.m_MapGridUnityLen;
         }
+
+        //Debug.LogWarning("xxxxxxxxxxxxxx mul=" + mulPar + " Sx=" + StartX + " SizeX=" + SizeX
+        //    + "\nsizex=" + sizex + " posx=" + posx + " ret=" + ret);
+
         return ret;
     }
 
@@ -444,9 +445,9 @@ public class Map
         ret.y = GetCornerPosX(mulPar, m_StartPos.y, m_Size.y, size.y, pos.y);
         ret.z = GetCornerPosX(mulPar, m_StartPos.z, m_Size.z, size.z, pos.z);
 
-        ret = Adjust2Wall(ret, 0f);
+        ret = AdjustFurn2Wall2(size, false, ret);
 
-        //Debug.LogWarning("corner=" + ret + " min=" + min + " pos=" + pos);
+        //Debug.LogWarning("corner=" + MapUtil.Vector3String(ret) + " min=" + min + " pos=" + pos);
         return ret;
     }
 }

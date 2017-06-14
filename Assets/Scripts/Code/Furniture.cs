@@ -457,6 +457,7 @@ public class Furniture : MonoBehaviour
             transform.position = m_Pos;
 
             bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_Config.size);
+            //Debug.LogWarning("xxxxxxxxxxxxx");
             FurnitureShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).Adjust2Wall(this.transform.position), this.transform.eulerAngles);
             SetOutLineColor(canSet ? Color.green : Color.red);
             FurnitureShadow.Inst.SetColor(canSet ? Color.green : Color.red);
@@ -523,6 +524,8 @@ public class Furniture : MonoBehaviour
 
         //Debug.LogWarning(MapUtil.Vector3String(fp.pos) + " grid=" + MapUtil.GetMap(m_InitData.m_CurWall).Pos2Grid(fp.pos));
 
+        //Debug.LogWarning("name=" + this.name + " wall=" + m_InitData.m_CurWall);
+
         if (fp.wallType == m_InitData.m_CurWall)
         {
             Place2Pos(fp.pos, false);
@@ -550,14 +553,19 @@ public class Furniture : MonoBehaviour
             return;
         }
 
-        MapUtil.m_SelectOK = true;
-        MapUtil.m_SelectDrag = null;
         MapUtil.m_SelectId = 0;
+        MapUtil.m_SelectOK = true;
         MapUtil.m_SelectNew = false;
+        MapUtil.m_SelectDrag = null;
 
         GridMgr.Inst.HideGrid();
         FurnitureShadow.Inst.SetVisible(false);
         UI_Ctr.Inst.HideCtr();
+
+        m_Selected = false;
+        m_InitData.isNew = true;
+        m_InitData.isSeted = false;
+        m_InDraging = false;
 
         GameObject.Destroy(this.gameObject);
     }
