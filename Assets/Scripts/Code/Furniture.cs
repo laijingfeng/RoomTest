@@ -757,6 +757,8 @@ public class Furniture : MonoBehaviour
         m_InitData.isNew = false;
         this.transform.eulerAngles = MapUtil.GetMap(m_InitData.m_CurWall).GetObjEulerAngles();
         this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos + m_SaveData.savePos.MulVal(0.5f * MapUtil.m_MapGridUnityLen);
+
+        MapUtil.GetMap(m_InitData.m_CurWall).SetOne(this.transform.position, m_Config.size);
     }
 
     #endregion 存档
