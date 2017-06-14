@@ -84,7 +84,7 @@ public class Furniture : MonoBehaviour
 
     void Update()
     {
-        UpdateCtr();
+        //UpdateCtr();
         TryDrag();
     }
 
@@ -386,7 +386,7 @@ public class Furniture : MonoBehaviour
             {
                 if (!canChangeWall)
                 {
-                    m_Pos.x = m_InitData.m_MinPos.x + MapUtil.m_MapGridUnityLen;
+                    m_Pos.x = m_InitData.m_MinPos.x + GameApp.Inst.m_MapGridUnityLen;
                 }
                 else
                 {
@@ -397,7 +397,7 @@ public class Furniture : MonoBehaviour
             {
                 if (!canChangeWall)
                 {
-                    m_Pos.x = m_InitData.m_MaxPos.x - MapUtil.m_MapGridUnityLen;
+                    m_Pos.x = m_InitData.m_MaxPos.x - GameApp.Inst.m_MapGridUnityLen;
                 }
                 else
                 {
@@ -406,7 +406,7 @@ public class Furniture : MonoBehaviour
             }
             else
             {
-                m_Pos.x = Mathf.Clamp(m_Pos.x, m_InitData.m_MinPos.x + MapUtil.m_MapGridUnityLen, m_InitData.m_MaxPos.x - MapUtil.m_MapGridUnityLen);
+                m_Pos.x = Mathf.Clamp(m_Pos.x, m_InitData.m_MinPos.x + GameApp.Inst.m_MapGridUnityLen, m_InitData.m_MaxPos.x - GameApp.Inst.m_MapGridUnityLen);
             }
             m_Pos.y = Mathf.Clamp(m_Pos.y, m_InitData.m_MinPos.y, m_InitData.m_MaxPos.y);
         }
@@ -418,7 +418,7 @@ public class Furniture : MonoBehaviour
             {
                 if (!canChangeWall)
                 {
-                    m_Pos.z = m_InitData.m_MaxPos.z - MapUtil.m_MapGridUnityLen;
+                    m_Pos.z = m_InitData.m_MaxPos.z - GameApp.Inst.m_MapGridUnityLen;
                 }
                 else
                 {
@@ -427,7 +427,7 @@ public class Furniture : MonoBehaviour
             }
             else
             {
-                m_Pos.z = Mathf.Clamp(m_Pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z - MapUtil.m_MapGridUnityLen);
+                m_Pos.z = Mathf.Clamp(m_Pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z - GameApp.Inst.m_MapGridUnityLen);
             }
 
             m_Pos.y = Mathf.Clamp(m_Pos.y, m_InitData.m_MinPos.y, m_InitData.m_MaxPos.y);
@@ -470,7 +470,7 @@ public class Furniture : MonoBehaviour
         //Debug.LogWarning("pp1=" + MapUtil.Vector3String(pos) + " ad=" + MapUtil.Vector3String(m_InitData.m_AdjustPar));
         pos = pos - m_InitData.m_AdjustPar - MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos;
 
-        Vector3 p1 = pos / MapUtil.m_MapGridUnityLen;
+        Vector3 p1 = pos / GameApp.Inst.m_MapGridUnityLen;
         p1.x = Mathf.RoundToInt(p1.x);
         p1.y = Mathf.RoundToInt(p1.y);
         p1.z = Mathf.RoundToInt(p1.z);
@@ -478,7 +478,7 @@ public class Furniture : MonoBehaviour
         //Debug.LogWarning("pp2=" + MapUtil.Vector3String(pos) + " " + MapUtil.Vector3String(p1));
 
         pos = MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos + m_InitData.m_AdjustPar;
-        pos += p1 * MapUtil.m_MapGridUnityLen;
+        pos += p1 * GameApp.Inst.m_MapGridUnityLen;
 
         //Debug.LogWarning("pp3=" + MapUtil.Vector3String(pos));
 
@@ -717,7 +717,7 @@ public class Furniture : MonoBehaviour
     {
         m_SaveData.type = m_Config.type;
         m_SaveData.saveWall = m_InitData.m_CurWall;
-        m_SaveData.savePos = new MapUtil.IVector3((this.transform.position - MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos) / (0.5f * MapUtil.m_MapGridUnityLen));
+        m_SaveData.savePos = new MapUtil.IVector3((this.transform.position - MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos) / GameApp.Inst.m_MapGridUnityLenHalf);
     }
 
     private void Set2SavePos()
@@ -727,7 +727,7 @@ public class Furniture : MonoBehaviour
         m_InitData.isSeted = true;
         m_InitData.isNew = false;
         this.transform.eulerAngles = MapUtil.GetMap(m_InitData.m_CurWall).GetObjEulerAngles();
-        this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos + m_SaveData.savePos.MulVal(0.5f * MapUtil.m_MapGridUnityLen);
+        this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos + m_SaveData.savePos.MulVal(GameApp.Inst.m_MapGridUnityLenHalf);
 
         MapUtil.GetMap(m_InitData.m_CurWall).SetOne(this.transform.position, m_Config.size);
     }

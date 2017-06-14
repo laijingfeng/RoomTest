@@ -14,12 +14,6 @@ public class MapUtil
     public static bool m_SelectNew = false;
     public static Furniture m_SelectDrag = null;
 
-    public static float m_MapGridUnityLen;
-    /// <summary>
-    /// 不要大于格子单位
-    /// </summary>
-    public static float m_AdjustFurn2WallPar = 0.1f;
-
     public static Map m_LeftSideWall = new Map();
     public static Map m_Wall = new Map();
     public static Map m_RightSideWall = new Map();
@@ -30,10 +24,10 @@ public class MapUtil
         m_SelectId = 0;
         m_SelectOK = true;
 
-        m_LeftSideWall.Init(Enum_Layer.LeftWall);
-        m_Wall.Init(Enum_Layer.Wall);
-        m_RightSideWall.Init(Enum_Layer.RightWall);
-        m_FloorWall.Init(Enum_Layer.FloorWall);
+        m_LeftSideWall.Init(Enum_Layer.LeftWall, GameApp.Inst.m_LeftSideWallStartPos, GameApp.Inst.m_LeftSideWallSize);
+        m_Wall.Init(Enum_Layer.Wall, GameApp.Inst.m_WallStartPos, GameApp.Inst.m_WallSize);
+        m_RightSideWall.Init(Enum_Layer.RightWall, GameApp.Inst.m_RightSideWallStartPos, GameApp.Inst.m_RightSideWallSize);
+        m_FloorWall.Init(Enum_Layer.FloorWall, GameApp.Inst.m_FloorWallStartPos, GameApp.Inst.m_FloorWallSize);
     }
 
     public static void ResetMapStartPosY()

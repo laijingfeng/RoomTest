@@ -23,7 +23,7 @@ public class FurnitureShadow : SingletonMono<FurnitureShadow>
     /// <param name="size"></param>
     public void SetSize(Vector3 size, MapUtil.SetType setType)
     {
-        size = size * MapUtil.m_MapGridUnityLen;
+        size = size * GameApp.Inst.m_MapGridUnityLen;
         if (setType == MapUtil.SetType.Floor)
         {
             size.y = 0.001f;

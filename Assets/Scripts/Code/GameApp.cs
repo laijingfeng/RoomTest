@@ -23,6 +23,13 @@ public class GameApp : SingletonMono<GameApp>
     [Header("Other Settings")]
 
     public float m_MapGridUnityLen;
+    [HideInInspector]
+    public float m_MapGridUnityLenHalf;
+
+    /// <summary>
+    /// 不要大于格子单位
+    /// </summary>
+    public float m_AdjustFurn2WallPar = 0.1f;
 
     public float m_OutScreenJudgeFactor = 50;
     public float m_OutScreenDragFactor = 5;
@@ -70,6 +77,7 @@ public class GameApp : SingletonMono<GameApp>
     public override void Awake()
     {
         base.Awake();
+
         space = GameObject.Find("Space");
         houseNode = new Transform[HOUSE_NODE_CNT];
         for (int i = 0; i < HOUSE_NODE_CNT; i++)
@@ -81,19 +89,7 @@ public class GameApp : SingletonMono<GameApp>
 
         houses = new House[HOUSE_NODE_CNT];
 
-        MapUtil.m_MapGridUnityLen = GameApp.Inst.m_MapGridUnityLen;
-
-        MapUtil.m_Wall.m_StartPos = m_WallStartPos;
-        MapUtil.m_Wall.m_Size = m_WallSize;
-
-        MapUtil.m_LeftSideWall.m_StartPos = m_LeftSideWallStartPos;
-        MapUtil.m_LeftSideWall.m_Size = m_LeftSideWallSize;
-
-        MapUtil.m_RightSideWall.m_StartPos = m_RightSideWallStartPos;
-        MapUtil.m_RightSideWall.m_Size = m_RightSideWallSize;
-
-        MapUtil.m_FloorWall.m_StartPos = m_FloorWallStartPos;
-        MapUtil.m_FloorWall.m_Size = m_FloorWallSize;
+        m_MapGridUnityLenHalf = 0.5f * m_MapGridUnityLen;
 
         MapUtil.Init();
 
@@ -102,25 +98,25 @@ public class GameApp : SingletonMono<GameApp>
 #if UNITY_EDITOR
             JerryDrawer.Draw<DrawerElementGrid>()
                         .SetMinPos(m_LeftSideWallStartPos)
-                        .SetGridSize(new Vector3(0, MapUtil.m_MapGridUnityLen, MapUtil.m_MapGridUnityLen))
+                        .SetGridSize(new Vector3(0, GameApp.Inst.m_MapGridUnityLen, GameApp.Inst.m_MapGridUnityLen))
                         .SetSize(m_LeftSideWallSize.ToVector3())
                         .SetColor(Color.red);
 
             JerryDrawer.Draw<DrawerElementGrid>()
                         .SetMinPos(m_RightSideWallStartPos)
-                        .SetGridSize(new Vector3(0, MapUtil.m_MapGridUnityLen, MapUtil.m_MapGridUnityLen))
+                        .SetGridSize(new Vector3(0, GameApp.Inst.m_MapGridUnityLen, GameApp.Inst.m_MapGridUnityLen))
                         .SetSize(m_RightSideWallSize.ToVector3())
                         .SetColor(Color.red);
 
             JerryDrawer.Draw<DrawerElementGrid>()
                         .SetMinPos(m_WallStartPos)
-                        .SetGridSize(new Vector3(MapUtil.m_MapGridUnityLen, MapUtil.m_MapGridUnityLen, 0))
+                        .SetGridSize(new Vector3(GameApp.Inst.m_MapGridUnityLen, GameApp.Inst.m_MapGridUnityLen, 0))
                         .SetSize(m_WallSize.ToVector3())
                         .SetColor(Color.black);
 
             JerryDrawer.Draw<DrawerElementGrid>()
                         .SetMinPos(m_FloorWallStartPos)
-                        .SetGridSize(new Vector3(MapUtil.m_MapGridUnityLen, 0, MapUtil.m_MapGridUnityLen))
+                        .SetGridSize(new Vector3(GameApp.Inst.m_MapGridUnityLen, 0, GameApp.Inst.m_MapGridUnityLen))
                         .SetSize(m_FloorWallSize.ToVector3())
                         .SetColor(Color.black);
 #endif

@@ -5,7 +5,7 @@ public class Map
     /// <summary>
     /// 地图大小，XYZ三个方向
     /// </summary>
-    public MapUtil.IVector3 m_Size;
+    private MapUtil.IVector3 m_Size;
     public Vector3 m_StartPos;
 
     private Enum_Layer m_Type;
@@ -23,13 +23,13 @@ public class Map
     /// 初始化
     /// </summary>
     /// <param name="type"></param>
-    public void Init(Enum_Layer type)
+    public void Init(Enum_Layer type, Vector3 startPos, MapUtil.IVector3 size)
     {
         m_Type = type;
+        m_StartPos = startPos;
+        m_Size = size;
 
-        m_SizeXY = new MapUtil.IVector3(0, 0, 0);
-        m_SizeXY.x = (m_Type == Enum_Layer.Wall || m_Type == Enum_Layer.FloorWall) ? m_Size.x : m_Size.z;
-        m_SizeXY.y = (m_Type == Enum_Layer.FloorWall) ? m_Size.z : m_Size.y;
+        m_SizeXY = GridXYZ2XY(m_Size);
 
         m_Flag = new bool[2, m_SizeXY.x, m_SizeXY.y];
         for (int k = 0; k < 2; k++)
@@ -97,34 +97,34 @@ public class Map
     {
         if (m_Type == Enum_Layer.Wall)
         {
-            pos.z = m_StartPos.z - size.z * MapUtil.m_MapGridUnityLen * 0.5f;
+            pos.z = m_StartPos.z - size.z * GameApp.Inst.m_MapGridUnityLenHalf;
             if (floating)
             {
-                pos.z -= MapUtil.m_AdjustFurn2WallPar;
+                pos.z -= GameApp.Inst.m_AdjustFurn2WallPar;
             }
         }
         else if (m_Type == Enum_Layer.LeftWall)
         {
-            pos.x = m_StartPos.x + size.x * MapUtil.m_MapGridUnityLen * 0.5f;
+            pos.x = m_StartPos.x + size.x * GameApp.Inst.m_MapGridUnityLenHalf;
             if (floating)
             {
-                pos.x += MapUtil.m_AdjustFurn2WallPar;
+                pos.x += GameApp.Inst.m_AdjustFurn2WallPar;
             }
         }
         else if (m_Type == Enum_Layer.RightWall)
         {
-            pos.x = m_StartPos.x - size.x * MapUtil.m_MapGridUnityLen * 0.5f;
+            pos.x = m_StartPos.x - size.x * GameApp.Inst.m_MapGridUnityLenHalf;
             if (floating)
             {
-                pos.x -= MapUtil.m_AdjustFurn2WallPar;
+                pos.x -= GameApp.Inst.m_AdjustFurn2WallPar;
             }
         }
         else if (m_Type == Enum_Layer.FloorWall)
         {
-            pos.y = m_StartPos.y + size.y * MapUtil.m_MapGridUnityLen * 0.5f;
+            pos.y = m_StartPos.y + size.y * GameApp.Inst.m_MapGridUnityLenHalf;
             if (floating)
             {
-                pos.y += MapUtil.m_AdjustFurn2WallPar;
+                pos.y += GameApp.Inst.m_AdjustFurn2WallPar;
             }
         }
         return pos;
@@ -149,27 +149,27 @@ public class Map
     /// <param name="data"></param>
     public void GetMinMaxPos(MapUtil.IVector3 size, MapUtil.SetType setType, ref DragInitData data)
     {
-        data.m_MinPos = m_StartPos + size.MulVal(MapUtil.m_MapGridUnityLen * 0.5f);
-        data.m_MaxPos = m_StartPos + m_Size.MulVal(MapUtil.m_MapGridUnityLen) - size.MulVal(MapUtil.m_MapGridUnityLen * 0.5f);
+        data.m_MinPos = m_StartPos + size.MulVal(GameApp.Inst.m_MapGridUnityLenHalf);
+        data.m_MaxPos = m_StartPos + m_Size.MulVal(GameApp.Inst.m_MapGridUnityLen) - size.MulVal(GameApp.Inst.m_MapGridUnityLenHalf);
         if (setType == MapUtil.SetType.WallOnFloor)
         {
             data.m_MaxPos.y = data.m_MinPos.y;
         }
         else if (setType == MapUtil.SetType.Wall)//墙上的不能贴地
         {
-            data.m_MinPos.y += MapUtil.m_MapGridUnityLen;
+            data.m_MinPos.y += GameApp.Inst.m_MapGridUnityLen;
         }
 
         //墙面可以互跳
         if (m_Type == Enum_Layer.Wall)
         {
-            data.m_MinPos.x -= MapUtil.m_MapGridUnityLen;
-            data.m_MaxPos.x += MapUtil.m_MapGridUnityLen;
+            data.m_MinPos.x -= GameApp.Inst.m_MapGridUnityLen;
+            data.m_MaxPos.x += GameApp.Inst.m_MapGridUnityLen;
         }
         else if (m_Type == Enum_Layer.LeftWall
             || m_Type == Enum_Layer.RightWall)
         {
-            data.m_MaxPos.z += MapUtil.m_MapGridUnityLen;
+            data.m_MaxPos.z += GameApp.Inst.m_MapGridUnityLen;
         }
 
         data.m_MinPos = Adjust2Wall(data.m_MinPos, 0f);
@@ -193,7 +193,7 @@ public class Map
         }
         else
         {
-            ret.x = MapUtil.m_MapGridUnityLen / 2;
+            ret.x = GameApp.Inst.m_MapGridUnityLen / 2;
         }
 
         if ((size.y & 1) == 0)
@@ -202,7 +202,7 @@ public class Map
         }
         else
         {
-            ret.y = MapUtil.m_MapGridUnityLen / 2;
+            ret.y = GameApp.Inst.m_MapGridUnityLen / 2;
         }
 
         if ((size.z & 1) == 0)
@@ -211,7 +211,7 @@ public class Map
         }
         else
         {
-            ret.z = MapUtil.m_MapGridUnityLen / 2;
+            ret.z = GameApp.Inst.m_MapGridUnityLen / 2;
         }
 
         //Debug.LogWarning("size=" + size + " ret=" + MapUtil.Vector3String(ret) + " " + m_Type);
@@ -226,7 +226,7 @@ public class Map
     /// <returns></returns>
     public Vector3 Grid2Pos(MapUtil.IVector3 grid)
     {
-        Vector3 ret = m_StartPos + Vector3.one * MapUtil.m_MapGridUnityLen * 0.5f + grid.MulVal(MapUtil.m_MapGridUnityLen);
+        Vector3 ret = m_StartPos + Vector3.one * GameApp.Inst.m_MapGridUnityLenHalf + grid.MulVal(GameApp.Inst.m_MapGridUnityLen);
         ret = Adjust2Wall(ret, 0f);
         return ret;
     }
@@ -239,7 +239,7 @@ public class Map
     public MapUtil.IVector3 Pos2Grid(Vector3 pos)
     {
         MapUtil.IVector3 ret = new MapUtil.IVector3(0, 0, 0);
-        pos = (pos - (m_StartPos + Vector3.one * MapUtil.m_MapGridUnityLen * 0.5f)) / MapUtil.m_MapGridUnityLen;
+        pos = (pos - m_StartPos) / GameApp.Inst.m_MapGridUnityLen - Vector3.one;
 
         ret.x = Mathf.RoundToInt(pos.x);
         ret.y = Mathf.RoundToInt(pos.y);
@@ -570,48 +570,48 @@ public class Map
         {
             if (size.x == 0)
             {
-                ret.x = m_StartPos.x + (m_Size.x + 1 + mulPar) * MapUtil.m_MapGridUnityLen;//MIN要大于MAX，都大于边界
+                ret.x = m_StartPos.x + (m_Size.x + 1 + mulPar) * GameApp.Inst.m_MapGridUnityLen;//MIN要大于MAX，都大于边界
             }
             else
             {
-                ret.x = pos.x - mulPar * ((size.x - 1) / 2 + 0.5f) * MapUtil.m_MapGridUnityLen;
+                ret.x = pos.x - mulPar * ((size.x - 1) / 2 + 0.5f) * GameApp.Inst.m_MapGridUnityLen;
             }
         }
         else
         {
-            ret.x = pos.x - mulPar * (size.x / 2) * MapUtil.m_MapGridUnityLen;
+            ret.x = pos.x - mulPar * (size.x / 2) * GameApp.Inst.m_MapGridUnityLen;
         }
 
         if ((size.y & 1) == 0)
         {
             if (size.y == 0)
             {
-                ret.y = m_StartPos.y + (m_Size.y + 1 + mulPar) * MapUtil.m_MapGridUnityLen;//MIN要大于MAX，都大于边界
+                ret.y = m_StartPos.y + (m_Size.y + 1 + mulPar) * GameApp.Inst.m_MapGridUnityLen;//MIN要大于MAX，都大于边界
             }
             else
             {
-                ret.y = pos.y - mulPar * ((size.y - 1) / 2 + 0.5f) * MapUtil.m_MapGridUnityLen;
+                ret.y = pos.y - mulPar * ((size.y - 1) / 2 + 0.5f) * GameApp.Inst.m_MapGridUnityLen;
             }
         }
         else
         {
-            ret.y = pos.y - mulPar * (size.y / 2) * MapUtil.m_MapGridUnityLen;
+            ret.y = pos.y - mulPar * (size.y / 2) * GameApp.Inst.m_MapGridUnityLen;
         }
 
         if ((size.z & 1) == 0)
         {
             if (size.z == 0)
             {
-                ret.z = m_StartPos.z + (m_Size.z + 1 + mulPar) * MapUtil.m_MapGridUnityLen;//MIN要大于MAX，都大于边界
+                ret.z = m_StartPos.z + (m_Size.z + 1 + mulPar) * GameApp.Inst.m_MapGridUnityLen;//MIN要大于MAX，都大于边界
             }
             else
             {
-                ret.z = pos.z - mulPar * (size.z / 2 - 1 + 0.5f) * MapUtil.m_MapGridUnityLen;
+                ret.z = pos.z - mulPar * (size.z / 2 - 1 + 0.5f) * GameApp.Inst.m_MapGridUnityLen;
             }
         }
         else
         {
-            ret.z = pos.z - mulPar * (size.z / 2) * MapUtil.m_MapGridUnityLen;
+            ret.z = pos.z - mulPar * (size.z / 2) * GameApp.Inst.m_MapGridUnityLen;
         }
 
         ret = Adjust2Wall(ret, 0f);
