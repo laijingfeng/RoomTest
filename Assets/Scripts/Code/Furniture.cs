@@ -49,7 +49,7 @@ public class Furniture : MonoBehaviour
     void Update()
     {
         //UpdateCtr();
-        JudgeDrag();
+        TryDrag();
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public class Furniture : MonoBehaviour
     private Vector3 m_ClickDownPos = Vector3.zero;
     private Vector3 m_ClickUpPos = Vector3.zero;
 
-    private void JudgeDrag()
+    private void TryDrag()
     {
         if (Input.GetMouseButtonDown(0))
         {
@@ -93,12 +93,9 @@ public class Furniture : MonoBehaviour
             }
             else
             {
-                if (GameApp.Inst.m_CtrType != GameApp.CtrObjType.OnlyClick)
-                {
-                    m_InDraging = true;
-                    this.StopCoroutine("IE_DoDrag");
-                    this.StartCoroutine("IE_DoDrag");
-                }
+                m_InDraging = true;
+                this.StopCoroutine("IE_DoDrag");
+                this.StartCoroutine("IE_DoDrag");
             }
         }
 
@@ -209,11 +206,6 @@ public class Furniture : MonoBehaviour
 
     private bool JudgePosOutScreen()
     {
-        if (GameApp.Inst.m_CtrType == GameApp.CtrObjType.OnlyClick)
-        {
-            return false;
-        }
-
         if (JerryUtil.GetClickPos().x < GameApp.Inst.m_OutScreenJudgeFactor)
         {
             CameraCtr.Inst.DoDrag(-GameApp.Inst.m_OutScreenDragFactor);

@@ -217,11 +217,6 @@ public class WallConfig : SingletonMono<WallConfig>
             return;
         }
 
-        if (GameApp.Inst.m_CtrType == GameApp.CtrObjType.OnlyDrag)
-        {
-            return;
-        }
-
         if (MapUtil.m_SelectId == 0
             || MapUtil.m_SelectOK)
         {
@@ -250,6 +245,7 @@ public class WallConfig : SingletonMono<WallConfig>
                 {
                     return;
                 }
+
                 if (MapUtil.IsWallLayer(m_HitInfo.collider.gameObject.layer))
                 {
                     FirstPos fp = new FirstPos();
@@ -265,22 +261,6 @@ public class WallConfig : SingletonMono<WallConfig>
                     //    .SetSizeFactor(0.2f);
 
                     JerryEventMgr.DispatchEvent(Enum_Event.Place2Pos.ToString(), new object[] { fp });
-                }
-                else if (GameApp.Inst.m_CtrType == GameApp.CtrObjType.OnlyClick
-                    && m_HitInfo.collider.gameObject.layer == LayerMask.NameToLayer(Enum_Layer.ActiveCube.ToString()))
-                {
-                    if (Physics.Raycast(m_Ray, out m_HitInfo, 100, JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false), MapUtil.GetWallLayerNames())))
-                    {
-                        if (m_HitInfo.collider != null
-                            && m_HitInfo.collider.gameObject != null)
-                        {
-                            FirstPos fp = new FirstPos();
-                            fp.pos = m_HitInfo.point;
-                            fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
-
-                            JerryEventMgr.DispatchEvent(Enum_Event.Place2Pos.ToString(), new object[] { fp });
-                        }
-                    }
                 }
             }
         }
