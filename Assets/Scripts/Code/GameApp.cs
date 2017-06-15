@@ -122,7 +122,19 @@ public class GameApp : SingletonMono<GameApp>
 #endif
         }
 
+        JerryEventMgr.AddEvent(Enum_Event.Click3DObj.ToString(), EventClick3DObj);
+
         CreateHouse(0, 0);
+    }
+
+    void Update()
+    {
+        Check3DClick();
+    }
+
+    void OnDestroy()
+    {
+        JerryEventMgr.RemoveEvent(Enum_Event.Click3DObj.ToString(), EventClick3DObj);
     }
 
     #region GUI
@@ -194,26 +206,11 @@ public class GameApp : SingletonMono<GameApp>
         {
             if (GUILayout.Button("保存方案", m_GUIOpt1))
             {
-                if (UpDowning)
-                {
-                    return;
-                }
-
                 JerryEventMgr.DispatchEvent(Enum_Event.SaveCurHouseData.ToString());
             }
 
             if (GUILayout.Button("随机一个", m_GUIOpt1))
             {
-                if (UpDowning)
-                {
-                    return;
-                }
-
-                if (!m_EditorMode)
-                {
-                    UI_Tip.Inst.ShowTip("请先进入[编辑模式]");
-                    return;
-                }
                 houses[CurNodeIdx].AddOneFurniture();
             }
         }
@@ -227,11 +224,6 @@ public class GameApp : SingletonMono<GameApp>
                     return;
                 }
 
-                if (m_EditorMode)
-                {
-                    UI_Tip.Inst.ShowTip("请先退出[编辑模式]");
-                    return;
-                }
                 ToFloor(curFloor + 1);
             }
 
@@ -242,11 +234,6 @@ public class GameApp : SingletonMono<GameApp>
                     return;
                 }
 
-                if (m_EditorMode)
-                {
-                    UI_Tip.Inst.ShowTip("请先退出[编辑模式]");
-                    return;
-                }
                 ToFloor(curFloor - 1);
             }
         }
@@ -312,4 +299,116 @@ public class GameApp : SingletonMono<GameApp>
         houseNode[curHouseNodeIdx].position = new Vector3(0, GetHouseYOffset, 0);
         houses[curHouseNodeIdx].Init(curFloor);
     }
+
+    #region 3D点击
+
+    private Ray m_Ray;
+    private RaycastHit m_HitInfo;
+
+    private RayClickInfo m_ClickDownInfo = new RayClickInfo();
+    private RayClickInfo m_ClickUpInfo = new RayClickInfo();
+    private RayClickInfo m_LastClickInfo = new RayClickInfo();
+    private RayClickInfo m_ClickInfoTmp = new RayClickInfo();
+
+    private void Check3DClick()
+    {
+        if (Input.GetMouseButtonDown(0)
+            && !Util.ClickUI())
+        {
+            m_ClickDownInfo = DoRayClick();
+            JerryEventMgr.DispatchEvent(Enum_Event.Click3DDown.ToString(), new object[] { m_ClickDownInfo });
+        }
+
+        if (Input.GetMouseButtonUp(0)
+            && !Util.ClickUI())
+        {
+            m_ClickUpInfo = DoRayClick();
+            JudgeClick();
+        }
+    }
+
+    private RayClickInfo DoRayClick()
+    {
+        m_ClickInfoTmp.Init();
+        m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos());
+        if (Physics.Raycast(m_Ray, out m_HitInfo, 100))
+        {
+            if (m_HitInfo.collider != null)
+            {
+                m_ClickInfoTmp.pos = m_HitInfo.point;
+                m_ClickInfoTmp.col = m_HitInfo.collider;
+                m_ClickInfoTmp.time = Time.realtimeSinceStartup;
+            }
+        }
+        return m_ClickInfoTmp;
+    }
+
+    private void JudgeClick()
+    {
+        if(m_ClickUpInfo.col != m_ClickDownInfo.col
+            || m_ClickUpInfo.col == null)
+        {
+            Debug.LogWarning("11");
+            return;
+        }
+        if(m_ClickUpInfo.time < m_ClickDownInfo.time
+            || m_ClickUpInfo.time - m_ClickDownInfo.time > 0.3f)
+        {
+            Debug.LogWarning("12");
+            return;
+        }
+        if (!Util.Vector3Equal(m_ClickUpInfo.pos, m_ClickDownInfo.pos, 0.01f))
+        {
+            Debug.LogWarning("13");
+            return;
+        }
+        if(m_LastClickInfo.col == m_ClickUpInfo.col
+            && m_ClickUpInfo.time - m_LastClickInfo.time < 0.5f)
+        {
+            Debug.LogWarning("14 " + (m_LastClickInfo.col == m_ClickUpInfo.col) + " ");
+            return;
+        }
+        m_LastClickInfo = m_ClickUpInfo;
+        Debug.LogWarning("xxx222");
+        JerryEventMgr.DispatchEvent(Enum_Event.Click3DObj.ToString(), new object[] { m_ClickUpInfo });
+    }
+
+    #endregion 3D点击
+
+    #region 事件
+
+    private void EventClick3DObj(object[] args)
+    {
+        if (args == null || args.Length != 1)
+        {
+            return;
+        }
+        if (MapUtil.m_SelectId == 0
+            || MapUtil.m_SelectOK)
+        {
+            return;
+        }
+
+        Debug.LogWarning("xxx");
+
+        RayClickInfo info = (RayClickInfo)args[0];
+        if (MapUtil.IsWallLayer(info.col.gameObject.layer))
+        {
+            RayClickPos fp = new RayClickPos();
+            fp.pos = info.pos;
+            fp.wallType = MapUtil.WallLayer2WallEnum(info.col.gameObject.layer);
+
+            //JerryDrawer.Draw<DrawerElementCube>()
+            //    .SetColor(Color.black)
+            //    .SetLife(3f)
+            //    .SetPos(fp.pos)
+            //    .SetSize(Vector3.one)
+            //    .SetWire(false)
+            //    .SetSizeFactor(0.2f);
+
+            JerryEventMgr.DispatchEvent(Enum_Event.SetFurn2Pos.ToString(), new object[] { fp });
+        }
+    }
+
+    #endregion 事件
 }

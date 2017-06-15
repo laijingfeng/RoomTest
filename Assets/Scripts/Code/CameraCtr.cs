@@ -38,6 +38,7 @@ public class CameraCtr : SingletonMono<CameraCtr>
     public override void Awake()
     {
         base.Awake();
+        JerryEventMgr.AddEvent(Enum_Event.Click3DDown.ToString(), EventClickDown);
     }
 
     void Update()
@@ -45,38 +46,48 @@ public class CameraCtr : SingletonMono<CameraCtr>
         TryDrag();
     }
 
+    void OnDestroy()
+    {
+        JerryEventMgr.RemoveEvent(Enum_Event.Click3DDown.ToString(), EventClickDown);
+    }
+
+    private void EventClickDown(object[] args)
+    {
+        if (args == null || args.Length != 1)
+        {
+            return;
+        }
+        RayClickInfo info = (RayClickInfo)args[0];
+        //点到选中的物体，是移动物体，不移动镜头
+        if (info.col == null
+            || info.col.gameObject.layer != LayerMask.NameToLayer(Enum_Layer.ActiveFurniture.ToString()))
+        {
+            OnCameraDown(true);
+        }
+        else
+        {
+            OnCameraDown(false);
+        }
+    }
+
+    private void OnCameraDown(bool usefull)
+    {
+        this.StopCoroutine("IE_AdjustCamera");
+        m_DragUsefull = usefull;
+        if (!usefull)
+        {
+            return;
+        }
+        m_LastPos = JerryUtil.GetClickPos();
+    }
+
     private void TryDrag()
     {
         if (GameApp.Inst.UpDowning)
         {
-            this.StopCoroutine("IE_AdjustCamera");
+            this.StopCoroutine("IE_AdjustCamera");//TODO:一直Stop会不会耗性能?
             m_DragUsefull = false;
             return;
-        }
-
-        if (Input.GetMouseButtonDown(0)
-            && !Util.ClickUI())
-        {
-            this.StopCoroutine("IE_AdjustCamera");
-
-            m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos());
-            if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
-                JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
-                    new string[]
-                {
-                    Enum_Layer.ActiveFurniture.ToString()
-                })))
-            {
-                if (m_HitInfo.collider != null
-                    && m_HitInfo.collider.gameObject != null)
-                {
-                    //点到选中的物体，是移动物体，不移动镜头
-                    m_DragUsefull = false;
-                    return;
-                }
-            }
-            m_LastPos = JerryUtil.GetClickPos();
-            m_DragUsefull = true;
         }
 
         if (Input.GetMouseButtonUp(0))

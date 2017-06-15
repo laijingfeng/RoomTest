@@ -78,6 +78,18 @@ public enum Enum_Event
     /// <para>参数:无</para>
     /// </summary>
     SaveCurHouseData,
+
+    /// <summary>
+    /// <para>点击到了3D对象</para>
+    /// <para>参数:info(RayClickInfo)</para>
+    /// </summary>
+    Click3DObj,
+
+    /// <summary>
+    /// <para>点下3D对象</para>
+    /// <para>参数:info(RayClickInfo)</para>
+    /// </summary>
+    Click3DDown,
 }
 
 [System.Serializable]
@@ -92,6 +104,9 @@ public enum Enum_Layer
     FloorWall = 13,
 }
 
+/// <summary>
+/// 墙类型
+/// </summary>
 public enum Enum_Wall
 {
     None = 0,
@@ -128,4 +143,23 @@ public class RayClickPos
 {
     public Vector3 pos;
     public Enum_Wall wallType;
+}
+
+public class RayClickInfo
+{
+    public float time;
+    public Collider col;
+    public Vector3 pos;
+
+    public RayClickInfo()
+    {
+        Init();
+    }
+
+    public void Init()
+    {
+        time = 0;
+        col = null;
+        pos = Vector3.zero;
+    }
 }
