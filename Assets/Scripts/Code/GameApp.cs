@@ -190,59 +190,65 @@ public class GameApp : SingletonMono<GameApp>
         }
         GUI.color = Color.white;
 
-        if (GUILayout.Button("保存方案", m_GUIOpt1))
+        if (m_EditorMode)
         {
-            if (UpDowning)
+            if (GUILayout.Button("保存方案", m_GUIOpt1))
             {
-                return;
+                if (UpDowning)
+                {
+                    return;
+                }
+
+                JerryEventMgr.DispatchEvent(Enum_Event.SaveCurHouseData.ToString());
             }
 
-            JerryEventMgr.DispatchEvent(Enum_Event.SaveCurHouseData.ToString());
+            if (GUILayout.Button("随机一个", m_GUIOpt1))
+            {
+                if (UpDowning)
+                {
+                    return;
+                }
+
+                if (!m_EditorMode)
+                {
+                    UI_Tip.Inst.ShowTip("请先进入[编辑模式]");
+                    return;
+                }
+                houses[CurNodeIdx].AddOneFurniture();
+            }
         }
 
-        if (GUILayout.Button("随机一个", m_GUIOpt1))
+        if (!m_EditorMode)
         {
-            if (UpDowning)
+            if (GUILayout.Button(string.Format("上楼({0})", curFloor), m_GUIOpt1))
             {
-                return;
+                if (UpDowning)
+                {
+                    return;
+                }
+
+                if (m_EditorMode)
+                {
+                    UI_Tip.Inst.ShowTip("请先退出[编辑模式]");
+                    return;
+                }
+                ToFloor(curFloor + 1);
             }
 
-            if (!m_EditorMode)
+            if (GUILayout.Button(string.Format("下楼({0})", curFloor), m_GUIOpt1))
             {
-                UI_Tip.Inst.ShowTip("请先进入[编辑模式]");
-                return;
-            }
-            houses[CurNodeIdx].AddOneFurniture();
-        }
+                if (UpDowning)
+                {
+                    return;
+                }
 
-        if (GUILayout.Button(string.Format("上楼({0})", curFloor), m_GUIOpt1))
-        {
-            if (UpDowning)
-            {
-                return;
+                if (m_EditorMode)
+                {
+                    UI_Tip.Inst.ShowTip("请先退出[编辑模式]");
+                    return;
+                }
+                ToFloor(curFloor - 1);
             }
-
-            if (m_EditorMode)
-            {
-                UI_Tip.Inst.ShowTip("请先退出[编辑模式]");
-                return;
-            }
-            ToFloor(curFloor + 1);
-        }
-
-        if (GUILayout.Button(string.Format("下楼({0})", curFloor), m_GUIOpt1))
-        {
-            if (UpDowning)
-            {
-                return;
-            }
-
-            if (m_EditorMode)
-            {
-                UI_Tip.Inst.ShowTip("请先退出[编辑模式]");
-                return;
-            }
-            ToFloor(curFloor - 1);
         }
 
         GUILayout.EndHorizontal();
