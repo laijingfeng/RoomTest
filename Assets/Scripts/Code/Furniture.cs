@@ -281,9 +281,9 @@ public class Furniture : MonoBehaviour
         else if (m_InitData.m_CurWall != Enum_Wall.None)
         {
             //先浮起来，再记录，保持回退时一致性
-            this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall2(m_Config.size, true, this.transform.position);
+            this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall(m_Config.size, true, this.transform.position);
 
-            m_InitData.m_LastPos = m_Pos;
+            m_InitData.m_LastPos = this.transform.position;
             m_InitData.m_LastWall = m_InitData.m_CurWall;
 
             MapUtil.GetMap(m_InitData.m_CurWall).CleanOne(this.transform.position, m_Config.size);
@@ -344,7 +344,6 @@ public class Furniture : MonoBehaviour
 
     #region 放置
 
-    private Vector3 m_Pos;
     private Vector3 m_LastPos;
 
     /// <summary>
@@ -359,8 +358,8 @@ public class Furniture : MonoBehaviour
         //    + " wall:" + m_InitData.m_CurWall 
         //    + " posGrid:" + MapUtil.GetMap(m_InitData.m_CurWall).Pos2Grid(pos));
 
-        m_Pos = AdjustPos(pos);
-        MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall(m_Config.size, true, ref m_Pos);
+        pos = AdjustPos(pos);
+        pos = MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall(m_Config.size, true, pos);
         Enum_Wall changeType = Enum_Wall.None;
 
         //Debug.LogWarning("pos=" + MapUtil.Vector3String(m_Pos)
@@ -371,23 +370,23 @@ public class Furniture : MonoBehaviour
 
         if (m_InitData.m_CurWall == Enum_Wall.Wall)
         {
-            m_Pos.x = Mathf.Clamp(m_Pos.x, m_InitData.m_MinPos.x, m_InitData.m_MaxPos.x);
-            if (m_Pos.x <= m_InitData.m_MinPos.x)
+            pos.x = Mathf.Clamp(pos.x, m_InitData.m_MinPos.x, m_InitData.m_MaxPos.x);
+            if (pos.x <= m_InitData.m_MinPos.x)
             {
                 if (!canChangeWall)
                 {
-                    m_Pos.x = m_InitData.m_MinPos.x + GameApp.Inst.m_MapGridUnityLen;
+                    pos.x = m_InitData.m_MinPos.x + GameApp.Inst.m_MapGridUnityLen;
                 }
                 else
                 {
                     changeType = Enum_Wall.Left;
                 }
             }
-            else if (m_Pos.x >= m_InitData.m_MaxPos.x)
+            else if (pos.x >= m_InitData.m_MaxPos.x)
             {
                 if (!canChangeWall)
                 {
-                    m_Pos.x = m_InitData.m_MaxPos.x - GameApp.Inst.m_MapGridUnityLen;
+                    pos.x = m_InitData.m_MaxPos.x - GameApp.Inst.m_MapGridUnityLen;
                 }
                 else
                 {
@@ -396,19 +395,19 @@ public class Furniture : MonoBehaviour
             }
             else
             {
-                m_Pos.x = Mathf.Clamp(m_Pos.x, m_InitData.m_MinPos.x + GameApp.Inst.m_MapGridUnityLen, m_InitData.m_MaxPos.x - GameApp.Inst.m_MapGridUnityLen);
+                pos.x = Mathf.Clamp(pos.x, m_InitData.m_MinPos.x + GameApp.Inst.m_MapGridUnityLen, m_InitData.m_MaxPos.x - GameApp.Inst.m_MapGridUnityLen);
             }
-            m_Pos.y = Mathf.Clamp(m_Pos.y, m_InitData.m_MinPos.y, m_InitData.m_MaxPos.y);
+            pos.y = Mathf.Clamp(pos.y, m_InitData.m_MinPos.y, m_InitData.m_MaxPos.y);
         }
         else if (m_InitData.m_CurWall == Enum_Wall.Left
             || m_InitData.m_CurWall == Enum_Wall.Right)
         {
-            m_Pos.z = Mathf.Clamp(m_Pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z);
-            if (m_Pos.z >= m_InitData.m_MaxPos.z)
+            pos.z = Mathf.Clamp(pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z);
+            if (pos.z >= m_InitData.m_MaxPos.z)
             {
                 if (!canChangeWall)
                 {
-                    m_Pos.z = m_InitData.m_MaxPos.z - GameApp.Inst.m_MapGridUnityLen;
+                    pos.z = m_InitData.m_MaxPos.z - GameApp.Inst.m_MapGridUnityLen;
                 }
                 else
                 {
@@ -417,15 +416,15 @@ public class Furniture : MonoBehaviour
             }
             else
             {
-                m_Pos.z = Mathf.Clamp(m_Pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z - GameApp.Inst.m_MapGridUnityLen);
+                pos.z = Mathf.Clamp(pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z - GameApp.Inst.m_MapGridUnityLen);
             }
 
-            m_Pos.y = Mathf.Clamp(m_Pos.y, m_InitData.m_MinPos.y, m_InitData.m_MaxPos.y);
+            pos.y = Mathf.Clamp(pos.y, m_InitData.m_MinPos.y, m_InitData.m_MaxPos.y);
         }
         else if (m_InitData.m_CurWall == Enum_Wall.Floor)
         {
-            m_Pos.x = Mathf.Clamp(m_Pos.x, m_InitData.m_MinPos.x, m_InitData.m_MaxPos.x);
-            m_Pos.z = Mathf.Clamp(m_Pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z);
+            pos.x = Mathf.Clamp(pos.x, m_InitData.m_MinPos.x, m_InitData.m_MaxPos.x);
+            pos.z = Mathf.Clamp(pos.z, m_InitData.m_MinPos.z, m_InitData.m_MaxPos.z);
         }
 
         if (changeType != Enum_Wall.None)
@@ -433,10 +432,10 @@ public class Furniture : MonoBehaviour
             //Debug.LogWarning("yyyyyyyyyyyy " + MapUtil.Vector3String(m_Pos));
             //这一步不标记状态，因为已经越界了
 
-            MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall(m_Config.size, false, ref m_Pos);
-            transform.position = m_Pos;
+            pos = MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall(m_Config.size, false, pos);
+            transform.position = pos;
 
-            SelectChange2Wall(m_InitData.m_CurWall, changeType, MapUtil.GetMap(changeType).ChangeWallAdjust2Bound(m_Pos, m_InitData.m_CurWall));
+            SelectChange2Wall(m_InitData.m_CurWall, changeType, MapUtil.GetMap(changeType).ChangeWallAdjust2Bound(pos, m_InitData.m_CurWall));
         }
         else
         {
@@ -444,7 +443,7 @@ public class Furniture : MonoBehaviour
             //    + "\nMin:" + MapUtil.Vector3String(m_InitData.m_MinPos)
             //    + " Max:" + MapUtil.Vector3String(m_InitData.m_MaxPos)
             //    + "\nWall:" + m_InitData.m_CurWall);
-            transform.position = m_Pos;
+            transform.position = pos;
 
             bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_Config.size);
             //Debug.LogWarning("xxxxxxxxxxxxx");
@@ -564,7 +563,7 @@ public class Furniture : MonoBehaviour
 
             MapUtil.GetMap(m_InitData.m_CurWall).SetOne(m_InitData.m_LastPos, m_Config.size);
             UnSelect(true);
-            this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall2(m_Config.size, false, m_InitData.m_LastPos);
+            this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall(m_Config.size, false, m_InitData.m_LastPos);
         }
     }
 
@@ -585,7 +584,7 @@ public class Furniture : MonoBehaviour
         if (MapUtil.GetMap(m_InitData.m_CurWall).SetOne(this.transform.position, m_Config.size))
         {
             UnSelect(true);
-            this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall2(m_Config.size, false, this.transform.position);
+            this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall(m_Config.size, false, this.transform.position);
 
             UI_Tip.Inst.ShowTip("设置OK");
         }

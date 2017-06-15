@@ -94,7 +94,7 @@ public class Map
     /// <param name="size">size指的是xyz方向的长度，所以到侧墙，x和z应该互换</param>
     /// <param name="floating"></param>
     /// <param name="pos"></param>
-    public Vector3 AdjustFurn2Wall2(MapUtil.IVector3 size, bool floating, Vector3 pos)
+    public Vector3 AdjustFurn2Wall(MapUtil.IVector3 size, bool floating, Vector3 pos)
     {
         if (m_Type == Enum_Wall.Wall)
         {
@@ -132,17 +132,6 @@ public class Map
     }
 
     /// <summary>
-    /// 家具粘着墙
-    /// </summary>
-    /// <param name="size">size指的是xyz方向的长度，所以到侧墙，x和z应该互换</param>
-    /// <param name="floating"></param>
-    /// <param name="pos"></param>
-    public void AdjustFurn2Wall(MapUtil.IVector3 size, bool floating, ref Vector3 pos)
-    {
-        pos = AdjustFurn2Wall2(size, floating, pos);
-    }
-
-    /// <summary>
     /// 
     /// </summary>
     /// <param name="size">size指的是xyz方向的长度，所以到侧墙，x和z应该互换</param>
@@ -173,8 +162,8 @@ public class Map
             data.m_MaxPos.z += GameApp.Inst.m_MapGridUnityLen;
         }
 
-        data.m_MinPos = AdjustFurn2Wall2(size, false, data.m_MinPos);
-        data.m_MaxPos = AdjustFurn2Wall2(size, false, data.m_MaxPos);
+        data.m_MinPos = AdjustFurn2Wall(size, false, data.m_MinPos);
+        data.m_MaxPos = AdjustFurn2Wall(size, false, data.m_MaxPos);
 
         //Debug.LogWarning("min=" + MapUtil.Vector3String(data.m_MinPos) + " max=" + MapUtil.Vector3String(data.m_MaxPos) + " size=" + size);
     }
@@ -292,7 +281,7 @@ public class Map
     /// <returns></returns>
     private bool DoCleanJudgeSet(Vector3 pos, MapUtil.IVector3 size, bool mainJudge = true, int workType = 0)
     {
-        pos = AdjustFurn2Wall2(size, false, pos);
+        pos = AdjustFurn2Wall(size, false, pos);
 
         MapUtil.IVector3 min = GridXYZ2XY(Pos2Grid(GetCornerPos(pos, size, true)));
         MapUtil.IVector3 max = GridXYZ2XY(Pos2Grid(GetCornerPos(pos, size, false)));
@@ -445,7 +434,7 @@ public class Map
         ret.y = GetCornerPosX(mulPar, m_StartPos.y, m_Size.y, size.y, pos.y);
         ret.z = GetCornerPosX(mulPar, m_StartPos.z, m_Size.z, size.z, pos.z);
 
-        ret = AdjustFurn2Wall2(size, false, ret);
+        ret = AdjustFurn2Wall(size, false, ret);
 
         //Debug.LogWarning("corner=" + MapUtil.Vector3String(ret) + " min=" + min + " pos=" + pos);
         return ret;
