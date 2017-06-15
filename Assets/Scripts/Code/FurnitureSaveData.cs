@@ -130,7 +130,7 @@ public class FurnitureSaveDataSet
 public class FurnitureSaveData
 {
     public FurnitureType type = FurnitureType.None;
-    public Enum_Layer saveWall = Enum_Layer.None;
+    public Enum_Wall saveWall = Enum_Wall.None;
     /// <summary>
     /// 位置，半个格子的几倍
     /// </summary>

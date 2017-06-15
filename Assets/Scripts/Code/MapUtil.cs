@@ -27,10 +27,10 @@ public class MapUtil
         m_SelectId = 0;
         m_SelectOK = true;
 
-        m_LeftSideWall.Init(Enum_Layer.LeftWall, GameApp.Inst.m_LeftSideWallStartPos, GameApp.Inst.m_LeftSideWallSize);
-        m_Wall.Init(Enum_Layer.Wall, GameApp.Inst.m_WallStartPos, GameApp.Inst.m_WallSize);
-        m_RightSideWall.Init(Enum_Layer.RightWall, GameApp.Inst.m_RightSideWallStartPos, GameApp.Inst.m_RightSideWallSize);
-        m_FloorWall.Init(Enum_Layer.FloorWall, GameApp.Inst.m_FloorWallStartPos, GameApp.Inst.m_FloorWallSize);
+        m_LeftSideWall.Init(Enum_Wall.Left, GameApp.Inst.m_LeftSideWallStartPos, GameApp.Inst.m_LeftSideWallSize);
+        m_Wall.Init(Enum_Wall.Wall, GameApp.Inst.m_WallStartPos, GameApp.Inst.m_WallSize);
+        m_RightSideWall.Init(Enum_Wall.Right, GameApp.Inst.m_RightSideWallStartPos, GameApp.Inst.m_RightSideWallSize);
+        m_FloorWall.Init(Enum_Wall.Floor, GameApp.Inst.m_FloorWallStartPos, GameApp.Inst.m_FloorWallSize);
     }
 
     public static void ResetMapStartPosY()
@@ -49,23 +49,23 @@ public class MapUtil
         m_FloorWall.ResetMapFlag();
     }
 
-    public static Map GetMap(Enum_Layer type)
+    public static Map GetMap(Enum_Wall type)
     {
         switch (type)
         {
-            case Enum_Layer.LeftWall:
+            case Enum_Wall.Left:
                 {
                     return m_LeftSideWall;
                 }
-            case Enum_Layer.Wall:
+            case Enum_Wall.Wall:
                 {
                     return m_Wall;
                 }
-            case Enum_Layer.RightWall:
+            case Enum_Wall.Right:
                 {
                     return m_RightSideWall;
                 }
-            case Enum_Layer.FloorWall:
+            case Enum_Wall.Floor:
                 {
                     return m_FloorWall;
                 }
@@ -73,7 +73,7 @@ public class MapUtil
         return null;
     }
 
-    public static DragInitData InitDrag(IVector3 size, MapUtil.SetType setType, DragInitData oldData, Enum_Layer wall)
+    public static DragInitData InitFurn(IVector3 size, MapUtil.SetType setType, DragInitData oldData, Enum_Wall wall)
     {
         if (oldData == null)
         {
@@ -92,11 +92,11 @@ public class MapUtil
     /// 默认放一个位置
     /// </summary>
     /// <returns></returns>
-    public static FirstPos GetFirstPos(MapUtil.SetType setType)
+    public static RayClickPos GetFirstPos(MapUtil.SetType setType)
     {
-        FirstPos ret = new FirstPos();
+        RayClickPos ret = new RayClickPos();
         ret.pos = Vector3.zero;
-        ret.wallType = Enum_Layer.Wall;
+        ret.wallType = Enum_Wall.Wall;
 
         Vector3 pos = new Vector3(Screen.width / 2, Screen.height / 2, 0f);
         if (setType == SetType.Floor)
@@ -112,7 +112,7 @@ public class MapUtil
                 && hitInfo.collider.gameObject != null)
             {
                 ret.pos = hitInfo.point;
-                ret.wallType = WallLayer2Enum(hitInfo.collider.gameObject.layer);
+                ret.wallType = WallLayer2WallEnum(hitInfo.collider.gameObject.layer);
             }
         }
         else 
@@ -169,46 +169,24 @@ public class MapUtil
         }
     }
 
-    public static Enum_Layer WallLayer2Enum(int layer)
+    public static Enum_Wall WallLayer2WallEnum(int layer)
     {
-        Enum_Layer ret = Enum_Layer.None;
+        Enum_Wall ret = Enum_Wall.None;
         if (layer == Enum_Layer.Wall.GetHashCode())
         {
-            ret = Enum_Layer.Wall;
+            ret = Enum_Wall.Wall;
         }
         else if (layer == Enum_Layer.LeftWall.GetHashCode())
         {
-            ret = Enum_Layer.LeftWall;
+            ret = Enum_Wall.Left;
         }
         else if (layer == Enum_Layer.RightWall.GetHashCode())
         {
-            ret = Enum_Layer.RightWall;
+            ret = Enum_Wall.Right;
         }
         else if (layer == Enum_Layer.FloorWall.GetHashCode())
         {
-            ret = Enum_Layer.FloorWall;
-        }
-        return ret;
-    }
-
-    public static Enum_Layer WallLayerName2Enum(string layerName)
-    {
-        Enum_Layer ret = Enum_Layer.None;
-        if (layerName == Enum_Layer.Wall.ToString())
-        {
-            ret = Enum_Layer.Wall;
-        }
-        else if (layerName == Enum_Layer.LeftWall.ToString())
-        {
-            ret = Enum_Layer.LeftWall;
-        }
-        else if (layerName == Enum_Layer.RightWall.ToString())
-        {
-            ret = Enum_Layer.RightWall;
-        }
-        else if (layerName == Enum_Layer.FloorWall.ToString())
-        {
-            ret = Enum_Layer.FloorWall;
+            ret = Enum_Wall.Floor;
         }
         return ret;
     }
@@ -286,20 +264,20 @@ public class MapUtil
         return string.Format("({0},{1},{2})", v.x, v.y, v.z);
     }
 
-    public static Vector3 GetObjEulerAngles(Enum_Layer wallType)
+    public static Vector3 GetObjEulerAngles(Enum_Wall wallType)
     {
         switch (wallType)
         {
-            case Enum_Layer.LeftWall:
+            case Enum_Wall.Left:
                 {
                     return new Vector3(0, -90, 0);
                 }
-            case Enum_Layer.RightWall:
+            case Enum_Wall.Right:
                 {
                     return new Vector3(0, 90, 0);
                 }
-            case Enum_Layer.Wall:
-            case Enum_Layer.FloorWall:
+            case Enum_Wall.Wall:
+            case Enum_Wall.Floor:
                 {
                     return Vector3.zero;
                 }
@@ -307,13 +285,13 @@ public class MapUtil
         return Vector3.zero;
     }
 
-    public static MapUtil.IVector3 ChangeObjSize(MapUtil.IVector3 size, Enum_Layer fromType, Enum_Layer toType)
+    public static MapUtil.IVector3 ChangeObjSize(MapUtil.IVector3 size, Enum_Wall fromType, Enum_Wall toType)
     {
         MapUtil.IVector3 ret = new MapUtil.IVector3(size);
-        if (((fromType == Enum_Layer.LeftWall || fromType == Enum_Layer.RightWall)
-            && (toType == Enum_Layer.FloorWall || toType == Enum_Layer.Wall)) ||
-            ((fromType == Enum_Layer.FloorWall || fromType == Enum_Layer.Wall)
-            && (toType == Enum_Layer.LeftWall || toType == Enum_Layer.RightWall)))
+        if (((fromType == Enum_Wall.Left || fromType == Enum_Wall.Right)
+            && (toType == Enum_Wall.Floor || toType == Enum_Wall.Wall)) ||
+            ((fromType == Enum_Wall.Floor || fromType == Enum_Wall.Wall)
+            && (toType == Enum_Wall.Left || toType == Enum_Wall.Right)))
         {
             ret.x = size.z;
             ret.z = size.x;

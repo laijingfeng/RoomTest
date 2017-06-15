@@ -161,9 +161,9 @@ public class House : MonoBehaviour
 
                 if (MapUtil.IsWallLayer(m_HitInfo.collider.gameObject.layer))
                 {
-                    FirstPos fp = new FirstPos();
+                    RayClickPos fp = new RayClickPos();
                     fp.pos = m_HitInfo.point;
-                    fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
+                    fp.wallType = MapUtil.WallLayer2WallEnum(m_HitInfo.collider.gameObject.layer);
 
                     //JerryDrawer.Draw<DrawerElementCube>()
                     //    .SetColor(Color.black)

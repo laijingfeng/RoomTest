@@ -78,7 +78,7 @@ public enum Enum_Event
 {
     None = 0,
     SetOne,
-    
+
     /// <summary>
     /// 点击放到一个位置
     /// </summary>
@@ -89,7 +89,7 @@ public enum Enum_Event
     /// <para>参数:id</para>
     /// </summary>
     BackOne,
-    
+
     /// <summary>
     /// <para>放回背包</para>
     /// <para>参数:id</para>
@@ -118,6 +118,15 @@ public enum Enum_Layer
     FloorWall = 13,
 }
 
+public enum Enum_Wall
+{
+    None = 0,
+    Wall,
+    Left,
+    Right,
+    Floor,
+}
+
 public class DragInitData
 {
     public Vector3 m_MinPos;
@@ -129,20 +138,20 @@ public class DragInitData
     /// </summary>
     public bool isSeted = false;
 
-    public Enum_Layer m_CurWall = Enum_Layer.None;
-    
+    public Enum_Wall m_CurWall = Enum_Wall.None;
+
     /// <summary>
     /// 上次的墙，用来回退
     /// </summary>
-    public Enum_Layer m_LastWall = Enum_Layer.None;
+    public Enum_Wall m_LastWall = Enum_Wall.None;
     /// <summary>
     /// 上次的位置，用来回退
     /// </summary>
     public Vector3 m_LastPos = Vector3.zero;
 }
 
-public class FirstPos
+public class RayClickPos
 {
     public Vector3 pos;
-    public Enum_Layer wallType;
+    public Enum_Wall wallType;
 }

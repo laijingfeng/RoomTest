@@ -25,15 +25,15 @@ public class FurnitureShadow : SingletonMono<FurnitureShadow>
     /// </summary>
     /// <param name="size"></param>
     /// <param name="setType"></param>
-    public void SetSize(Vector3 size, Enum_Layer wallType)
+    public void SetSize(Vector3 size, Enum_Wall wallType)
     {
         //Debug.LogWarning("size = " + MapUtil.Vector3String(size));
         size = size * GameApp.Inst.m_MapGridUnityLen;
-        if (wallType == Enum_Layer.FloorWall)
+        if (wallType == Enum_Wall.Floor)
         {
             size.y = 0.001f;
         }
-        else if(wallType == Enum_Layer.Wall)
+        else if (wallType == Enum_Wall.Wall)
         {
             size.z = 0.001f;
         }
