@@ -127,7 +127,7 @@ public enum Enum_Wall
     Floor,
 }
 
-public class DragInitData
+public class FurnitureInitData
 {
     public Vector3 m_MinPos;
     public Vector3 m_MaxPos;

@@ -148,7 +148,7 @@ public class Map
     /// <param name="size">size指的是xyz方向的长度，所以到侧墙，x和z应该互换</param>
     /// <param name="setType"></param>
     /// <param name="data"></param>
-    public void GetMinMaxPos(MapUtil.IVector3 size, MapUtil.SetType setType, ref DragInitData data)
+    public void GetMinMaxPos(MapUtil.IVector3 size, MapUtil.SetType setType, ref FurnitureInitData data)
     {
         data.m_MinPos = m_StartPos + size.MulVal(GameApp.Inst.m_MapGridUnityLenHalf);
         data.m_MaxPos = m_StartPos + m_Size.MulVal(GameApp.Inst.m_MapGridUnityLen) - size.MulVal(GameApp.Inst.m_MapGridUnityLenHalf);

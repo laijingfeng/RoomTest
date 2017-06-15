@@ -73,11 +73,11 @@ public class MapUtil
         return null;
     }
 
-    public static DragInitData InitFurn(IVector3 size, MapUtil.SetType setType, DragInitData oldData, Enum_Wall wall)
+    public static FurnitureInitData InitFurn(IVector3 size, MapUtil.SetType setType, FurnitureInitData oldData, Enum_Wall wall)
     {
         if (oldData == null)
         {
-            oldData = new DragInitData();
+            oldData = new FurnitureInitData();
         }
 
         oldData.m_CurWall = wall;

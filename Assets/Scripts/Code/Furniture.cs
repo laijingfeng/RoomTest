@@ -20,7 +20,7 @@ public class Furniture : MonoBehaviour
 
     private Renderer m_Render;
 
-    public DragInitData m_InitData = null;
+    public FurnitureInitData m_InitData = null;
     public FurnitureConfig m_Config;
     public FurnitureSaveData m_SaveData = null;
 
@@ -33,7 +33,7 @@ public class Furniture : MonoBehaviour
         this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.Cube.ToString());
 
         m_Id = Util.IDGenerator(m_Id);
-        m_InitData = new DragInitData();
+        m_InitData = new FurnitureInitData();
         
         JerryEventMgr.AddEvent(Enum_Event.SetOne.ToString(), EventSetOne);
         JerryEventMgr.AddEvent(Enum_Event.Place2Pos.ToString(), EventPlace2Pos);
