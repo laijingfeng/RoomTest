@@ -130,12 +130,14 @@ public class DragInitData
     public bool isSeted = false;
 
     public Enum_Layer m_CurWall = Enum_Layer.None;
-    public Vector3 m_CurPos = Vector3.zero;
-
+    
     /// <summary>
-    /// 用来回退
+    /// 上次的墙，用来回退
     /// </summary>
     public Enum_Layer m_LastWall = Enum_Layer.None;
+    /// <summary>
+    /// 上次的位置，用来回退
+    /// </summary>
     public Vector3 m_LastPos = Vector3.zero;
 }
 

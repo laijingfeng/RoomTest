@@ -83,17 +83,8 @@ public class Furniture : MonoBehaviour
 
     void Update()
     {
-        UpdateCtr();
+        //UpdateCtr();
         TryDrag();
-    }
-
-    private void Init2Wall(Enum_Layer fromWall, Enum_Layer toWall, Vector3 pos)
-    {
-        m_Config.size = MapUtil.ChangeObjSize(m_Config.size, fromWall, toWall);
-        m_InitData = MapUtil.InitDrag(m_Config.size, m_Config.setType, m_InitData, toWall);
-        this.transform.eulerAngles = MapUtil.GetObjEulerAngles(m_InitData.m_CurWall);
-        FurnitureShadow.Inst.SetSize(m_Config.size.ToVector3(), m_InitData.m_CurWall);
-        Place2Pos(pos, false);
     }
 
     #region 拖拽和选中
@@ -227,7 +218,7 @@ public class Furniture : MonoBehaviour
                             {
                                 //Debug.LogWarning("aaaa================");
                                 UI_Ctr.Inst.HideCtr();
-                                Init2Wall(m_InitData.m_CurWall, fp.wallType, fp.pos);
+                                SelectChange2Wall(m_InitData.m_CurWall, fp.wallType, fp.pos);
                                 //yield return new WaitForEndOfFrame();
                                 CalOffset();
                                 //yield break;
@@ -285,14 +276,12 @@ public class Furniture : MonoBehaviour
         {
             FirstPos fp = MapUtil.GetFirstPos(m_Config.setType);
             //Debug.LogWarning(fp.pos + " x " + fp.wallType + " " + m_Config.setType);
-            Init2Wall(Enum_Layer.Wall, fp.wallType, fp.pos);
+            SelectChange2Wall(Enum_Layer.Wall, fp.wallType, fp.pos);
         }
         else if (m_InitData.m_CurWall != Enum_Layer.None)
         {
             //先浮起来，再记录，保持回退时一致性
-            m_Pos = this.transform.position;
-            MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall(m_Config.size, true, ref m_Pos);
-            this.transform.position = m_Pos;
+            this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall2(m_Config.size, true, this.transform.position);
 
             m_InitData.m_LastPos = m_Pos;
             m_InitData.m_LastWall = m_InitData.m_CurWall;
@@ -316,8 +305,8 @@ public class Furniture : MonoBehaviour
         GridMgr.Inst.ShowGrid(m_Config.setType, m_Config.size.y);
         SetOutLineVisible(true);
         SetOutLineColor(canSet ? Color.green : Color.red);
-        FurnitureShadow.Inst.SetVisible(true);
         FurnitureShadow.Inst.SetSize(m_Config.size.ToVector3(), m_InitData.m_CurWall);
+        FurnitureShadow.Inst.SetVisible(true);
         FurnitureShadow.Inst.SetPosColor(MapUtil.GetMap(m_InitData.m_CurWall).Adjust2Wall(this.transform.position), canSet ? Color.green : Color.red);
         UI_Ctr.Inst.ShowCtr();
     }
@@ -447,7 +436,7 @@ public class Furniture : MonoBehaviour
             MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall(m_Config.size, false, ref m_Pos);
             transform.position = m_Pos;
 
-            Init2Wall(m_InitData.m_CurWall, changeType, MapUtil.GetMap(changeType).ChangeWallAdjust2Bound(m_Pos, m_InitData.m_CurWall));
+            SelectChange2Wall(m_InitData.m_CurWall, changeType, MapUtil.GetMap(changeType).ChangeWallAdjust2Bound(m_Pos, m_InitData.m_CurWall));
         }
         else
         {
@@ -534,7 +523,7 @@ public class Furniture : MonoBehaviour
             if (m_Config.setType != MapUtil.SetType.Floor
                 && fp.wallType != Enum_Layer.FloorWall)
             {
-                Init2Wall(m_InitData.m_CurWall, fp.wallType, fp.pos);
+                SelectChange2Wall(m_InitData.m_CurWall, fp.wallType, fp.pos);
             }
         }
         UI_Ctr.Inst.ShowCtr();
@@ -554,10 +543,6 @@ public class Furniture : MonoBehaviour
 
         UnSelect(false);
 
-        GridMgr.Inst.HideGrid();
-        FurnitureShadow.Inst.SetVisible(false);
-        UI_Ctr.Inst.HideCtr();
-
         GameObject.Destroy(this.gameObject);
     }
 
@@ -575,26 +560,11 @@ public class Furniture : MonoBehaviour
 
         if (m_InitData.m_LastWall != Enum_Layer.None)
         {
-            m_Config.size = MapUtil.ChangeObjSize(m_Config.size, m_InitData.m_CurWall, m_InitData.m_LastWall);
+            Init2Wall(m_InitData.m_CurWall, m_InitData.m_LastWall);
 
-            if (MapUtil.GetMap(m_InitData.m_LastWall).SetOne(m_InitData.m_LastPos, m_Config.size))
-            {
-                m_InitData.m_CurWall = m_InitData.m_LastWall;
-
-                UnSelect(true);
-
-                this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.Cube.ToString());
-                m_Pos = m_InitData.m_LastPos;
-                MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall(m_Config.size, false, ref m_Pos);
-
-                this.transform.position = m_Pos;
-                this.transform.eulerAngles = MapUtil.GetObjEulerAngles(m_InitData.m_CurWall);
-
-                GridMgr.Inst.HideGrid();
-                FurnitureShadow.Inst.SetVisible(false);
-                SetOutLineVisible(false);
-                UI_Ctr.Inst.HideCtr();
-            }
+            MapUtil.GetMap(m_InitData.m_CurWall).SetOne(m_InitData.m_LastPos, m_Config.size);
+            UnSelect(true);
+            this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall2(m_Config.size, false, m_InitData.m_LastPos);
         }
     }
 
@@ -614,23 +584,8 @@ public class Furniture : MonoBehaviour
 
         if (MapUtil.GetMap(m_InitData.m_CurWall).SetOne(this.transform.position, m_Config.size))
         {
-            MapUtil.m_SelectId = 0;
-            MapUtil.m_SelectOK = true;
-            MapUtil.m_SelectNew = false;
-            MapUtil.m_SelectDrag = null;
-
-            m_Selected = false;
-            m_InitData.isSeted = true;
-            this.gameObject.layer = LayerMask.NameToLayer("Cube");
-            m_Pos = this.transform.position;
-            MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall(m_Config.size, false, ref m_Pos);
-            this.transform.position = m_Pos;
-
-            GridMgr.Inst.HideGrid();
-            FurnitureShadow.Inst.SetVisible(false);
-            SetOutLineVisible(false);
-            UI_Ctr.Inst.HideCtr();
-            //Debug.LogWarning("SetHideCtr");
+            UnSelect(true);
+            this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall2(m_Config.size, false, this.transform.position);
 
             UI_Tip.Inst.ShowTip("设置OK");
         }
@@ -638,17 +593,6 @@ public class Furniture : MonoBehaviour
         {
             UI_Tip.Inst.ShowTip("重叠");
         }
-    }
-
-    [System.Serializable]
-    public class SaveData
-    {
-        /// <summary>
-        /// 位置半个格子的几倍
-        /// </summary>
-        public MapUtil.IVector3 pos;
-
-        public int wallCode;
     }
 
     #endregion 事件
@@ -662,41 +606,7 @@ public class Furniture : MonoBehaviour
 
     private void UpdateCtr()
     {
-        if (m_Selected && Input.GetKeyDown(KeyCode.M))
-        {
-            m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos());
-            if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
-                    JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
-                    MapUtil.GetWallLayerNames(m_Config.setType))))
-            {
-                if (m_HitInfo.collider != null
-                    && m_HitInfo.collider.gameObject != null)
-                {
-                    FirstPos fp = new FirstPos();
-                    fp.pos = m_HitInfo.point;
-                    fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
-
-                    Debug.LogWarning("hi " + fp.wallType + " " + MapUtil.GetMap(fp.wallType).Pos2Grid(fp.pos));
-                }
-            }
-
-            m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos() - m_Offset);
-            if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
-                    JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
-                    MapUtil.GetWallLayerNames(m_Config.setType))))
-            {
-                if (m_HitInfo.collider != null
-                    && m_HitInfo.collider.gameObject != null)
-                {
-                    FirstPos fp = new FirstPos();
-                    fp.pos = m_HitInfo.point;
-                    fp.wallType = MapUtil.WallLayer2Enum(m_HitInfo.collider.gameObject.layer);
-
-                    Debug.LogWarning("hi_or " + fp.wallType + " " + MapUtil.GetMap(fp.wallType).Pos2Grid(fp.pos));
-                }
-            }
-        }
-        else if (m_Selected && Input.GetKeyDown(KeyCode.N))
+        if (m_Selected && Input.GetKeyDown(KeyCode.N))
         {
             Flag.Inst.Set2Pos(JerryUtil.GetClickPos() - m_Offset);
         }
@@ -713,24 +623,32 @@ public class Furniture : MonoBehaviour
         m_SaveData.saveWall = m_InitData.m_CurWall;
         m_SaveData.savePos = new MapUtil.IVector3((this.transform.position - MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos) / GameApp.Inst.m_MapGridUnityLenHalf);
     }
-
+    
     private void Set2SavePos()
     {
-        m_Config.size = MapUtil.ChangeObjSize(m_Config.size, Enum_Layer.Wall, m_SaveData.saveWall);
-        m_InitData = MapUtil.InitDrag(m_Config.size, m_Config.setType, m_InitData, m_SaveData.saveWall);
+        Init2Wall(Enum_Layer.Wall, m_SaveData.saveWall);
+        
         m_InitData.isSeted = true;
-        this.transform.eulerAngles = MapUtil.GetObjEulerAngles(m_InitData.m_CurWall);
         this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos + m_SaveData.savePos.MulVal(GameApp.Inst.m_MapGridUnityLenHalf);
-
         MapUtil.GetMap(m_InitData.m_CurWall).SetOne(this.transform.position, m_Config.size);
+        SetOutLineVisible(false);
     }
 
     #endregion 存档
 
     #region 辅助
     
+    /// <summary>
+    /// 取消选中
+    /// </summary>
+    /// <param name="isSeted"></param>
     private void UnSelect(bool isSeted = false)
     {
+        GridMgr.Inst.HideGrid();
+        FurnitureShadow.Inst.SetVisible(false);
+        SetOutLineVisible(false);
+        UI_Ctr.Inst.HideCtr();
+
         MapUtil.m_SelectId = 0;
         MapUtil.m_SelectOK = true;
         MapUtil.m_SelectNew = false;
@@ -739,6 +657,33 @@ public class Furniture : MonoBehaviour
         m_Selected = false;
         m_InitData.isSeted = isSeted;
         m_InDraging = false;
+
+        this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.Cube.ToString());
+    }
+
+    /// <summary>
+    /// 初始化到墙
+    /// </summary>
+    /// <param name="fromWall"></param>
+    /// <param name="toWall"></param>
+    private void Init2Wall(Enum_Layer fromWall, Enum_Layer toWall)
+    {
+        m_Config.size = MapUtil.ChangeObjSize(m_Config.size, fromWall, toWall);
+        m_InitData = MapUtil.InitDrag(m_Config.size, m_Config.setType, m_InitData, toWall);
+        this.transform.eulerAngles = MapUtil.GetObjEulerAngles(m_InitData.m_CurWall);
+    }
+
+    /// <summary>
+    /// 选中转墙
+    /// </summary>
+    /// <param name="fromWall"></param>
+    /// <param name="toWall"></param>
+    /// <param name="pos"></param>
+    private void SelectChange2Wall(Enum_Layer fromWall, Enum_Layer toWall, Vector3 pos)
+    {
+        Init2Wall(fromWall, toWall);
+        FurnitureShadow.Inst.SetSize(m_Config.size.ToVector3(), m_InitData.m_CurWall);
+        Place2Pos(pos, false);
     }
 
     #endregion 辅助
