@@ -17,5 +17,6 @@ public class  Flag : SingletonMono<Flag>
     {
         this.transform.localPosition = JerryUtil.PosScreen2Canvas(m_Canvas, pos, this.transform);
         m_Img.enabled = true;
+        Debug.LogWarning("Flag==========================");
     }
 }

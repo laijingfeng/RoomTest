@@ -450,4 +450,38 @@ public class Map
         //Debug.LogWarning("corner=" + MapUtil.Vector3String(ret) + " min=" + min + " pos=" + pos);
         return ret;
     }
+
+    /// <summary>
+    /// 刚转过的时候，为了让靠边，位置强修正
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns></returns>
+    public Vector3 ChangeWallAdjust2Bound(Vector3 pos, Enum_Layer fromWall)
+    {
+        switch (m_Type)
+        {
+            case Enum_Layer.Wall:
+                {
+                    if (fromWall == Enum_Layer.LeftWall)
+                    {
+                        pos.x = m_StartPos.x;
+                    }
+                    else if (fromWall == Enum_Layer.RightWall)
+                    {
+                        pos.x = m_StartPos.x + m_Size.x * GameApp.Inst.m_MapGridUnityLen;
+                    }
+                }
+                break;
+            case Enum_Layer.LeftWall:
+            case Enum_Layer.RightWall:
+                {
+                    if (fromWall == Enum_Layer.Wall)
+                    {
+                        pos.z = m_StartPos.z + m_Size.z * GameApp.Inst.m_MapGridUnityLen;
+                    }
+                }
+                break;
+        }
+        return pos;
+    }
 }

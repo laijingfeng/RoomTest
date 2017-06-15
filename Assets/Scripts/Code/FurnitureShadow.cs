@@ -20,17 +20,26 @@ public class FurnitureShadow : SingletonMono<FurnitureShadow>
         m_Color = Color.green;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="size"></param>
-    public void SetSize(Vector3 size, MapUtil.SetType setType)
+    /// <param name="setType"></param>
+    public void SetSize(Vector3 size, Enum_Layer wallType)
     {
+        //Debug.LogWarning("size = " + MapUtil.Vector3String(size));
         size = size * GameApp.Inst.m_MapGridUnityLen;
-        if (setType == MapUtil.SetType.Floor)
+        if (wallType == Enum_Layer.FloorWall)
         {
             size.y = 0.001f;
         }
-        else
+        else if(wallType == Enum_Layer.Wall)
         {
             size.z = 0.001f;
+        }
+        else
+        {
+            size.x = 0.001f;
         }
         this.transform.localScale = size;
     }
@@ -44,10 +53,9 @@ public class FurnitureShadow : SingletonMono<FurnitureShadow>
         m_Render.enabled = isShow;
     }
 
-    public void SetPos(Vector3 pos, Vector3 rotate)
+    public void SetPos(Vector3 pos)
     {
         this.transform.position = pos;
-        this.transform.eulerAngles = rotate;
     }
 
     public bool CanSet
