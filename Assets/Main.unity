@@ -2054,7 +2054,7 @@ GameObject:
   - 33: {fileID: 1896824615}
   - 23: {fileID: 1896824613}
   - 114: {fileID: 1896824612}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: Shadow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
