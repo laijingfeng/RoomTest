@@ -11,7 +11,7 @@ public class Furniture : MonoBehaviour
     /// <summary>
     /// id
     /// </summary>
-    public int m_Id;
+    public uint m_Id;
 
     /// <summary>
     /// 选中
@@ -30,15 +30,15 @@ public class Furniture : MonoBehaviour
     void Awake()
     {
         m_Render = this.GetComponent<Renderer>();
-        this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.Cube.ToString());
+        this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.Furniture.ToString());
 
         m_Id = Util.IDGenerator(m_Id);
         m_InitData = new FurnitureInitData();
         
-        JerryEventMgr.AddEvent(Enum_Event.SetOne.ToString(), EventSetOne);
-        JerryEventMgr.AddEvent(Enum_Event.Place2Pos.ToString(), EventPlace2Pos);
-        JerryEventMgr.AddEvent(Enum_Event.BackOne.ToString(), EventBackOne);
-        JerryEventMgr.AddEvent(Enum_Event.Back2Package.ToString(), EventBack2Package);
+        JerryEventMgr.AddEvent(Enum_Event.SetOneFurn.ToString(), EventSetOneFurn);
+        JerryEventMgr.AddEvent(Enum_Event.SetFurn2Pos.ToString(), EventSetFurn2Pos);
+        JerryEventMgr.AddEvent(Enum_Event.CancelSetFurn.ToString(), EventCancelSetFurn);
+        JerryEventMgr.AddEvent(Enum_Event.SetFurn2Package.ToString(), EventSetFurn2Package);
 
         _awaked = true;
         TryWork();
@@ -46,10 +46,10 @@ public class Furniture : MonoBehaviour
 
     void OnDestroy()
     {
-        JerryEventMgr.RemoveEvent(Enum_Event.SetOne.ToString(), EventSetOne);
-        JerryEventMgr.RemoveEvent(Enum_Event.Place2Pos.ToString(), EventPlace2Pos);
-        JerryEventMgr.RemoveEvent(Enum_Event.BackOne.ToString(), EventBackOne);
-        JerryEventMgr.RemoveEvent(Enum_Event.Back2Package.ToString(), EventBack2Package);
+        JerryEventMgr.RemoveEvent(Enum_Event.SetOneFurn.ToString(), EventSetOneFurn);
+        JerryEventMgr.RemoveEvent(Enum_Event.SetFurn2Pos.ToString(), EventSetFurn2Pos);
+        JerryEventMgr.RemoveEvent(Enum_Event.CancelSetFurn.ToString(), EventCancelSetFurn);
+        JerryEventMgr.RemoveEvent(Enum_Event.SetFurn2Package.ToString(), EventSetFurn2Package);
     }
 
     /// <summary>
@@ -264,11 +264,11 @@ public class Furniture : MonoBehaviour
         {
             if (MapUtil.m_SelectNew)
             {
-                JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
+                JerryEventMgr.DispatchEvent(Enum_Event.SetFurn2Package.ToString(), new object[] { MapUtil.m_SelectId });
             }
             else
             {
-                JerryEventMgr.DispatchEvent(Enum_Event.BackOne.ToString(), new object[] { MapUtil.m_SelectId });
+                JerryEventMgr.DispatchEvent(Enum_Event.CancelSetFurn.ToString(), new object[] { MapUtil.m_SelectId });
             }
         }
 
@@ -294,9 +294,9 @@ public class Furniture : MonoBehaviour
         MapUtil.m_SelectId = m_Id;
         MapUtil.m_SelectOK = false;
         MapUtil.m_SelectNew = isNew;
-        MapUtil.m_SelectDrag = this;
+        MapUtil.m_SelectFurn = this;
 
-        this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.ActiveCube.ToString());
+        this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.ActiveFurniture.ToString());
         m_Selected = true;
         m_InitData.isSeted = false;
 
@@ -501,7 +501,7 @@ public class Furniture : MonoBehaviour
     /// 点击放到一个位置
     /// </summary>
     /// <param name="args"></param>
-    private void EventPlace2Pos(object[] args)
+    private void EventSetFurn2Pos(object[] args)
     {
         if (m_Selected == false)
         {
@@ -533,9 +533,9 @@ public class Furniture : MonoBehaviour
     /// 撤回背包
     /// </summary>
     /// <param name="args"></param>
-    private void EventBack2Package(object[] args)
+    private void EventSetFurn2Package(object[] args)
     {
-        int id = (int)args[0];
+        uint id = (uint)args[0];
         if (id != m_Id)
         {
             return;
@@ -550,9 +550,9 @@ public class Furniture : MonoBehaviour
     /// 放回原处
     /// </summary>
     /// <param name="args"></param>
-    private void EventBackOne(object[] args)
+    private void EventCancelSetFurn(object[] args)
     {
-        int id = (int)args[0];
+        uint id = (uint)args[0];
         if (id != m_Id)
         {
             return;
@@ -572,9 +572,9 @@ public class Furniture : MonoBehaviour
     /// 放置
     /// </summary>
     /// <param name="args"></param>
-    private void EventSetOne(object[] args)
+    private void EventSetOneFurn(object[] args)
     {
-        int id = (int)args[0];
+        uint id = (uint)args[0];
         if (id != m_Id)
         {
             return;
@@ -652,13 +652,13 @@ public class Furniture : MonoBehaviour
         MapUtil.m_SelectId = 0;
         MapUtil.m_SelectOK = true;
         MapUtil.m_SelectNew = false;
-        MapUtil.m_SelectDrag = null;
+        MapUtil.m_SelectFurn = null;
 
         m_Selected = false;
         m_InitData.isSeted = isSeted;
         m_InDraging = false;
 
-        this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.Cube.ToString());
+        this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.Furniture.ToString());
     }
 
     /// <summary>

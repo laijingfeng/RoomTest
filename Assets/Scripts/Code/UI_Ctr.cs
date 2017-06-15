@@ -34,7 +34,7 @@ public class UI_Ctr : SingletonMono<UI_Ctr>
         {
             if (m_CanSet)
             {
-                JerryEventMgr.DispatchEvent(Enum_Event.SetOne.ToString(), new object[] { MapUtil.m_SelectId });
+                JerryEventMgr.DispatchEvent(Enum_Event.SetOneFurn.ToString(), new object[] { MapUtil.m_SelectId });
             }
             else
             {
@@ -44,12 +44,12 @@ public class UI_Ctr : SingletonMono<UI_Ctr>
 
         UGUIEventListener.Get(m_Cancel.gameObject).onClick += (go) =>
         {
-            JerryEventMgr.DispatchEvent(Enum_Event.BackOne.ToString(), new object[] { MapUtil.m_SelectId });
+            JerryEventMgr.DispatchEvent(Enum_Event.CancelSetFurn.ToString(), new object[] { MapUtil.m_SelectId });
         };
 
         UGUIEventListener.Get(m_Back.gameObject).onClick += (go) =>
         {
-            JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
+            JerryEventMgr.DispatchEvent(Enum_Event.SetFurn2Package.ToString(), new object[] { MapUtil.m_SelectId });
         };
 
         m_CanSet = false;
@@ -85,11 +85,11 @@ public class UI_Ctr : SingletonMono<UI_Ctr>
 
     private void DoAdjustPos()
     {
-        if(MapUtil.m_SelectDrag == null)
+        if(MapUtil.m_SelectFurn == null)
         {
             return ;
         }
-        Vector3 wordPos = MapUtil.m_SelectDrag.transform.position;
+        Vector3 wordPos = MapUtil.m_SelectFurn.transform.position;
         Vector3 screenPos = Camera.main.WorldToScreenPoint(wordPos);
         screenPos.z = 0;
         this.transform.localPosition = JerryUtil.PosScreen2Canvas(m_Canvas, screenPos, this.transform);

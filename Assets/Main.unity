@@ -1896,7 +1896,7 @@ GameObject:
   - 65: {fileID: 1748365052}
   - 65: {fileID: 1748365051}
   - 65: {fileID: 1748365050}
-  m_Layer: 14
+  m_Layer: 0
   m_Name: Other
   m_TagString: Untagged
   m_Icon: {fileID: 0}

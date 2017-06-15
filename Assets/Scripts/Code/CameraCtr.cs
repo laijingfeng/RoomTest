@@ -59,12 +59,12 @@ public class CameraCtr : SingletonMono<CameraCtr>
         {
             this.StopCoroutine("IE_AdjustCamera");
 
-            m_Ray = Camera.main.ScreenPointToRay(Util.GetClickPos());
+            m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos());
             if (Physics.Raycast(m_Ray, out m_HitInfo, 100,
                 JerryUtil.MakeLayerMask(JerryUtil.MakeLayerMask(false),
                     new string[]
                 {
-                    Enum_Layer.ActiveCube.ToString()
+                    Enum_Layer.ActiveFurniture.ToString()
                 })))
             {
                 if (m_HitInfo.collider != null
@@ -123,8 +123,8 @@ public class CameraCtr : SingletonMono<CameraCtr>
         }
 
         //Debug.LogWarning("val=" + val);
-        tmp1 = Camera.main.transform.position;
-        tmp2 = Camera.main.transform.eulerAngles;
+        tmp1 = this.transform.position;
+        tmp2 = this.transform.eulerAngles;
 
         if (tmp1.x >= GetDragBound && (tmp2.y > 0 || val > 0))
         {
@@ -156,16 +156,16 @@ public class CameraCtr : SingletonMono<CameraCtr>
         }
         else
         {
-            Camera.main.transform.position = tmp1;
+            this.transform.position = tmp1;
         }
-        Camera.main.transform.eulerAngles = tmp2;
+        this.transform.eulerAngles = tmp2;
 
         UI_Ctr.Inst.AdjustPos();
     }
 
     public void AdjustCamera()
     {
-        Vector3 pos = Camera.main.transform.position;
+        Vector3 pos = this.transform.position;
         pos.x = Mathf.Clamp(tmp1.x, -GetDragBound, GetDragBound);
 
         this.StopCoroutine("IE_AdjustCamera");
@@ -175,15 +175,15 @@ public class CameraCtr : SingletonMono<CameraCtr>
     private IEnumerator IE_AdjustCamera(Vector3 pos)
     {
         tmp1 = pos;
-        //Debug.LogWarning(MapUtil.Vector3String(Camera.main.transform.position) + " ||| " + MapUtil.Vector3String(tmp1));
+        //Debug.LogWarning(MapUtil.Vector3String(this.transform.position) + " ||| " + MapUtil.Vector3String(tmp1));
         Vector3 v = Vector3.zero;
-        while (!Util.Vector3Equal(tmp1, Camera.main.transform.position, 0.05f))
+        while (!Util.Vector3Equal(tmp1, this.transform.position, 0.05f))
         {
-            Camera.main.transform.position = Vector3.SmoothDamp(Camera.main.transform.position, tmp1, ref v, Time.deltaTime * 15);
+            this.transform.position = Vector3.SmoothDamp(this.transform.position, tmp1, ref v, Time.deltaTime * 15);
             yield return new WaitForEndOfFrame();
             UI_Ctr.Inst.AdjustPos();
         }
-        Camera.main.transform.position = tmp1;
+        this.transform.position = tmp1;
         UI_Ctr.Inst.AdjustPos();
     }
 }

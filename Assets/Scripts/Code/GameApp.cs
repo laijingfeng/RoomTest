@@ -137,7 +137,13 @@ public class GameApp : SingletonMono<GameApp>
         }
     }
 
+    /// <summary>
+    /// 正则切换楼层
+    /// </summary>
     private bool m_IsUpDowning = false;
+    /// <summary>
+    /// 正则切换楼层
+    /// </summary>
     public bool UpDowning
     {
         get
@@ -175,11 +181,11 @@ public class GameApp : SingletonMono<GameApp>
 
             if (MapUtil.m_SelectNew)
             {
-                JerryEventMgr.DispatchEvent(Enum_Event.Back2Package.ToString(), new object[] { MapUtil.m_SelectId });
+                JerryEventMgr.DispatchEvent(Enum_Event.SetFurn2Package.ToString(), new object[] { MapUtil.m_SelectId });
             }
             else
             {
-                JerryEventMgr.DispatchEvent(Enum_Event.BackOne.ToString(), new object[] { MapUtil.m_SelectId });
+                JerryEventMgr.DispatchEvent(Enum_Event.CancelSetFurn.ToString(), new object[] { MapUtil.m_SelectId });
             }
         }
         GUI.color = Color.white;

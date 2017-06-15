@@ -149,7 +149,7 @@ public class House : MonoBehaviour
                 return;
             }
 
-            m_Ray = Camera.main.ScreenPointToRay(Util.GetClickPos());
+            m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos());
 
             if (Physics.Raycast(m_Ray, out m_HitInfo, 100))
             {
@@ -173,7 +173,7 @@ public class House : MonoBehaviour
                     //    .SetWire(false)
                     //    .SetSizeFactor(0.2f);
 
-                    JerryEventMgr.DispatchEvent(Enum_Event.Place2Pos.ToString(), new object[] { fp });
+                    JerryEventMgr.DispatchEvent(Enum_Event.SetFurn2Pos.ToString(), new object[] { fp });
                 }
             }
         }

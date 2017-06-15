@@ -16,10 +16,10 @@ TagManager:
   - Wall
   - LeftWall
   - RightWall
-  - Cube
-  - ActiveCube
+  - Furniture
+  - ActiveFurniture
   - FloorWall
-  - OtherRoom
+  - 
   - 
   - 
   - 

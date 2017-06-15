@@ -6,7 +6,7 @@ public class MapUtil
     /// <summary>
     /// 选中的ID
     /// </summary>
-    public static int m_SelectId = 0;
+    public static uint m_SelectId = 0;
     /// <summary>
     /// 选中的已经放好了
     /// </summary>
@@ -15,7 +15,7 @@ public class MapUtil
     /// 是否是新的
     /// </summary>
     public static bool m_SelectNew = false;
-    public static Furniture m_SelectDrag = null;
+    public static Furniture m_SelectFurn = null;
 
     public static Map m_LeftSideWall = new Map();
     public static Map m_Wall = new Map();
@@ -26,6 +26,8 @@ public class MapUtil
     {
         m_SelectId = 0;
         m_SelectOK = true;
+        m_SelectNew = false;
+        m_SelectFurn = null;
 
         m_LeftSideWall.Init(Enum_Wall.Left, GameApp.Inst.m_LeftSideWallStartPos, GameApp.Inst.m_LeftSideWallSize);
         m_Wall.Init(Enum_Wall.Wall, GameApp.Inst.m_WallStartPos, GameApp.Inst.m_WallSize);
