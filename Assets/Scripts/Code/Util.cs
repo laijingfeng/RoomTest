@@ -125,10 +125,6 @@ public class DragInitData
     public Vector3 m_AdjustPar;
 
     /// <summary>
-    /// 是否是新的，没有放置过
-    /// </summary>
-    public bool isNew = false;
-    /// <summary>
     /// 是否是放好的
     /// </summary>
     public bool isSeted = false;

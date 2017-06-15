@@ -11,6 +11,9 @@ public class MapUtil
     /// 选中的已经放好了
     /// </summary>
     public static bool m_SelectOK = true;
+    /// <summary>
+    /// 是否是新的
+    /// </summary>
     public static bool m_SelectNew = false;
     public static Furniture m_SelectDrag = null;
 

@@ -34,8 +34,7 @@ public class Furniture : MonoBehaviour
 
         m_Id = Util.IDGenerator(m_Id);
         m_InitData = new DragInitData();
-        m_InitData.isNew = true;
-
+        
         JerryEventMgr.AddEvent(Enum_Event.SetOne.ToString(), EventSetOne);
         JerryEventMgr.AddEvent(Enum_Event.Place2Pos.ToString(), EventPlace2Pos);
         JerryEventMgr.AddEvent(Enum_Event.BackOne.ToString(), EventBackOne);
@@ -267,7 +266,7 @@ public class Furniture : MonoBehaviour
     /// <summary>
     /// 选中
     /// </summary>
-    private void SelectSelf()
+    private void SelectSelf(bool isNew = false)
     {
         if (MapUtil.m_SelectId != 0
             && !MapUtil.m_SelectOK)
@@ -282,7 +281,7 @@ public class Furniture : MonoBehaviour
             }
         }
 
-        if (m_InitData.isNew)
+        if (isNew)
         {
             FirstPos fp = MapUtil.GetFirstPos(m_Config.setType);
             //Debug.LogWarning(fp.pos + " x " + fp.wallType + " " + m_Config.setType);
@@ -305,10 +304,9 @@ public class Furniture : MonoBehaviour
 
         MapUtil.m_SelectId = m_Id;
         MapUtil.m_SelectOK = false;
-        MapUtil.m_SelectNew = m_InitData.isNew;
+        MapUtil.m_SelectNew = isNew;
         MapUtil.m_SelectDrag = this;
 
-        m_InitData.isNew = false;
         this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.ActiveCube.ToString());
         m_Selected = true;
         m_InitData.isSeted = false;
@@ -320,8 +318,7 @@ public class Furniture : MonoBehaviour
         SetOutLineColor(canSet ? Color.green : Color.red);
         FurnitureShadow.Inst.SetVisible(true);
         FurnitureShadow.Inst.SetSize(m_Config.size.ToVector3(), m_InitData.m_CurWall);
-        FurnitureShadow.Inst.SetColor(canSet ? Color.green : Color.red);
-        FurnitureShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).Adjust2Wall(this.transform.position));
+        FurnitureShadow.Inst.SetPosColor(MapUtil.GetMap(m_InitData.m_CurWall).Adjust2Wall(this.transform.position), canSet ? Color.green : Color.red);
         UI_Ctr.Inst.ShowCtr();
     }
 
@@ -462,9 +459,8 @@ public class Furniture : MonoBehaviour
 
             bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_Config.size);
             //Debug.LogWarning("xxxxxxxxxxxxx");
-            FurnitureShadow.Inst.SetPos(MapUtil.GetMap(m_InitData.m_CurWall).Adjust2Wall(this.transform.position));
+            FurnitureShadow.Inst.SetPosColor(MapUtil.GetMap(m_InitData.m_CurWall).Adjust2Wall(this.transform.position), canSet ? Color.green : Color.red);
             SetOutLineColor(canSet ? Color.green : Color.red);
-            FurnitureShadow.Inst.SetColor(canSet ? Color.green : Color.red);
         }
 
         return changeType == Enum_Layer.None ? false : true;
@@ -556,19 +552,11 @@ public class Furniture : MonoBehaviour
             return;
         }
 
-        MapUtil.m_SelectId = 0;
-        MapUtil.m_SelectOK = true;
-        MapUtil.m_SelectNew = false;
-        MapUtil.m_SelectDrag = null;
+        UnSelect(false);
 
         GridMgr.Inst.HideGrid();
         FurnitureShadow.Inst.SetVisible(false);
         UI_Ctr.Inst.HideCtr();
-
-        m_Selected = false;
-        m_InitData.isNew = true;
-        m_InitData.isSeted = false;
-        m_InDraging = false;
 
         GameObject.Destroy(this.gameObject);
     }
@@ -593,13 +581,8 @@ public class Furniture : MonoBehaviour
             {
                 m_InitData.m_CurWall = m_InitData.m_LastWall;
 
-                MapUtil.m_SelectId = 0;
-                MapUtil.m_SelectOK = true;
-                MapUtil.m_SelectNew = false;
-                MapUtil.m_SelectDrag = null;
+                UnSelect(true);
 
-                m_Selected = false;
-                m_InitData.isSeted = true;
                 this.gameObject.layer = LayerMask.NameToLayer(Enum_Layer.Cube.ToString());
                 m_Pos = m_InitData.m_LastPos;
                 MapUtil.GetMap(m_InitData.m_CurWall).AdjustFurn2Wall(m_Config.size, false, ref m_Pos);
@@ -674,7 +657,7 @@ public class Furniture : MonoBehaviour
     public void ToScreen()
     {
         Debug.LogWarning(this.name);
-        SelectSelf();
+        SelectSelf(true);
     }
 
     private void UpdateCtr()
@@ -736,7 +719,6 @@ public class Furniture : MonoBehaviour
         m_Config.size = MapUtil.ChangeObjSize(m_Config.size, Enum_Layer.Wall, m_SaveData.saveWall);
         m_InitData = MapUtil.InitDrag(m_Config.size, m_Config.setType, m_InitData, m_SaveData.saveWall);
         m_InitData.isSeted = true;
-        m_InitData.isNew = false;
         this.transform.eulerAngles = MapUtil.GetObjEulerAngles(m_InitData.m_CurWall);
         this.transform.position = MapUtil.GetMap(m_InitData.m_CurWall).m_StartPos + m_SaveData.savePos.MulVal(GameApp.Inst.m_MapGridUnityLenHalf);
 
@@ -744,4 +726,20 @@ public class Furniture : MonoBehaviour
     }
 
     #endregion 存档
+
+    #region 辅助
+    
+    private void UnSelect(bool isSeted = false)
+    {
+        MapUtil.m_SelectId = 0;
+        MapUtil.m_SelectOK = true;
+        MapUtil.m_SelectNew = false;
+        MapUtil.m_SelectDrag = null;
+
+        m_Selected = false;
+        m_InitData.isSeted = isSeted;
+        m_InDraging = false;
+    }
+
+    #endregion 辅助
 }

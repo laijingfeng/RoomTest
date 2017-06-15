@@ -21,7 +21,7 @@ public class FurnitureShadow : SingletonMono<FurnitureShadow>
     }
 
     /// <summary>
-    /// 
+    /// 设置大小，选中时，切换墙面时
     /// </summary>
     /// <param name="size"></param>
     /// <param name="setType"></param>
@@ -44,6 +44,11 @@ public class FurnitureShadow : SingletonMono<FurnitureShadow>
         this.transform.localScale = size;
     }
 
+    /// <summary>
+    /// <para>设置可见</para>
+    /// <para>选中可见</para>
+    /// </summary>
+    /// <param name="isShow"></param>
     public void SetVisible(bool isShow)
     {
         if (m_Render == null)
@@ -53,21 +58,15 @@ public class FurnitureShadow : SingletonMono<FurnitureShadow>
         m_Render.enabled = isShow;
     }
 
-    public void SetPos(Vector3 pos)
+    /// <summary>
+    /// 设置位置
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <param name="col"></param>
+    public void SetPosColor(Vector3 pos, Color col)
     {
         this.transform.position = pos;
-    }
 
-    public bool CanSet
-    {
-        get
-        {
-            return m_Color == Color.red ? false : true;
-        }
-    }
-
-    public void SetColor(Color col)
-    {
         if (m_Render == null)
         {
             return;
@@ -80,5 +79,16 @@ public class FurnitureShadow : SingletonMono<FurnitureShadow>
 
         m_Color = col;
         m_Render.material.SetColor("_Color", col);
+    }
+
+    /// <summary>
+    /// 是否可以放置
+    /// </summary>
+    public bool CanSet
+    {
+        get
+        {
+            return m_Color == Color.red ? false : true;
+        }
     }
 }
