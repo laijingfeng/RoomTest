@@ -315,14 +315,14 @@ public class GameApp : SingletonMono<GameApp>
         if (Input.GetMouseButtonDown(0)
             && !Util.ClickUI())
         {
-            m_ClickDownInfo = DoRayClick();
+            m_ClickDownInfo.Init(DoRayClick());
             JerryEventMgr.DispatchEvent(Enum_Event.Click3DDown.ToString(), new object[] { m_ClickDownInfo });
         }
 
         if (Input.GetMouseButtonUp(0)
             && !Util.ClickUI())
         {
-            m_ClickUpInfo = DoRayClick();
+            m_ClickUpInfo.Init(DoRayClick());
             JudgeClick();
         }
     }
@@ -338,6 +338,7 @@ public class GameApp : SingletonMono<GameApp>
                 m_ClickInfoTmp.pos = m_HitInfo.point;
                 m_ClickInfoTmp.col = m_HitInfo.collider;
                 m_ClickInfoTmp.time = Time.realtimeSinceStartup;
+                m_ClickInfoTmp.screenPos = JerryUtil.GetClickPos();
             }
         }
         return m_ClickInfoTmp;
@@ -348,28 +349,33 @@ public class GameApp : SingletonMono<GameApp>
         if(m_ClickUpInfo.col != m_ClickDownInfo.col
             || m_ClickUpInfo.col == null)
         {
-            Debug.LogWarning("11");
+            //Debug.LogWarning("11");
             return;
         }
         if(m_ClickUpInfo.time < m_ClickDownInfo.time
             || m_ClickUpInfo.time - m_ClickDownInfo.time > 0.3f)
         {
-            Debug.LogWarning("12");
+            //Debug.LogWarning("12");
             return;
         }
         if (!Util.Vector3Equal(m_ClickUpInfo.pos, m_ClickDownInfo.pos, 0.01f))
         {
-            Debug.LogWarning("13");
+            //Debug.LogWarning("13");
+            return;
+        }
+        if (!Util.Vector3Equal(m_ClickUpInfo.screenPos, m_ClickDownInfo.screenPos, 2f))
+        {
+            //Debug.LogWarning("13");
             return;
         }
         if(m_LastClickInfo.col == m_ClickUpInfo.col
             && m_ClickUpInfo.time - m_LastClickInfo.time < 0.5f)
         {
-            Debug.LogWarning("14 " + (m_LastClickInfo.col == m_ClickUpInfo.col) + " ");
+            //Debug.LogWarning("14 " + (m_LastClickInfo.col == m_ClickUpInfo.col) + " " + (m_ClickUpInfo.time - m_LastClickInfo.time));
             return;
         }
-        m_LastClickInfo = m_ClickUpInfo;
-        Debug.LogWarning("xxx222");
+        m_LastClickInfo.Init(m_ClickUpInfo);
+        //Debug.LogWarning("Click " + m_ClickUpInfo.ToString() + " downPos=" + MapUtil.Vector3String(m_ClickDownInfo.pos));
         JerryEventMgr.DispatchEvent(Enum_Event.Click3DObj.ToString(), new object[] { m_ClickUpInfo });
     }
 
@@ -388,8 +394,6 @@ public class GameApp : SingletonMono<GameApp>
         {
             return;
         }
-
-        Debug.LogWarning("xxx");
 
         RayClickInfo info = (RayClickInfo)args[0];
         if (MapUtil.IsWallLayer(info.col.gameObject.layer))
