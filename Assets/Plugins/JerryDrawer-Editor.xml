@@ -1,14 +1,9 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>JerryDrawer-Editor</name>
+        <name>JerryDrawer</name>
     </assembly>
     <members>
-        <member name="T:Jerry.DrawerElementGrid">
-            <summary>
-            平面网格
-            </summary>
-        </member>
         <member name="F:Jerry.DrawerElementBase._id">
             <summary>
             id
@@ -63,6 +58,16 @@
             </summary>
             <returns>是否继续往子类传递</returns>
         </member>
+        <member name="F:Jerry.DrawerElementPath._useVectorPoint">
+            <summary>
+            点使用Vector而不是Transform
+            </summary>
+        </member>
+        <member name="T:Jerry.DrawerElementGrid">
+            <summary>
+            平面网格
+            </summary>
+        </member>
         <member name="F:Jerry.DrawerElementGrid._minPos">
             <summary>
             左下角位置
@@ -70,12 +75,17 @@
         </member>
         <member name="F:Jerry.DrawerElementGrid._size">
             <summary>
-            大小
+            尺寸大小，几个格子大小，整数
             </summary>
         </member>
         <member name="F:Jerry.DrawerElementGrid._gridSize">
             <summary>
             格子大小
+            </summary>
+        </member>
+        <member name="T:Jerry.DrawerElementGrid.PlaneType">
+            <summary>
+            平面类型
             </summary>
         </member>
         <member name="F:Jerry.DrawerElementCube._useVectorPoint">
@@ -84,11 +94,6 @@
             </summary>
         </member>
         <member name="F:Jerry.DrawerElementLabel._useVectorPoint">
-            <summary>
-            点使用Vector而不是Transform
-            </summary>
-        </member>
-        <member name="F:Jerry.DrawerElementPath._useVectorPoint">
             <summary>
             点使用Vector而不是Transform
             </summary>

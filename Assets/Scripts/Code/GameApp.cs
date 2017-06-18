@@ -97,27 +97,31 @@ public class GameApp : SingletonMono<GameApp>
         {
 #if UNITY_EDITOR
             JerryDrawer.Draw<DrawerElementGrid>()
-                        .SetMinPos(m_LeftSideWallStartPos)
-                        .SetGridSize(new Vector3(0, GameApp.Inst.m_MapGridUnityLen, GameApp.Inst.m_MapGridUnityLen))
-                        .SetSize(m_LeftSideWallSize.ToVector3())
+                        .SetMinPos(m_LeftSideWallStartPos + new Vector3(0.01f, 0, 0))
+                        .SetGridSize(Vector2.one * GameApp.Inst.m_MapGridUnityLen)
+                        .SetSize(SizeXYZ2XY(m_LeftSideWallSize, Enum_Wall.Left))
+                        .SetPlaneType(DrawerElementGrid.PlaneType.ZY)
                         .SetColor(Color.red);
 
             JerryDrawer.Draw<DrawerElementGrid>()
-                        .SetMinPos(m_RightSideWallStartPos)
-                        .SetGridSize(new Vector3(0, GameApp.Inst.m_MapGridUnityLen, GameApp.Inst.m_MapGridUnityLen))
-                        .SetSize(m_RightSideWallSize.ToVector3())
+                        .SetMinPos(m_RightSideWallStartPos + new Vector3(-0.01f, 0, 0))
+                        .SetGridSize(Vector2.one * GameApp.Inst.m_MapGridUnityLen)
+                        .SetSize(SizeXYZ2XY(m_RightSideWallSize, Enum_Wall.Right))
+                        .SetPlaneType(DrawerElementGrid.PlaneType.ZY)
                         .SetColor(Color.red);
 
             JerryDrawer.Draw<DrawerElementGrid>()
-                        .SetMinPos(m_WallStartPos)
-                        .SetGridSize(new Vector3(GameApp.Inst.m_MapGridUnityLen, GameApp.Inst.m_MapGridUnityLen, 0))
-                        .SetSize(m_WallSize.ToVector3())
+                        .SetMinPos(m_WallStartPos + new Vector3(0, 0, -0.01f))
+                        .SetGridSize(Vector2.one * GameApp.Inst.m_MapGridUnityLen)
+                        .SetSize(SizeXYZ2XY(m_WallSize, Enum_Wall.Wall))
+                        .SetPlaneType(DrawerElementGrid.PlaneType.XY)
                         .SetColor(Color.black);
 
             JerryDrawer.Draw<DrawerElementGrid>()
-                        .SetMinPos(m_FloorWallStartPos)
-                        .SetGridSize(new Vector3(GameApp.Inst.m_MapGridUnityLen, 0, GameApp.Inst.m_MapGridUnityLen))
-                        .SetSize(m_FloorWallSize.ToVector3())
+                        .SetMinPos(m_FloorWallStartPos + new Vector3(0, 0.01f, 0))
+                        .SetGridSize(Vector2.one * GameApp.Inst.m_MapGridUnityLen)
+                        .SetSize(SizeXYZ2XY(m_FloorWallSize, Enum_Wall.Floor))
+                        .SetPlaneType(DrawerElementGrid.PlaneType.XZ)
                         .SetColor(Color.black);
 #endif
         }
@@ -125,6 +129,14 @@ public class GameApp : SingletonMono<GameApp>
         JerryEventMgr.AddEvent(Enum_Event.Click3DObj.ToString(), EventClick3DObj);
 
         CreateHouse(0, 0);
+    }
+
+    private Vector2 SizeXYZ2XY(MapUtil.IVector3 size, Enum_Wall type)
+    {
+        Vector2 ret;
+        ret.x = (type == Enum_Wall.Wall || type == Enum_Wall.Floor) ? size.x : size.z;
+        ret.y = (type == Enum_Wall.Floor) ? size.z : size.y;
+        return ret;
     }
 
     void Update()
@@ -346,13 +358,13 @@ public class GameApp : SingletonMono<GameApp>
 
     private void JudgeClick()
     {
-        if(m_ClickUpInfo.col != m_ClickDownInfo.col
+        if (m_ClickUpInfo.col != m_ClickDownInfo.col
             || m_ClickUpInfo.col == null)
         {
             //Debug.LogWarning("11");
             return;
         }
-        if(m_ClickUpInfo.time < m_ClickDownInfo.time
+        if (m_ClickUpInfo.time < m_ClickDownInfo.time
             || m_ClickUpInfo.time - m_ClickDownInfo.time > 0.3f)
         {
             //Debug.LogWarning("12");
@@ -368,7 +380,7 @@ public class GameApp : SingletonMono<GameApp>
             //Debug.LogWarning("13");
             return;
         }
-        if(m_LastClickInfo.col == m_ClickUpInfo.col
+        if (m_LastClickInfo.col == m_ClickUpInfo.col
             && m_ClickUpInfo.time - m_LastClickInfo.time < 0.5f)
         {
             //Debug.LogWarning("14 " + (m_LastClickInfo.col == m_ClickUpInfo.col) + " " + (m_ClickUpInfo.time - m_LastClickInfo.time));
