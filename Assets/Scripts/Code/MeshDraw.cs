@@ -1,16 +1,120 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Jerry;
+using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
-public class MeshDraw : MonoBehaviour
+public class MeshDraw : SingletonMono<MeshDraw>
 {
+    #region 对外接口
+
+    private DrawConfig m_Left;
+    private DrawConfig m_Right;
+    private DrawConfig m_Wall;
+    private DrawConfig m_Floor;
+
+    public void RefreshPos()
+    {
+        m_Left.m_StartPos.y = GameApp.Inst.GetHouseYOffset;
+        m_Right.m_StartPos.y = GameApp.Inst.GetHouseYOffset;
+        m_Wall.m_StartPos.y = GameApp.Inst.GetHouseYOffset;
+        m_Floor.m_StartPos.y = GameApp.Inst.GetHouseYOffset;
+    }
+
+    public void HideGrid()
+    {
+        DoClean();
+    }
+
+    public void ShowGrid(MapUtil.SetType setType, int par = 6)
+    {
+        DoClean();
+        
+        switch (setType)
+        {
+            case MapUtil.SetType.Floor:
+                {
+                    AddOneConfig(m_Floor);
+                }
+                break;
+            case MapUtil.SetType.WallOnFloor:
+                {
+                    m_Left.m_Size.y = par;
+                    m_Right.m_Size.y = par;
+                    m_Wall.m_Size.y = par;
+
+                    m_Left.m_StartPos.y = GameApp.Inst.GetHouseYOffset;
+                    m_Right.m_StartPos.y = GameApp.Inst.GetHouseYOffset;
+                    m_Wall.m_StartPos.y = GameApp.Inst.GetHouseYOffset;
+
+                    AddOneConfig(m_Left);
+                    AddOneConfig(m_Right);
+                    AddOneConfig(m_Wall);
+                }
+                break;
+            case MapUtil.SetType.Wall:
+                {
+                    m_Left.m_Size.y = 5;
+                    m_Right.m_Size.y = 5;
+                    m_Wall.m_Size.y = 5;
+
+                    m_Left.m_StartPos.y = GameApp.Inst.GetHouseYOffset + GameApp.Inst.m_MapGridUnityLen;
+                    m_Right.m_StartPos.y = GameApp.Inst.GetHouseYOffset + GameApp.Inst.m_MapGridUnityLen;
+                    m_Wall.m_StartPos.y = GameApp.Inst.GetHouseYOffset + GameApp.Inst.m_MapGridUnityLen;
+
+                    AddOneConfig(m_Left);
+                    AddOneConfig(m_Right);
+                    AddOneConfig(m_Wall);
+                }
+                break;
+        }
+        ApplyDraw();
+    }
+
+    public void InitConfig()
+    {
+        m_Left =new DrawConfig()
+        {
+            m_StartPos = GameApp.Inst.m_LeftSideWallStartPos + new Vector3(0.01f, 0, 0),
+            m_Size = GameApp.SizeXYZ2XY(GameApp.Inst.m_LeftSideWallSize, Enum_Wall.Left),
+            m_ClockDir = true,
+            m_Plane = Plane.ZY,
+            m_HLineWidthHalf = 0.01f,
+            m_VLineWidthHalf = 0.04f,
+        };
+        m_Right = new DrawConfig()
+        {
+            m_StartPos = GameApp.Inst.m_RightSideWallStartPos + new Vector3(-0.01f, 0, 0),
+            m_Size = GameApp.SizeXYZ2XY(GameApp.Inst.m_RightSideWallSize, Enum_Wall.Right),
+            m_ClockDir = false,
+            m_Plane = Plane.ZY,
+            m_HLineWidthHalf = 0.01f,
+            m_VLineWidthHalf = 0.04f,
+        };
+        m_Wall = new DrawConfig()
+        {
+            m_StartPos = GameApp.Inst.m_WallStartPos + new Vector3(0, 0, -0.01f),
+            m_Size = GameApp.SizeXYZ2XY(GameApp.Inst.m_WallSize, Enum_Wall.Wall),
+            m_ClockDir = true,
+            m_Plane = Plane.XY,
+            m_HLineWidthHalf = 0.01f,
+            m_VLineWidthHalf = 0.01f,
+        };
+        m_Floor = new DrawConfig()
+        {
+            m_StartPos = GameApp.Inst.m_FloorWallStartPos + new Vector3(0, 0.01f, 0),
+            m_Size = GameApp.SizeXYZ2XY(GameApp.Inst.m_FloorWallSize, Enum_Wall.Floor),
+            m_ClockDir = true,
+            m_Plane = Plane.XZ,
+            m_HLineWidthHalf = 0.02f,
+            m_VLineWidthHalf = 0.01f,
+        };
+    }
+
+    #endregion 对外接口
+
     [Header("Common Settings")]
 
     public float m_GridWidth = 0.5f;
-
-    [Header("Config")]
-
-    public DrawConfig[] m_Config;
 
     private Mesh m_Mesh;
     private List<Vector3> m_DrawVertices = new List<Vector3>();
@@ -37,10 +141,10 @@ public class MeshDraw : MonoBehaviour
         public bool m_ClockDir = true;
     }
 
-    void Awake()
+    public override void Awake()
     {
+        base.Awake();
         m_Mesh = this.gameObject.GetComponent<MeshFilter>().mesh;
-        ReDraw();
     }
 
     private void DoClean()
@@ -54,17 +158,6 @@ public class MeshDraw : MonoBehaviour
     {
         m_Mesh.vertices = m_DrawVertices.ToArray();
         m_Mesh.triangles = m_DrawIdx.ToArray();
-    }
-
-    [ContextMenu("ReDraw")]
-    private void ReDraw()
-    {
-        DoClean();
-        foreach (DrawConfig con in m_Config)
-        {
-            AddOneConfig(con);
-        }
-        ApplyDraw();
     }
 
     private void AddOneConfig(DrawConfig config)
@@ -121,7 +214,7 @@ public class MeshDraw : MonoBehaviour
         m_DrawVertices.Add(new Vector3(0 - otherWidthHalf, i * m_GridWidth + widthHalf, 0));
         m_DrawVertices.Add(new Vector3(x * m_GridWidth + otherWidthHalf, i * m_GridWidth + widthHalf, 0));
         m_DrawVertices.Add(new Vector3(x * m_GridWidth + otherWidthHalf, i * m_GridWidth - widthHalf, 0));
-        m_DrawVertices.Add(new Vector3(0-otherWidthHalf, i * m_GridWidth - widthHalf, 0));
+        m_DrawVertices.Add(new Vector3(0 - otherWidthHalf, i * m_GridWidth - widthHalf, 0));
 
         AddIdx(idx, clockDir);
     }

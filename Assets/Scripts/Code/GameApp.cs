@@ -126,12 +126,14 @@ public class GameApp : SingletonMono<GameApp>
 #endif
         }
 
+        MeshDraw.Inst.InitConfig();
+
         JerryEventMgr.AddEvent(Enum_Event.Click3DObj.ToString(), EventClick3DObj);
 
         CreateHouse(0, 0);
     }
 
-    private Vector2 SizeXYZ2XY(MapUtil.IVector3 size, Enum_Wall type)
+    public static Vector2 SizeXYZ2XY(MapUtil.IVector3 size, Enum_Wall type)
     {
         Vector2 ret;
         ret.x = (type == Enum_Wall.Wall || type == Enum_Wall.Floor) ? size.x : size.z;
@@ -288,7 +290,10 @@ public class GameApp : SingletonMono<GameApp>
     {
         curHouseNodeIdx = houseNodeIdx;
         curFloor = floor;
-        GridMgr.Inst.RefreshPos();
+        
+        //GridMgr.Inst.RefreshPos();
+        MeshDraw.Inst.RefreshPos();
+
         MapUtil.ResetMapStartPosY();
 
         //回到上一次的房子

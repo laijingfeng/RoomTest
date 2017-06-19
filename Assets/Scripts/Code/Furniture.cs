@@ -302,7 +302,9 @@ public class Furniture : MonoBehaviour
 
         bool canSet = MapUtil.GetMap(m_InitData.m_CurWall).JudgeSet(this.transform.position, m_Config.size);
 
-        GridMgr.Inst.ShowGrid(m_Config.setType, m_Config.size.y);
+        //GridMgr.Inst.ShowGrid(m_Config.setType, m_Config.size.y);
+        MeshDraw.Inst.ShowGrid(m_Config.setType, m_Config.size.y);
+
         SetOutLineVisible(true);
         SetOutLineColor(canSet ? Color.green : Color.red);
         FurnitureShadow.Inst.SetSize(m_Config.size.ToVector3(), m_InitData.m_CurWall);
@@ -643,7 +645,9 @@ public class Furniture : MonoBehaviour
     /// <param name="isSeted"></param>
     private void UnSelect(bool isSeted = false)
     {
-        GridMgr.Inst.HideGrid();
+        //GridMgr.Inst.HideGrid();
+        MeshDraw.Inst.HideGrid();
+
         FurnitureShadow.Inst.SetVisible(false);
         SetOutLineVisible(false);
         UI_Ctr.Inst.HideCtr();
