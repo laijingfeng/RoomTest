@@ -74,6 +74,8 @@ public class GameApp : SingletonMono<GameApp>
         }
     }
 
+    private Click3DCheck _click3DCheck;
+
     public override void Awake()
     {
         base.Awake();
@@ -90,6 +92,8 @@ public class GameApp : SingletonMono<GameApp>
         houses = new House[HOUSE_NODE_CNT];
 
         m_MapGridUnityLenHalf = 0.5f * m_MapGridUnityLen;
+
+        _click3DCheck = new Click3DCheck();
 
         MapUtil.Init();
 
@@ -143,7 +147,10 @@ public class GameApp : SingletonMono<GameApp>
 
     void Update()
     {
-        Check3DClick();
+        if (_click3DCheck != null)
+        {
+            _click3DCheck.Update();
+        }
     }
 
     void OnDestroy()
@@ -317,90 +324,6 @@ public class GameApp : SingletonMono<GameApp>
         houses[curHouseNodeIdx].Init(curFloor);
     }
 
-    #region 3D点击
-
-    private Ray m_Ray;
-    private RaycastHit m_HitInfo;
-
-    private RayClickInfo m_ClickDownInfo = new RayClickInfo();
-    private RayClickInfo m_ClickUpInfo = new RayClickInfo();
-    private RayClickInfo m_LastClickInfo = new RayClickInfo();
-    private RayClickInfo m_ClickInfoTmp = new RayClickInfo();
-
-    private void Check3DClick()
-    {
-        if (Input.GetMouseButtonDown(0)
-            && !Util.ClickUI())
-        {
-            m_ClickDownInfo.Init(DoRayClick());
-            if (m_ClickDownInfo.col != null)
-            {
-                JerryEventMgr.DispatchEvent(Enum_Event.Click3DDown.ToString(), new object[] { m_ClickDownInfo });
-            }
-        }
-
-        if (Input.GetMouseButtonUp(0)
-            && !Util.ClickUI())
-        {
-            m_ClickUpInfo.Init(DoRayClick());
-            JudgeClick();
-        }
-    }
-
-    private RayClickInfo DoRayClick()
-    {
-        m_ClickInfoTmp.Init();
-        m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos());
-        if (Physics.Raycast(m_Ray, out m_HitInfo, 100))
-        {
-            if (m_HitInfo.collider != null)
-            {
-                m_ClickInfoTmp.pos = m_HitInfo.point;
-                m_ClickInfoTmp.col = m_HitInfo.collider;
-                m_ClickInfoTmp.time = Time.realtimeSinceStartup;
-                m_ClickInfoTmp.screenPos = JerryUtil.GetClickPos();
-            }
-        }
-        return m_ClickInfoTmp;
-    }
-
-    private void JudgeClick()
-    {
-        if (m_ClickUpInfo.col != m_ClickDownInfo.col
-            || m_ClickUpInfo.col == null)
-        {
-            //Debug.LogWarning("11");
-            return;
-        }
-        if (m_ClickUpInfo.time < m_ClickDownInfo.time
-            || m_ClickUpInfo.time - m_ClickDownInfo.time > 0.3f)
-        {
-            //Debug.LogWarning("12");
-            return;
-        }
-        if (!Util.Vector3Equal(m_ClickUpInfo.pos, m_ClickDownInfo.pos, 0.01f))
-        {
-            //Debug.LogWarning("13");
-            return;
-        }
-        if (!Util.Vector3Equal(m_ClickUpInfo.screenPos, m_ClickDownInfo.screenPos, 2f))
-        {
-            //Debug.LogWarning("13");
-            return;
-        }
-        if (m_LastClickInfo.col == m_ClickUpInfo.col
-            && m_ClickUpInfo.time - m_LastClickInfo.time < 0.5f)
-        {
-            //Debug.LogWarning("14 " + (m_LastClickInfo.col == m_ClickUpInfo.col) + " " + (m_ClickUpInfo.time - m_LastClickInfo.time));
-            return;
-        }
-        m_LastClickInfo.Init(m_ClickUpInfo);
-        //Debug.LogWarning("Click " + m_ClickUpInfo.ToString() + " downPos=" + MapUtil.Vector3String(m_ClickDownInfo.pos));
-        JerryEventMgr.DispatchEvent(Enum_Event.Click3DObj.ToString(), new object[] { m_ClickUpInfo });
-    }
-
-    #endregion 3D点击
-
     #region 事件
 
     private void EventClick3DObj(object[] args)
@@ -416,7 +339,7 @@ public class GameApp : SingletonMono<GameApp>
             return;
         }
 
-        RayClickInfo info = (RayClickInfo)args[0];
+        Click3DCheck.RayClickInfo info = (Click3DCheck.RayClickInfo)args[0];
         if (MapUtil.IsWallLayer(info.col.gameObject.layer))
         {
             RayClickPos fp = new RayClickPos();

@@ -144,36 +144,3 @@ public class RayClickPos
     public Vector3 pos;
     public Enum_Wall wallType;
 }
-
-public class RayClickInfo
-{
-    public float time;
-    public Collider col;
-    public Vector3 pos;
-    public Vector3 screenPos;
-
-    public RayClickInfo()
-    {
-        Init();
-    }
-
-    public void Init(RayClickInfo info)
-    {
-        time = info.time;
-        col = info.col;
-        pos = info.pos;
-        screenPos = info.screenPos;
-    }
-
-    public void Init()
-    {
-        time = 0;
-        col = null;
-        pos = Vector3.zero;
-    }
-
-    public override string ToString()
-    {
-        return string.Format("time={0},col={1},pos={2},sPos={3}", time, col == null ? "无" : col.name, MapUtil.Vector3String(pos), MapUtil.Vector3String(screenPos));
-    }
-}

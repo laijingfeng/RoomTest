@@ -57,7 +57,7 @@ public class CameraCtr : SingletonMono<CameraCtr>
         {
             return;
         }
-        RayClickInfo info = (RayClickInfo)args[0];
+        Click3DCheck.RayClickInfo info = (Click3DCheck.RayClickInfo)args[0];
         //点到选中的物体，是移动物体，不移动镜头
         if (info.col == null
             || info.col.gameObject.layer != LayerMask.NameToLayer(Enum_Layer.ActiveFurniture.ToString()))

@@ -460,8 +460,8 @@ public class Furniture : MonoBehaviour
         {
             return;
         }
-        
-        RayClickInfo info = (RayClickInfo)args[0];
+
+        Click3DCheck.RayClickInfo info = (Click3DCheck.RayClickInfo)args[0];
         if (info.col.gameObject != this.gameObject)
         {
             return;
@@ -489,7 +489,7 @@ public class Furniture : MonoBehaviour
             return;
         }
 
-        RayClickInfo info = (RayClickInfo)args[0];
+        Click3DCheck.RayClickInfo info = (Click3DCheck.RayClickInfo)args[0];
         if (info.col.gameObject != this.gameObject)
         {
             return;
