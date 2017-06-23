@@ -333,7 +333,10 @@ public class GameApp : SingletonMono<GameApp>
             && !Util.ClickUI())
         {
             m_ClickDownInfo.Init(DoRayClick());
-            JerryEventMgr.DispatchEvent(Enum_Event.Click3DDown.ToString(), new object[] { m_ClickDownInfo });
+            if (m_ClickDownInfo.col != null)
+            {
+                JerryEventMgr.DispatchEvent(Enum_Event.Click3DDown.ToString(), new object[] { m_ClickDownInfo });
+            }
         }
 
         if (Input.GetMouseButtonUp(0)
@@ -406,6 +409,7 @@ public class GameApp : SingletonMono<GameApp>
         {
             return;
         }
+
         if (MapUtil.m_SelectId == 0
             || MapUtil.m_SelectOK)
         {

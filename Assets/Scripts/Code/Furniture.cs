@@ -39,6 +39,8 @@ public class Furniture : MonoBehaviour
         JerryEventMgr.AddEvent(Enum_Event.SetFurn2Pos.ToString(), EventSetFurn2Pos);
         JerryEventMgr.AddEvent(Enum_Event.CancelSetFurn.ToString(), EventCancelSetFurn);
         JerryEventMgr.AddEvent(Enum_Event.SetFurn2Package.ToString(), EventSetFurn2Package);
+        JerryEventMgr.AddEvent(Enum_Event.Click3DObj.ToString(), EventClick3DObj);
+        JerryEventMgr.AddEvent(Enum_Event.Click3DDown.ToString(), EventClick3DDown);
 
         _awaked = true;
         TryWork();
@@ -50,6 +52,8 @@ public class Furniture : MonoBehaviour
         JerryEventMgr.RemoveEvent(Enum_Event.SetFurn2Pos.ToString(), EventSetFurn2Pos);
         JerryEventMgr.RemoveEvent(Enum_Event.CancelSetFurn.ToString(), EventCancelSetFurn);
         JerryEventMgr.RemoveEvent(Enum_Event.SetFurn2Package.ToString(), EventSetFurn2Package);
+        JerryEventMgr.RemoveEvent(Enum_Event.Click3DObj.ToString(), EventClick3DObj);
+        JerryEventMgr.RemoveEvent(Enum_Event.Click3DDown.ToString(), EventClick3DDown);
     }
 
     /// <summary>
@@ -101,62 +105,9 @@ public class Furniture : MonoBehaviour
 
     private void TryDrag()
     {
-        if (GameApp.Inst.UpDowning)
-        {
-            //Debug.LogWarning("click 0");
-            return;
-        }
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (Util.ClickUI()
-                || !ClickMe())
-            {
-                //Debug.LogWarning("click 1");
-                return;
-            }
-
-            if (!m_Selected)
-            {
-                //Debug.LogWarning("click 2");
-                m_ClickDownPos = JerryUtil.GetClickPos();
-                return;
-            }
-            else
-            {
-                //Debug.LogWarning("click 3");
-                m_InDraging = true;
-                this.StopCoroutine("IE_DoDrag");
-                this.StartCoroutine("IE_DoDrag");
-            }
-
-            //Debug.LogWarning("click 3_1");
-        }
-
         if (Input.GetMouseButtonUp(0))
         {
             m_InDraging = false;
-
-            if (Util.ClickUI())
-            {
-                //Debug.LogWarning("click 4");
-                return;
-            }
-
-            if (!m_Selected)
-            {
-                //Debug.LogWarning("click 5");
-                m_ClickUpPos = JerryUtil.GetClickPos();
-                if (Util.Vector3Equal(m_ClickUpPos, m_ClickDownPos, 2)
-                    && GameApp.Inst.EditorMode)
-                {
-                    //Debug.LogWarning("click 6");
-                    SelectSelf();
-                    return;
-                }
-            }
-
-            //Debug.LogWarning("click 6_1");
         }
     }
 
@@ -497,6 +448,59 @@ public class Furniture : MonoBehaviour
     #endregion 描边
 
     #region 事件
+
+    private void EventClick3DDown(object[] args)
+    {
+        if (!GameApp.Inst.EditorMode)
+        {
+            return;
+        }
+
+        if (args == null || args.Length != 1)
+        {
+            return;
+        }
+        
+        RayClickInfo info = (RayClickInfo)args[0];
+        if (info.col.gameObject != this.gameObject)
+        {
+            return;
+        }
+        
+        if (!m_Selected)
+        {
+            return;
+        }
+        
+        m_InDraging = true;
+        this.StopCoroutine("IE_DoDrag");
+        this.StartCoroutine("IE_DoDrag");
+    }
+
+    private void EventClick3DObj(object[] args)
+    {
+        if (!GameApp.Inst.EditorMode)
+        {
+            return;
+        }
+
+        if (args == null || args.Length != 1)
+        {
+            return;
+        }
+
+        RayClickInfo info = (RayClickInfo)args[0];
+        if (info.col.gameObject != this.gameObject)
+        {
+            return;
+        }
+
+        if (!m_Selected)
+        {
+            SelectSelf();
+            return;
+        }
+    }
 
     /// <summary>
     /// 点击放到一个位置
