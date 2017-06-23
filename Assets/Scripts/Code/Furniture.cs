@@ -1,7 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 using Jerry;
-using UnityEngine.EventSystems;
+using UnityEngine;
 
 /// <summary>
 /// 家具
@@ -265,22 +264,6 @@ public class Furniture : MonoBehaviour
     }
 
     #region 辅助
-
-    private bool ClickMe()
-    {
-        m_Ray = Camera.main.ScreenPointToRay(JerryUtil.GetClickPos());
-
-        if (Physics.Raycast(m_Ray, out m_HitInfo, 100))
-        {
-            //Debug.LogWarning("Hit=" + m_HitInfo.collider.gameObject.name);
-            if (m_HitInfo.collider.gameObject != null
-                && m_HitInfo.collider.gameObject == this.gameObject)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
 
     private void CalOffset()
     {

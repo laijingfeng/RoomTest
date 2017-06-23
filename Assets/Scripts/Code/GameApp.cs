@@ -1,6 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 using Jerry;
+using UnityEngine;
 
 public class GameApp : SingletonMono<GameApp>
 {
