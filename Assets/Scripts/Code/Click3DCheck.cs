@@ -42,17 +42,17 @@ public class Click3DCheck
             return;
         }
 
-        if (!Util.Vector3Equal(clickUpInfo.pos, clickDownInfo.pos, 0.01f))
+        if (!Util.Vector3Equal(clickUpInfo.pos, clickDownInfo.pos, 0.15f))
         {
             return;
         }
-        if (!Util.Vector3Equal(clickUpInfo.screenPos, clickDownInfo.screenPos, 2f))
+        if (!Util.Vector3Equal(clickUpInfo.screenPos, clickDownInfo.screenPos, 10f))
         {
             return;
         }
         //防止连点
         if (lastClickInfo.col == clickUpInfo.col
-            && clickUpInfo.time - lastClickInfo.time < 0.5f)
+            && clickUpInfo.time - lastClickInfo.time < 0.3f)
         {
             return;
         }
